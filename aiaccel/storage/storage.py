@@ -88,6 +88,14 @@ class Storage:
             int: number of finished state in trials
         """
         return len(self.trial.get_finished())
+    
+    def get_num_running_ready_finished(self) -> int:
+        """Get the number of trials in the all state.
+
+        Returns:
+            int: number of all state in trials
+        """
+        return self.trial.get_num_running_ready_finished()
 
     def is_ready(self, trial_id: int) -> bool:
         """Whether the specified trial ID is ready or not.

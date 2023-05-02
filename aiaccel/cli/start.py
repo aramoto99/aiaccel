@@ -13,12 +13,14 @@ import yaml
 
 from aiaccel.cli import CsvWriter
 from aiaccel.common import dict_result, extension_hp
-from aiaccel.config import load_config
-from aiaccel.master import create_master
-from aiaccel.module import AbstractModule
+from aiaccel.config import Config, load_config
+from aiaccel.module import AiaccelCore
 from aiaccel.optimizer import create_optimizer
 from aiaccel.scheduler import create_scheduler
+from aiaccel.storage import Storage
 from aiaccel.tensorboard import TensorBoard
+from aiaccel.util.buffer import Buffer
+from aiaccel.util.time_tools import get_time_now_object, get_time_string_from_object
 from aiaccel.workspace import Workspace
 
 logger = getLogger(__name__)
@@ -34,7 +36,7 @@ def main() -> None:  # pragma: no cover
     parser.add_argument("--clean", nargs="?", const=True, default=False)
     args = parser.parse_args()
 
-    config = load_config(args.config)
+    config: Config = load_config(args.config)
     if config is None:
         logger.error(f"Invalid workspace: {args.workspace} or config: {args.config}")
         return
@@ -61,30 +63,87 @@ def main() -> None:  # pragma: no cover
 
     logger.info(f"config: {str(pathlib.Path(config.config_path).resolve())}")
 
-    Master = create_master(config.resource.type.value)
-    Optimizer = create_optimizer(config.optimize.search_algorithm)
+    storage = Storage(workspace.storage_file_path)
+
     Scheduler = create_scheduler(config.resource.type.value)
-    modules: list[AbstractModule] = [Master(config), Optimizer(config), Scheduler(config), TensorBoard(config)]
+    Optimizer = create_optimizer(config.optimize.search_algorithm)
+
+    opt = Optimizer(config)
+    # modules: list[AbstractModule] = [Optimizer(config), Scheduler(config, Optimizer(config)), TensorBoard(config)]
+    modules: list[AiaccelCore] = [Scheduler(config, opt), TensorBoard(config)]
 
     time_s = time.time()
 
     for module in modules:
         module.pre_process()
 
+    max_trial_number = config.optimize.trial_number
+    loop_start_time = get_time_now_object()
+    end_estimated_time = "Unknown"
+    buff = Buffer(['num_finished', 'available_pool_size'])
+    buff.d['num_finished'].set_max_len(2)
+    buff.d['available_pool_size'].set_max_len(2)
+
     while True:
-        for module in modules:
-            if not module.inner_loop_main_process():
-                break
-            if not module.check_error():
-                break
-            module.loop_count += 1
-        else:
-            time.sleep(config.generic.sleep_time)
-            continue
-        break
+        try:
+            for module in modules:
+                if not module.inner_loop_main_process():
+                    break
+                if not module.check_error():
+                    break
+                module.loop_count += 1
+            else:
+                nun_ready = modules[0].get_num_ready()
+                num_running = modules[0].get_num_running()
+                num_finished = modules[0].get_num_finished()
+                available_pool_size = modules[0].get_available_pool_size()
+                now = get_time_now_object()
+                looping_time = now - loop_start_time
+
+                if num_finished > 0:
+                    one_loop_time = looping_time / num_finished
+                    finishing_time = now + (max_trial_number - num_finished) * one_loop_time
+                    end_estimated_time = get_time_string_from_object(finishing_time)
+
+                if (
+                    int((time.time() - time_s)) % 10 == 0 or
+                    num_finished >= max_trial_number
+                ):
+                    buff.d['num_finished'].Add(num_finished)
+                    if (
+                        buff.d['num_finished'].Len == 1 or
+                        buff.d['num_finished'].has_difference()
+                    ):
+                        modules[0].logger.info(
+                            f"{num_finished}/{max_trial_number} finished, "
+                            f"ready: {nun_ready} ,"
+                            f"running: {num_running}, "
+                            f"end estimated time: {end_estimated_time}"
+                        )
+
+                    buff.d['available_pool_size'].Add(available_pool_size)
+                    if (
+                        buff.d['available_pool_size'].Len == 1 or
+                        buff.d['available_pool_size'].has_difference()
+                    ):
+                        modules[0].logger.info(f"pool_size: {available_pool_size}")
+
+                else:
+                    buff.d['num_finished'].Clear()
+                    buff.d['available_pool_size'].Clear()
+
+                time.sleep(config.generic.sleep_time)
+                continue
+            break
+        except Exception as e:
+            logger.exception("Unexpected error occurred.")
+            logger.exception(e)
+            break
 
     for module in modules:
         module.post_process()
+
+    modules[0].evaluate()
 
     csv_writer = CsvWriter(config)
     csv_writer.create()
