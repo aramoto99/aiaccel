@@ -216,9 +216,12 @@ class AbstractScheduler(AiaccelCore):
         for job in self.jobs:
             job.main()
             # Only log if the state has changed.
-            self.buff.d[job.trial_id].Add(job.get_state_name())
-            if self.buff.d[job.trial_id].has_difference():
-                self.logger.info(f"name: {job.trial_id}, state: {job.get_state_name()}")
+            if job.trial_id in self.buff.d.keys():
+                self.buff.d[job.trial_id].Add(job.get_state_name())
+                if self.buff.d[job.trial_id].has_difference():
+                    self.logger.info(f"name: {job.trial_id}, state: {job.get_state_name()}")
+            else:
+                self.logger.warning(f"trial id: {job.trial_id} is not in the buffer.")
 
         self.update_resource()
 
@@ -304,10 +307,14 @@ class AbstractScheduler(AiaccelCore):
         """
         if self.config.resume is not None and self.config.resume > 0:
             self._deserialize(self.config.resume)
+        self.optimizer.set_config(self.config)
+        self.optimizer.set_storage(self.storage)
+        self.optimizer.resume()
 
     def __getstate__(self) -> dict[str, Any]:
         obj = super().__getstate__()
         del obj["jobs"]
+        del obj["optimizer"]
         return obj
 
     def create_model(self) -> Any:

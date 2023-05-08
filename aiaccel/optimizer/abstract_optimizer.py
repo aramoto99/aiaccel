@@ -50,13 +50,7 @@ class AbstractOptimizer(AiaccelCore):
         self.trial_number = self.config.optimize.trial_number
         self.num_of_generated_parameter = 0
         self.params = HyperParameterConfiguration(self.config.optimize.parameters)
-        self._initial_process()
-
-    def _initial_process(self):
-        storage = Storage(self.workspace.storage_file_path)
-        self.set_storage(storage)
         self.write_random_seed_to_debug_log()
-        self.resume()
 
     def register_new_parameters(self, params: list[dict[str, float | int | str]]) -> None:
         """Create hyper parameter files.
