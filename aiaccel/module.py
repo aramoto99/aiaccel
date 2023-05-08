@@ -33,7 +33,10 @@ class AiaccelCore(object):
             process_name=self.module_name, labels=["native_random_state", "numpy_random_state", "state"]
         )
 
-    def set_storage(self, storage: Storage):
+    def set_config(self, config: DictConfig) -> None:
+        self.config = config
+
+    def set_storage(self, storage: Storage) -> None:
         self.storage = storage
         self.storage.variable.register(
             process_name=self.module_name, labels=[
@@ -87,9 +90,6 @@ class AiaccelCore(object):
         Returns:
             None
         """
-        print(self.storage.variable.d["state"])
-        print(type(self.storage.variable.d["state"]))
-        print(self.storage.variable.d["state"].get(trial_id))
         self.__dict__.update(self.storage.variable.d["state"].get(trial_id).__dict__.copy())
 
         # random state
