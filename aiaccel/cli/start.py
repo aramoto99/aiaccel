@@ -40,12 +40,9 @@ def main() -> None:  # pragma: no cover
     if config is None:
         logger.error(f"Invalid workspace: {args.workspace} or config: {args.config}")
         return
-
     config.resume = args.resume
     config.clean = args.clean
-
     workspace = Workspace(config.generic.workspace)
-
     if config.resume is None:
         if config.clean is True:
             logger.info("Cleaning workspace")
@@ -55,7 +52,6 @@ def main() -> None:  # pragma: no cover
             if workspace.exists():
                 logger.info("workspace exists.")
                 return
-
     workspace.create()
     if workspace.check_consists() is False:
         logger.error("Creating workspace is Failed.")
@@ -63,32 +59,38 @@ def main() -> None:  # pragma: no cover
 
     logger.info(f"config: {str(pathlib.Path(config.config_path).resolve())}")
 
+    # storage
     storage = Storage(workspace.storage_file_path)
-
-    Scheduler = create_scheduler(config.resource.type.value)
-    Optimizer = create_optimizer(config.optimize.search_algorithm)
-
-    # resume
-    opt = Optimizer(config)
     if config.resume is not None:
-        opt.resume()
+        storage.rollback_to_ready(config.resume)
+        storage.delete_trial_data_after_this(config.resume)
 
+    # optimizer
+    Optimizer = create_optimizer(config.optimize.search_algorithm)
+    optimizer = Optimizer(config)
+    if config.resume is not None:
+        optimizer.resume()
+
+    # scheduler
+    Scheduler = create_scheduler(config.resource.type.value)
+    scheduler = Scheduler(config, optimizer)
+
+    # tensorboard
     tensorboard = TensorBoard(config)
 
-    # modules: list[AbstractModule] = [Optimizer(config), Scheduler(config, Optimizer(config)), TensorBoard(config)]
-    modules: list[AiaccelCore] = [Scheduler(config, opt)]
+    modules: list[AiaccelCore] = [scheduler]
 
     time_s = time.time()
-
-    for module in modules:
-        module.pre_process()
-
     max_trial_number = config.optimize.trial_number
     loop_start_time = get_time_now_object()
     end_estimated_time = "Unknown"
     buff = Buffer(['num_finished', 'available_pool_size'])
     buff.d['num_finished'].set_max_len(2)
     buff.d['available_pool_size'].set_max_len(2)
+
+    # main process
+    for module in modules:
+        module.pre_process()
 
     while True:
         try:
@@ -97,7 +99,6 @@ def main() -> None:  # pragma: no cover
                     break
                 if not module.check_error():
                     break
-                module.loop_count += 1
             else:
                 nun_ready = modules[0].get_num_ready()
                 num_running = modules[0].get_num_running()
@@ -122,6 +123,7 @@ def main() -> None:  # pragma: no cover
                     ):
                         modules[0].logger.info(
                             f"{num_finished}/{max_trial_number} finished, "
+                            f"max trial number: {max_trial_number}, "
                             f"ready: {nun_ready} ,"
                             f"running: {num_running}, "
                             f"end estimated time: {end_estimated_time}"
@@ -151,7 +153,7 @@ def main() -> None:  # pragma: no cover
     for module in modules:
         module.post_process()
 
-    modules[0].evaluate()
+    scheduler.evaluate()
 
     csv_writer = CsvWriter(config)
     csv_writer.create()

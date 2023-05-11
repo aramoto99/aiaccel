@@ -14,7 +14,6 @@ class SobolOptimizer(AbstractOptimizer):
             command line options.
 
     Attributes:
-        num_generated_params (int): A number of generated hyper parameters.
         sampler (Sobol): Engine for generating (scrambled) Sobol' sequences.
 
     Todo:
@@ -28,8 +27,6 @@ class SobolOptimizer(AbstractOptimizer):
         self.sampler = qmc.Sobol(
             d=len(self.params.get_parameter_list()), scramble=self.config.optimize.sobol_scramble, seed=self._rng
         )
-        finished = self.storage.trial.get_finished()
-        self.num_generated_params = len(finished)
 
     def generate_parameter(self) -> list[dict[str, float | int | str]]:
         """Generate parameters.
@@ -42,8 +39,6 @@ class SobolOptimizer(AbstractOptimizer):
 
         new_params = []
         vec = self.sampler.random()[0]
-
-        self.num_generated_params += 1
 
         for i in range(0, n_params):
             min_value = l_params[i].lower

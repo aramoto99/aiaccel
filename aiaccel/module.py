@@ -21,7 +21,6 @@ class AiaccelCore(object):
         self.fh: Any = None
         self.ch: Any = None
         self.ch_formatter: Any = None
-        self.loop_count = 0
         self.seed = self.config.optimize.rand_seed
         self.storage = Storage(self.workspace.storage_file_path)
         self.trial_id = TrialId(self.config)
@@ -128,6 +127,62 @@ class AiaccelCore(object):
         """
         self._rng.set_state(state)
 
+    def __getstate__(self) -> dict[str, Any]:
+        obj = self.__dict__.copy()
+        del obj["storage"]
+        del obj["config"]
+        return obj
+
+
+class AbstractModule(AiaccelCore):
+
+    def pre_process(self) -> None:
+        """Pre-procedure before executing processes.
+
+        Returns:
+            None
+        """
+        raise NotImplementedError
+
+    def post_process(self) -> None:
+        """Post-procedure after executed processes.
+
+        Returns:
+            None
+
+        Raises:
+            NotImplementedError: Causes when he inherited class does not
+                implement.
+        """
+        raise NotImplementedError
+
+    def inner_loop_main_process(self) -> bool:
+        """A main loop process. This process is repeated every main loop.
+
+        Returns:
+            None
+
+        Raises:
+            NotImplementedError: Causes when the inherited class does not
+                implement.
+        """
+        raise NotImplementedError
+
+    def check_error(self) -> bool:
+        """Check to confirm if an error has occurred.
+
+        Args:
+            None
+
+        Returns:
+            bool: True if no error, False if with error.
+
+        Raises:
+            NotImplementedError: Causes when the inherited class does not
+                implement.
+        """
+        return True
+
     def resume(self) -> None:
         """When in resume mode, load the previous
                 optimization data in advance.
@@ -137,12 +192,12 @@ class AiaccelCore(object):
 
         Returns:
             None
-        """
-        if self.config.resume is not None and self.config.resume > 0:
-            self._deserialize(self.config.resume)
 
-    def check_error(self) -> bool:
-        return True
+        Raises:
+            NotImplementedError: Causes when the inherited class does not
+                implement.
+        """
+        raise NotImplementedError
 
     def __getstate__(self) -> dict[str, Any]:
         obj = self.__dict__.copy()

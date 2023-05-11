@@ -112,7 +112,6 @@ pre_processメソッドの後メインループが周り，メインループ後
                 break
             if not module.check_error():
                 break
-            module.loop_count += 1
         else:
             time.sleep(sleep_time)
             continue
