@@ -9,7 +9,6 @@ from omegaconf.dictconfig import DictConfig
 from aiaccel.config import is_multi_objective
 from aiaccel.module import AiaccelCore
 from aiaccel.parameter import HyperParameterConfiguration
-from aiaccel.storage import Storage
 from aiaccel.util import str_to_logging_level
 
 
@@ -72,6 +71,8 @@ class AbstractOptimizer(AiaccelCore):
         self.storage.hp.set_any_trial_params(trial_id=self.trial_id.get(), params=params)
         self.storage.trial.set_any_trial_state(trial_id=self.trial_id.get(), state="ready")
         self.num_of_generated_parameter += 1
+        self.logger.debug(f"Generated parameters: {params}")
+        self.logger.debug(f"Num Of Generated parameters: {self.num_of_generated_parameter}")
 
     def generate_initial_parameter(self) -> Any:
         """Generate a list of initial parameters.
@@ -110,9 +111,9 @@ class AbstractOptimizer(AiaccelCore):
             parameters.
         """
         if self.num_of_generated_parameter == 0:
-            new_params = self.cast(self.generate_initial_parameter())
+            new_params = self.generate_initial_parameter()
         else:
-            new_params = self.cast(self.generate_parameter())
+            new_params = self.generate_parameter()
 
         return new_params
 
@@ -134,57 +135,10 @@ class AbstractOptimizer(AiaccelCore):
         Returns:
             None
         """
-        if self.config.resume is not None and self.config.resume > 0:
-            self.storage.rollback_to_ready(self.config.resume)
-            self.storage.delete_trial_data_after_this(self.config.resume)
-            self.trial_id.initial(num=self.config.resume)
-            self._deserialize(self.config.resume)
-            self.trial_number = self.config.optimize.trial_number
-
-    def cast(self, params: list[dict[str, Any]]) -> list[Any] | None:
-        """Casts types of parameter values to appropriate tepes.
-
-        Args:
-            params (list | None): list of parameters.
-
-        Raises:
-            ValueError: Occurs if any of parameter value could not be casted.
-
-        Returns:
-            list | None: A list of parameters with casted values. None if given
-            `params` is None.
-        """
-        if params is None or len(params) == 0:
-            return params
-
-        casted_params = []
-
-        for param in params:
-            _param = copy.deepcopy(param)
-            param_type = _param["type"]
-            param_value = _param["value"]
-
-            # None: str to NoneType
-            if type(_param["value"]) in [str, str_]:
-                if _param["value"].lower() == "none":
-                    _param["value"] = None
-                    _param["type"] = str(type(None))
-
-            try:
-                if param_type.lower() == "categorical" or param_type.lower() == "ordinal":
-                    casted_params.append(_param)
-                    continue
-
-                if param_type.lower() == "float":
-                    _param["value"] = float(param_value)
-                if param_type.lower() == "int":
-                    _param["value"] = int(param_value)
-                casted_params.append(_param)
-
-            except ValueError as e:
-                raise ValueError(e)
-
-        return casted_params
+        self.logger.info(f"Resume mode: {self.config.resume}")
+        self.trial_id.initial(num=self.config.resume)
+        super()._deserialize(self.config.resume)
+        self.trial_number = self.config.optimize.trial_number
 
     def get_any_trial_objective(self, trial_id: int) -> Any:
         """Get any trial result.

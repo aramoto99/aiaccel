@@ -33,7 +33,7 @@ class TestTpeOptimizer(BaseTest):
 
     def test_check_result(self):
         self.optimizer.pre_process()
-        self.optimizer.inner_loop_main_process()
+        self.optimizer.run_in_main_loop()
         with patch.object(
             self.optimizer.storage.result, "get_any_trial_objective", return_value=[1]
         ):

@@ -52,27 +52,32 @@ class TpeOptimizer(AbstractOptimizer):
         self.distributions: Any = None
         self.trial_pool: dict[str, Any] = {}
         self.randseed = self.config.optimize.rand_seed
-        self.resumed_list: list[Any] = []
-
-    def pre_process(self) -> None:
-        """Pre-Procedure before executing optimize processes."""
-
-        super().pre_process()
 
         self.parameter_list = self.params.get_parameter_list()
-
         if self.distributions is None:
             self.distributions = create_distributions(self.params)
-
-        if self.config.resume is not None and self.config.resume > 0:
-            self.resume_trial()
-
         self.create_study()
+        # if self.config.resume is not None and self.config.resume > 0:
+        #     self.resume_trial()
+
+    # def pre_process(self) -> None:
+    #     """Pre-Procedure before executing optimize processes."""
+
+    #     super().pre_process()
+
+    #     self.parameter_list = self.params.get_parameter_list()
+
+    #     if self.distributions is None:
+    #         self.distributions = create_distributions(self.params)
+
+    #     if self.config.resume is not None and self.config.resume > 0:
+    #         self.resume_trial()
+
+    #     self.create_study()
 
     def post_process(self) -> None:
         """Post-procedure after executed processes."""
         self.check_result()
-        super().post_process()
 
     def check_result(self) -> None:
         """Check the result files and add it to sampler object.
@@ -110,7 +115,6 @@ class TpeOptimizer(AbstractOptimizer):
         """
 
         self.check_result()
-        self.logger.debug(f"generate_parameter requests {number} params, pool length: {len(self.parameter_pool)}")
 
         # TPE has to be sequential.
         if (not self.is_startup_trials()) and (len(self.parameter_pool) >= 1):
@@ -118,6 +122,8 @@ class TpeOptimizer(AbstractOptimizer):
 
         if len(self.parameter_pool) >= self.config.resource.num_node:
             return None
+
+        self.logger.debug(f"generate_parameter requests {number} params, pool length: {len(self.parameter_pool)}")
 
         new_params: list[dict[str, Any]] = []
         trial = self.study.ask(self.distributions)
@@ -199,16 +205,35 @@ class TpeOptimizer(AbstractOptimizer):
         engine = sqlalchemy.create_engine(storage_path, echo=False)
         Session = sqlalchemy_orm.sessionmaker(bind=engine)
         session = Session()
-
+        print(f"debug: {optuna_trials}")
         for optuna_trial in optuna_trials:
             if optuna_trial.number >= self.config.resume:
-                self.resumed_list.append(optuna_trial)
                 resumed_trial = session.query(models.TrialModel).filter_by(number=optuna_trial.number).first()
                 session.delete(resumed_trial)
                 self.logger.info(f"resume_trial deletes the trial number {resumed_trial.number} from optuna db.")
 
         session.commit()
 
+        for trial_id in list(self.parameter_pool.keys()):
+            objective = self.get_any_trial_objective(int(trial_id))
+            if objective is not None:
+                del self.parameter_pool[trial_id]
+                self.logger.info(f"resume_trial trial_id {trial_id} is deleted from parameter_pool")
+
+    def resume(self) -> None:
+        super().resume()
+
+        optuna_trials = self.study.get_trials()
+        storage_path = f"sqlite:///{self.workspace.path}/optuna-{self.study_name}.db"
+        engine = sqlalchemy.create_engine(storage_path, echo=False)
+        Session = sqlalchemy_orm.sessionmaker(bind=engine)
+        session = Session()
+        for optuna_trial in optuna_trials:
+            if optuna_trial.number >= self.config.resume:
+                resumed_trial = session.query(models.TrialModel).filter_by(number=optuna_trial.number).first()
+                session.delete(resumed_trial)
+                self.logger.info(f"resume_trial deletes the trial number {resumed_trial.number} from optuna db.")
+        session.commit()
         for trial_id in list(self.parameter_pool.keys()):
             objective = self.get_any_trial_objective(int(trial_id))
             if objective is not None:

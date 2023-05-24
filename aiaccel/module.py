@@ -21,7 +21,6 @@ class AiaccelCore(object):
         self.fh: Any = None
         self.ch: Any = None
         self.ch_formatter: Any = None
-        self.loop_count = 0
         self.seed = self.config.optimize.rand_seed
         self.storage = Storage(self.workspace.storage_file_path)
         self.trial_id = TrialId(self.config)
@@ -79,9 +78,11 @@ class AiaccelCore(object):
         Returns:
             None
         """
+        self.logger.debug(f"serialize {self.__class__.__name__} module:")
         self.storage.variable.d["state"].set(trial_id, self)
 
         # random state
+        self.logger.debug(f"serialize random state")
         self.storage.variable.d["numpy_random_state"].set(trial_id, self.get_numpy_random_state())
 
     def _deserialize(self, trial_id: int) -> None:
@@ -90,10 +91,16 @@ class AiaccelCore(object):
         Returns:
             None
         """
-        self.__dict__.update(self.storage.variable.d["state"].get(trial_id).__dict__.copy())
+        __dict__ = self.storage.variable.d["state"].get(trial_id).__dict__.copy()
+        self.logger.debug(f"deserialize {self.__class__.__name__} module:")
+        self.logger.debug(f"  {__dict__}")
+        self.__dict__.update(__dict__)
 
         # random state
-        self.set_numpy_random_state(self.storage.variable.d["numpy_random_state"].get(trial_id))
+        _random_state = self.storage.variable.d["numpy_random_state"].get(trial_id)
+        self.set_numpy_random_state(_random_state)
+        self.logger.debug(f"deserialize random state")
+        self.logger.debug(f"{_random_state}")
 
     def write_random_seed_to_debug_log(self) -> None:
         """Writes the random seed to the logger as debug information."""
@@ -120,23 +127,79 @@ class AiaccelCore(object):
         """
         self._rng.set_state(state)
 
-    def resume(self) -> None:
-        """When in resume mode, load the previous
-                optimization data in advance.
+    def __getstate__(self) -> dict[str, Any]:
+        obj = self.__dict__.copy()
+        del obj["storage"]
+        del obj["config"]
+        return obj
 
-        Args:
-            None
+
+class AbstractModule(AiaccelCore):
+
+    def pre_process(self) -> None:
+        """Perform setup or initialization tasks before the main loop starts.
+
+        This method should be implemented by subclasses to perform any necessary setup operations.
+
+        Raises:
+            NotImplementedError: If the subclass does not implement this method.
+        """
+        raise NotImplementedError
+
+    def run_in_main_loop(self) -> bool:
+        """Perform tasks that should be executed in every cycle of the main loop.
+
+        This method should be implemented by subclasses to define the operations executed in each cycle.
 
         Returns:
-            None
-        """
-        if self.config.resume is not None and self.config.resume > 0:
-            self._deserialize(self.config.resume)
+            bool: True if the main process has been completed, False otherwise.
 
-    def check_error(self) -> bool:
+        Raises:
+            NotImplementedError: If the subclass does not implement this method.
+        """
+        raise NotImplementedError
+
+    def post_process(self) -> None:
+        """Perform cleanup tasks after the main loop ends.
+
+        This method should be implemented by subclasses to perform any necessary cleanup operations.
+
+        Raises:
+            NotImplementedError: If the subclass does not implement this method.
+        """
+        raise NotImplementedError
+
+    def is_error_free(self) -> bool:
+        """Check if there has been an error.
+
+        This method should be implemented by subclasses to define how to check for errors. 
+
+        Returns:
+            bool: True if there has been no error, False otherwise.
+
+        Raises:
+            NotImplementedError: If the subclass does not implement this method.
+        """
         return True
 
+    def resume(self) -> None:
+        """Load previous optimization data when in resume mode.
+
+        This method should be implemented by subclasses to define how to load previously saved optimization data.
+
+        Raises:
+            NotImplementedError: If the subclass does not implement this method.
+        """
+        raise NotImplementedError
+
     def __getstate__(self) -> dict[str, Any]:
+        """Prepare the object for serialization.
+
+        Certain attributes may need to be removed or modified before serialization.
+
+        Returns:
+            dict[str, Any]: A dictionary that can be serialized.
+        """
         obj = self.__dict__.copy()
         del obj["storage"]
         del obj["config"]

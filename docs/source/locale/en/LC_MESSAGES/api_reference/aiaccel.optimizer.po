@@ -165,13 +165,13 @@ msgstr ""
 #: aiaccel.optimizer.abstract_optimizer.AbstractOptimizer.all_parameters_processed
 #: aiaccel.optimizer.abstract_optimizer.AbstractOptimizer.all_parameters_registered
 #: aiaccel.optimizer.abstract_optimizer.AbstractOptimizer.cast
-#: aiaccel.optimizer.abstract_optimizer.AbstractOptimizer.check_error
+#: aiaccel.optimizer.abstract_optimizer.AbstractOptimizer.is_error_free
 #: aiaccel.optimizer.abstract_optimizer.AbstractOptimizer.generate_initial_parameter
 #: aiaccel.optimizer.abstract_optimizer.AbstractOptimizer.generate_new_parameter
 #: aiaccel.optimizer.abstract_optimizer.AbstractOptimizer.generate_parameter
 #: aiaccel.optimizer.abstract_optimizer.AbstractOptimizer.get_any_trial_objective
 #: aiaccel.optimizer.abstract_optimizer.AbstractOptimizer.get_pool_size
-#: aiaccel.optimizer.abstract_optimizer.AbstractOptimizer.inner_loop_main_process
+#: aiaccel.optimizer.abstract_optimizer.AbstractOptimizer.run_in_main_loop
 #: aiaccel.optimizer.abstract_optimizer.AbstractOptimizer.post_process
 #: aiaccel.optimizer.abstract_optimizer.AbstractOptimizer.pre_process
 #: aiaccel.optimizer.abstract_optimizer.AbstractOptimizer.register_new_parameters
@@ -215,13 +215,13 @@ msgstr ""
 #: aiaccel.optimizer.abstract_optimizer.AbstractOptimizer.all_parameters_processed
 #: aiaccel.optimizer.abstract_optimizer.AbstractOptimizer.all_parameters_registered
 #: aiaccel.optimizer.abstract_optimizer.AbstractOptimizer.cast
-#: aiaccel.optimizer.abstract_optimizer.AbstractOptimizer.check_error
+#: aiaccel.optimizer.abstract_optimizer.AbstractOptimizer.is_error_free
 #: aiaccel.optimizer.abstract_optimizer.AbstractOptimizer.generate_initial_parameter
 #: aiaccel.optimizer.abstract_optimizer.AbstractOptimizer.generate_new_parameter
 #: aiaccel.optimizer.abstract_optimizer.AbstractOptimizer.generate_parameter
 #: aiaccel.optimizer.abstract_optimizer.AbstractOptimizer.get_any_trial_objective
 #: aiaccel.optimizer.abstract_optimizer.AbstractOptimizer.get_pool_size
-#: aiaccel.optimizer.abstract_optimizer.AbstractOptimizer.inner_loop_main_process
+#: aiaccel.optimizer.abstract_optimizer.AbstractOptimizer.run_in_main_loop
 #: aiaccel.optimizer.budget_specified_grid_optimizer.BudgetSpecifiedGridOptimizer.generate_initial_parameter
 #: aiaccel.optimizer.budget_specified_grid_optimizer.BudgetSpecifiedGridOptimizer.generate_parameter
 #: aiaccel.optimizer.create.create_optimizer
@@ -293,11 +293,11 @@ msgstr ""
 msgid "A list of parameters with casted values. None if given `params` is None."
 msgstr ""
 
-#: aiaccel.optimizer.abstract_optimizer.AbstractOptimizer.check_error:1 of
+#: aiaccel.optimizer.abstract_optimizer.AbstractOptimizer.is_error_free:1 of
 msgid "Checks errors."
 msgstr ""
 
-#: aiaccel.optimizer.abstract_optimizer.AbstractOptimizer.check_error:3 of
+#: aiaccel.optimizer.abstract_optimizer.AbstractOptimizer.is_error_free:3 of
 msgid "True if there is no error."
 msgstr ""
 
@@ -356,12 +356,12 @@ msgstr ""
 msgid "Pool size."
 msgstr ""
 
-#: aiaccel.optimizer.abstract_optimizer.AbstractOptimizer.inner_loop_main_process:1
+#: aiaccel.optimizer.abstract_optimizer.AbstractOptimizer.run_in_main_loop:1
 #: of
 msgid "A main loop process. This process is repeated every main loop."
 msgstr ""
 
-#: aiaccel.optimizer.abstract_optimizer.AbstractOptimizer.inner_loop_main_process:3
+#: aiaccel.optimizer.abstract_optimizer.AbstractOptimizer.run_in_main_loop:3
 #: of
 msgid "The process succeeds or not. The main loop exits if failed."
 msgstr ""

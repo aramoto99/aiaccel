@@ -47,7 +47,7 @@ msgstr ""
 
 #: aiaccel.master.abci_master.AbciMaster
 #: aiaccel.master.abstract_master.AbstractMaster
-#: aiaccel.master.abstract_master.AbstractMaster.check_error
+#: aiaccel.master.abstract_master.AbstractMaster.is_error_free
 #: aiaccel.master.create.create_master
 #: aiaccel.master.evaluator.abstract_evaluator.AbstractEvaluator of
 msgid "パラメータ"
@@ -87,10 +87,10 @@ msgstr ""
 
 #: aiaccel.master.abci_master.AbciMaster.get_stats
 #: aiaccel.master.abci_master.AbciMaster.pre_process
-#: aiaccel.master.abstract_master.AbstractMaster.check_error
+#: aiaccel.master.abstract_master.AbstractMaster.is_error_free
 #: aiaccel.master.abstract_master.AbstractMaster.evaluate
 #: aiaccel.master.abstract_master.AbstractMaster.get_stats
-#: aiaccel.master.abstract_master.AbstractMaster.inner_loop_main_process
+#: aiaccel.master.abstract_master.AbstractMaster.run_in_main_loop
 #: aiaccel.master.abstract_master.AbstractMaster.post_process
 #: aiaccel.master.abstract_master.AbstractMaster.pre_process
 #: aiaccel.master.abstract_master.AbstractMaster.print_dict_state
@@ -195,16 +195,16 @@ msgstr ""
 msgid "list"
 msgstr ""
 
-#: aiaccel.master.abstract_master.AbstractMaster.check_error:1 of
+#: aiaccel.master.abstract_master.AbstractMaster.is_error_free:1 of
 msgid "Check to confirm if an error has occurred."
 msgstr ""
 
-#: aiaccel.master.abstract_master.AbstractMaster.check_error:5 of
+#: aiaccel.master.abstract_master.AbstractMaster.is_error_free:5 of
 msgid "True if no error. False if with error."
 msgstr ""
 
-#: aiaccel.master.abstract_master.AbstractMaster.check_error
-#: aiaccel.master.abstract_master.AbstractMaster.inner_loop_main_process
+#: aiaccel.master.abstract_master.AbstractMaster.is_error_free
+#: aiaccel.master.abstract_master.AbstractMaster.run_in_main_loop
 #: aiaccel.master.create.create_master of
 msgid "戻り値の型"
 msgstr ""
@@ -213,11 +213,11 @@ msgstr ""
 msgid "Evaluate the result of optimization."
 msgstr ""
 
-#: aiaccel.master.abstract_master.AbstractMaster.inner_loop_main_process:1 of
+#: aiaccel.master.abstract_master.AbstractMaster.run_in_main_loop:1 of
 msgid "A main loop process. This process is repeated every main loop."
 msgstr ""
 
-#: aiaccel.master.abstract_master.AbstractMaster.inner_loop_main_process:3 of
+#: aiaccel.master.abstract_master.AbstractMaster.run_in_main_loop:3 of
 msgid "The process succeeds or not. The main loop exits if failed."
 msgstr ""
 

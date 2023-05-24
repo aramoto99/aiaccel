@@ -109,7 +109,7 @@ class TestAbstractMaster(BaseTest):
         master.update_each_state_count()
         assert master.print_dict_state() is None
 
-    def test_inner_loop_main_process(
+    def test_run_in_main_loop(
         self,
         database_remove
     ):
@@ -118,11 +118,11 @@ class TestAbstractMaster(BaseTest):
         master = AbstractMaster(self.load_config_for_test(self.configs['config.json']))
 
         master.pre_process()
-        assert master.inner_loop_main_process()
+        assert master.run_in_main_loop()
 
         master.trial_number = 10
         for i in range(10):
             master.storage.trial.set_any_trial_state(trial_id=i, state='finished')
         # setup_hp_finished(10)
         master.update_each_state_count()
-        assert not master.inner_loop_main_process()
+        assert not master.run_in_main_loop()

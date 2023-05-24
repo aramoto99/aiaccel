@@ -13,7 +13,6 @@ from aiaccel.optimizer import AbstractOptimizer
 from aiaccel.scheduler.abstract_scheduler import AbstractScheduler
 from aiaccel.util import get_time_now
 from aiaccel.util.aiaccel import Run, set_logging_file_for_trial_id
-from aiaccel.util.cast import cast_y
 
 # These are for avoiding mypy-errors from initializer().
 # `global` does not work well.
@@ -30,10 +29,10 @@ class PylocalScheduler(AbstractScheduler):
         self.run = Run(self.config.config_path)
         self.processes: List[Any] = []
 
-        Pool_ = Pool if self.num_node > 1 else ThreadPool
-        self.pool = Pool_(self.num_node, initializer=initializer, initargs=(self.config.config_path,))
+        Pool_ = Pool if self.max_resource > 1 else ThreadPool
+        self.pool = Pool_(self.max_resource, initializer=initializer, initargs=(self.config.config_path,))
 
-    def inner_loop_main_process(self) -> bool:
+    def run_in_main_loop(self) -> bool:
         """A main loop process. This process is repeated every main loop.
 
         Returns:
@@ -41,12 +40,7 @@ class PylocalScheduler(AbstractScheduler):
         """
 
         self.num_ready, self.num_running, self.num_finished = self.storage.get_num_running_ready_finished()
-        self.available_pool_size = self.max_pool_size - self.num_running - self.num_ready
-        if (
-            not self.all_parameters_processed(self.num_ready, self.num_running) and
-            not self.all_parameters_registered(self.num_ready, self.num_running, self.num_finished)
-        ):
-            self.optimizer.run_optimizer_multiple_times(self.available_pool_size)
+        self.search_hyperparameters(self.num_ready, self.num_running, self.num_finished)
 
         if self.check_finished():
             return False
@@ -65,7 +59,7 @@ class PylocalScheduler(AbstractScheduler):
             self.report(trial_id, ys, err, start_time, end_time)
             self.storage.trial.set_any_trial_state(trial_id=trial_id, state="finished")
 
-            self.create_result_file(trial_id, xs, ys, err, start_time, end_time)
+            self.write_result_to_storage(trial_id, xs, ys, err, start_time, end_time)
 
         return True
 
@@ -120,22 +114,11 @@ class PylocalScheduler(AbstractScheduler):
         """
         return None
 
-    def get_result_file_path(self) -> Path:
-        """Get a path to the result file.
-
-        Args:
-            trial_id (int): Trial Id.
-
-        Returns:
-            PosixPath: A Path object which points to the result file.
-        """
-        return self.workspace.get_any_result_file_path(self.trial_id.get())
-
-    def create_result_file(
+    def write_result_to_storage(
         self, trial_id: int, xs: dict[str, Any], ys: list[Any], error: str, start_time: str, end_time: str
     ) -> None:
         args = {
-            "file": self.workspace.get_any_result_file_path(trial_id),
+            "storage_file_path": self.workspace.storage_file_path,
             "trial_id": str(trial_id),
             "config": self.config.config_path,
             "start_time": start_time,
@@ -213,18 +196,17 @@ def execute(args: Any) -> tuple[int, dict[str, Any], list[Any], str, str, str]:
     set_logging_file_for_trial_id(workspace, trial_id)
 
     try:
-        # y = cast_y(user_func(xs), y_data_type=None)
         y = user_func(xs)
         if isinstance(y, list):
-            y = [cast_y(yi, y_data_type=None) for yi in y]
+            ys = [yi for yi in y]
         else:
-            y = [cast_y(y, y_data_type=None)]
+            ys = [y]
     except BaseException as e:
         err = str(e)
-        y = [None]
+        ys = [None]
     else:
         err = ""
 
     end_time = get_time_now()
 
-    return trial_id, xs, y, err, start_time, end_time
+    return trial_id, xs, ys, err, start_time, end_time

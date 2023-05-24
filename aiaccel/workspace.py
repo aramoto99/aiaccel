@@ -10,11 +10,9 @@ from aiaccel.common import (
     dict_lock,
     dict_log,
     dict_output,
-    dict_result,
     dict_runner,
     dict_storage,
     dict_tensorboard,
-    extension_hp,
 )
 from aiaccel.util import Suffix, load_yaml, make_directories
 
@@ -38,7 +36,6 @@ class Workspace:
         log (Path): Path to "log", i.e. `path`/log.
         output (Path): Path to "abci_output", i.e. `path`/abci_output.
         pid (Path): Path to "pid", i.e. `path`/pid.
-        result (Path): Path to "result", i.e. `path`/result.
         runner (Path): Path to "runner", i.e. `path`/runner.
         storage (Path): Path to "storage", i.e. `path`/storage.
         timestamp (Path): Path to "timestamp", i.e. `path`/timestamp.
@@ -56,7 +53,6 @@ class Workspace:
         self.lock = self.path / dict_lock
         self.log = self.path / dict_log
         self.output = self.path / dict_output
-        self.result = self.path / dict_result
         self.runner = self.path / dict_runner
         self.storage = self.path / dict_storage
         self.tensorboard = self.path / dict_tensorboard
@@ -67,14 +63,13 @@ class Workspace:
             self.lock,
             self.log,
             self.output,
-            self.result,
             self.runner,
             self.storage,
             self.tensorboard
         ]
         self.results = Path("./results")
         self.retults_csv_file = self.path / "results.csv"
-        self.final_result_file = self.path / dict_result / "final_result.result"
+        self.final_result_file = self.path / "final_result.result"
         self.storage_file_path = self.storage / "storage.db"
 
     def create(self) -> bool:
@@ -148,30 +143,8 @@ class Workspace:
         shutil.copytree(self.path, dst, ignore=ignptn)
         return dst
 
-    def get_any_result_file_path(self, trial_id: int) -> Path:
-        """Get result file path.
+    def get_runner_file(self, trial_id: int) -> Path:
+        return self.runner / f"run_{trial_id}.sh"
 
-        Returns:
-            PosixPath: Path to result file.
-        """
-        return self.result / f"{trial_id}.{extension_hp}"
-
-    def result_file_exists(self, trial_id: int) -> bool:
-        """Check result file exists or not.
-
-        Returns:
-            bool: True if result file exists.
-        """
-        path = self.get_any_result_file_path(trial_id)
-        return path.exists()
-
-    def get_any_trial_result(self, trial_id: int) -> dict[str, Any] | None:
-        """Get any trial result.
-
-        Returns:
-            dict: Trial result.
-        """
-        path = self.get_any_result_file_path(trial_id)
-        if path.exists() is False:
-            return None
-        return load_yaml(path)
+    def get_error_output_file(self, trial_id: int) -> Path:
+        return self.error / f"{trial_id}.txt"

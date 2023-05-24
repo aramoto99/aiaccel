@@ -71,7 +71,7 @@ msgstr ""
 #: aiaccel.config.ConfigEntry aiaccel.config.ConfileWrapper
 #: aiaccel.config.ConfileWrapper.get aiaccel.config.JsonOrYamlObjectConfig
 #: aiaccel.config.JsonOrYamlObjectConfig.get_property
-#: aiaccel.config.is_multi_objective aiaccel.module.AbstractModule.check_error
+#: aiaccel.config.is_multi_objective aiaccel.module.AbstractModule.is_error_free
 #: aiaccel.module.AbstractModule.create_numpy_random_generator
 #: aiaccel.module.AbstractModule.get_numpy_random_state
 #: aiaccel.module.AbstractModule.resume
@@ -177,12 +177,12 @@ msgstr ""
 #: aiaccel.config.JsonOrYamlObjectConfig.get_property
 #: aiaccel.config.JsonOrYamlObjectConfig.to_dict
 #: aiaccel.config.is_multi_objective aiaccel.config.load_config
-#: aiaccel.module.AbstractModule.check_error
+#: aiaccel.module.AbstractModule.is_error_free
 #: aiaccel.module.AbstractModule.check_finished
 #: aiaccel.module.AbstractModule.create_numpy_random_generator
 #: aiaccel.module.AbstractModule.get_module_type
 #: aiaccel.module.AbstractModule.get_numpy_random_state
-#: aiaccel.module.AbstractModule.inner_loop_main_process
+#: aiaccel.module.AbstractModule.run_in_main_loop
 #: aiaccel.module.AbstractModule.post_process
 #: aiaccel.module.AbstractModule.pre_process
 #: aiaccel.module.AbstractModule.print_dict_state
@@ -266,7 +266,7 @@ msgstr ""
 #: aiaccel.config.JsonOrYamlObjectConfig.get_property
 #: aiaccel.config.JsonOrYamlObjectConfig.to_dict
 #: aiaccel.config.is_multi_objective aiaccel.config.load_config
-#: aiaccel.module.AbstractModule.check_error
+#: aiaccel.module.AbstractModule.is_error_free
 #: aiaccel.module.AbstractModule.check_finished
 #: aiaccel.module.AbstractModule.get_module_type
 #: aiaccel.parameter.HyperParameter.sample
@@ -376,7 +376,7 @@ msgid "loop() is called."
 msgstr ""
 
 #: aiaccel.module.AbstractModule of
-msgid "4-1. in while loop, inner_loop_main_process() is called."
+msgid "4-1. in while loop, run_in_main_loop() is called."
 msgstr ""
 
 #: aiaccel.module.AbstractModule of
@@ -464,11 +464,11 @@ msgstr ""
 msgid "A loop count that is incremented in loop method."
 msgstr ""
 
-#: aiaccel.module.AbstractModule.check_error:1 of
+#: aiaccel.module.AbstractModule.is_error_free:1 of
 msgid "Check to confirm if an error has occurred."
 msgstr ""
 
-#: aiaccel.module.AbstractModule.check_error:5 of
+#: aiaccel.module.AbstractModule.is_error_free:5 of
 msgid "True if no error, False if with error."
 msgstr ""
 
@@ -485,7 +485,7 @@ msgid "create random generator using any random seed."
 msgstr ""
 
 #: aiaccel.module.AbstractModule.create_numpy_random_generator:5
-#: aiaccel.module.AbstractModule.inner_loop_main_process:3
+#: aiaccel.module.AbstractModule.run_in_main_loop:3
 #: aiaccel.module.AbstractModule.post_process:3
 #: aiaccel.module.AbstractModule.pre_process:3
 #: aiaccel.module.AbstractModule.print_dict_state:3
@@ -514,11 +514,11 @@ msgstr ""
 msgid "numpy.random.get_state (tuple)"
 msgstr ""
 
-#: aiaccel.module.AbstractModule.inner_loop_main_process:1 of
+#: aiaccel.module.AbstractModule.run_in_main_loop:1 of
 msgid "A main loop process. This process is repeated every main loop."
 msgstr ""
 
-#: aiaccel.module.AbstractModule.inner_loop_main_process
+#: aiaccel.module.AbstractModule.run_in_main_loop
 #: aiaccel.module.AbstractModule.post_process
 #: aiaccel.parameter.HyperParameter.sample
 #: aiaccel.parameter.HyperParameterConfiguration.get_hyperparameter
@@ -527,7 +527,7 @@ msgstr ""
 msgid "例外"
 msgstr ""
 
-#: aiaccel.module.AbstractModule.inner_loop_main_process:5 of
+#: aiaccel.module.AbstractModule.run_in_main_loop:5 of
 msgid "Causes when the inherited class does not     implement."
 msgstr ""
 
@@ -923,7 +923,7 @@ msgstr ""
 #~ msgstr ""
 
 #~ msgid ""
-#~ "4-1. in while loop, inner_loop_main_process()"
+#~ "4-1. in while loop, run_in_main_loop()"
 #~ " is called. 4-2. in while loop, "
 #~ "loop_count is incremented."
 #~ msgstr ""
