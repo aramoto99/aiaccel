@@ -211,7 +211,6 @@ class TpeOptimizer(AbstractOptimizer):
         engine = sqlalchemy.create_engine(storage_path, echo=False)
         Session = sqlalchemy_orm.sessionmaker(bind=engine)
         session = Session()
-        print(f"debug: {optuna_trials}")
         for optuna_trial in optuna_trials:
             if optuna_trial.number >= self.config.resume:
                 resumed_trial = session.query(models.TrialModel).filter_by(number=optuna_trial.number).first()
