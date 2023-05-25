@@ -132,7 +132,5 @@ class LocalModel(AbstractModel):
             if 'parameter_name' in param.keys() and 'value' in param.keys():
                 commands.append('--' + param['parameter_name'])
                 commands.append(str(param['value']))
-        print(commands)
         Popen(commands)
-
         return None

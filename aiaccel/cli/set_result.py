@@ -93,7 +93,7 @@ def main() -> None:
     if args.error == '':
         del contents['error']
 
-    print(contents)
+    # print(contents)
 
     # create_yaml(args.file, contents)
     write_results_to_database(
