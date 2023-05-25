@@ -52,7 +52,7 @@ class GenericConfig:
 @dataclass
 class ResourceConifig:
     type: ResourceType
-    num_node: int
+    num_workers: int
 
 
 @dataclass

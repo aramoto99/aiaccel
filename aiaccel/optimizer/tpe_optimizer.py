@@ -120,7 +120,7 @@ class TpeOptimizer(AbstractOptimizer):
         if (not self.is_startup_trials()) and (len(self.parameter_pool) >= 1):
             return None
 
-        if len(self.parameter_pool) >= self.config.resource.num_node:
+        if len(self.parameter_pool) >= self.config.resource.num_workers:
             return None
 
         self.logger.debug(f"generate_parameter requests {number} params, pool length: {len(self.parameter_pool)}")
@@ -205,7 +205,6 @@ class TpeOptimizer(AbstractOptimizer):
         engine = sqlalchemy.create_engine(storage_path, echo=False)
         Session = sqlalchemy_orm.sessionmaker(bind=engine)
         session = Session()
-        print(f"debug: {optuna_trials}")
         for optuna_trial in optuna_trials:
             if optuna_trial.number >= self.config.resume:
                 resumed_trial = session.query(models.TrialModel).filter_by(number=optuna_trial.number).first()
