@@ -38,7 +38,7 @@ class AbstractScheduler(AbstractModule):
             "Scheduler",
         )
         self.optimizer = optimizer
-        self.max_resource = self.config.resource.num_node
+        self.max_resource = self.config.resource.num_workers
         self.trial_number = self.config.optimize.trial_number
         self.num_ready = 0
         self.num_running = 0
