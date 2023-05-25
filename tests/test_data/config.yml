@@ -18,7 +18,7 @@ optimize:
   trial_number: 10
   search_algorithm: 'aiaccel.optimizer.NelderMeadOptimizer'
 job_setting:
-  name_length: 32
+  trial_id_digits: 32
   runner_timeout: 10
   running_timeout: 10
   job_timeout: 60

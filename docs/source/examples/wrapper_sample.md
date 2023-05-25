@@ -165,7 +165,7 @@ run.execute_and_report("python user.py")
 generic:
     workspace: "./work"
     job_command: "python wrapper.py"
-    batch_job_timeout: 600
+    job_timeout_seconds: 600
 ```
 
 aiaccel で wrapper プログラムを最適化させる場合は，`job_command` に作成した wrapper の実行コマンドを設定します．

@@ -41,6 +41,9 @@ class LocalModel(AbstractModel):
             self.is_firsttime_called = True
             return False
 
+    def stop_job(self, obj: Job) -> None:
+        obj.th_oh.enforce_kill()
+
     def create_runner_command(
         self,
         command: str,

@@ -39,11 +39,11 @@
 generic:
   workspace: "./work"
   job_command: "python user.py"
-  batch_job_timeout: 7200
+  job_timeout_seconds: 7200
 ```
 - **workspace** - aiaccel の実行に必要な一時ファイルを保存するディレクトリを指定します．
 - **job_command** - ユーザープログラムを実行するためのコマンドです．
-- **batch_job_timeout** - ジョブのタイムアウト時間を設定します．[単位: 秒]
+- **job_timeout_seconds** - ジョブのタイムアウト時間を設定します．[単位: 秒]
     - 参考 - 100 epoch の学習に最長 60 分程かかるため，`7200` と長めに設定します．
 
 #### resource

@@ -100,7 +100,6 @@ def create_abci_batch_file(
     ]
 
     script = ""
-
     # preamble
     if job_script_preamble is not None:
         with open(job_script_preamble, "r") as f:
@@ -108,16 +107,12 @@ def create_abci_batch_file(
             if len(lines) > 0:
                 for line in lines:
                     script += line + "\n"
-
     script += "\n"
-
     # parameters
     for param in param_content["parameters"]:
         if "parameter_name" in param.keys() and "value" in param.keys():
             script += f'{param["parameter_name"]}={param["value"]}' + "\n"
-
     script += "\n"
-
     # main
     for s in main_parts:
         script += s + "\n"

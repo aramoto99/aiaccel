@@ -86,3 +86,29 @@ class OutputHandler(threading.Thread):
 
     def get_returncode(self) -> int | None:
         return self._proc.poll()
+
+    def raise_exception_if_error(self) -> None:
+        """Raise an exception if an error is detected.
+
+        Returns:
+            None
+        """
+        if self._proc.returncode != 0:
+            raise RuntimeError(
+                f'An error occurred in the subprocess.\n'
+                f'stdout: {self._stdouts}\n'
+                f'stderr: {self._stderrs}'
+            )
+
+    def enforce_kill(self) -> None:
+        """Enforce to kill the subprocess.
+
+        Returns:
+            None
+        """
+        self._proc.kill()
+        raise RuntimeError(
+            f'An error occurred in the subprocess.\n'
+            f'stdout: {self._stdouts}\n'
+            f'stderr: {self._stderrs}'
+        )

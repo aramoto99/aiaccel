@@ -104,12 +104,12 @@ import aiaccel
 generic:
     workspace: "./work"
     job_command: "python user.py"
-    batch_job_timeout: 600
+    job_timeout_seconds: 600
 ```
 
 - **workspace** - 途中経過の保存先を指定します。
 - **job_command** - ユーザプログラムを実行するコマンドを記述します。
-- **batch_job_timeout** - jobのタイムアウト時間を設定します。[単位: 秒]
+- **job_timeout_seconds** - jobのタイムアウト時間を設定します。[単位: 秒]
 
 ### resource
 
@@ -375,7 +375,7 @@ config.yaml
 generic:
     workspace: "./work"
     job_command: "python user.py"
-    batch_job_timeout: 600
+    job_timeout_seconds: 600
 
 resource:
     type: "local"
@@ -465,7 +465,7 @@ aiaccelでwrapperプログラムを最適化させる場合はコンフィグフ
     generic:
         workspace: "./work"
         job_command: "python wrapper.py"
-        batch_job_timeout: 600
+        job_timeout_seconds: 600
 ```
 
 5. job_script_preamble.shの作成

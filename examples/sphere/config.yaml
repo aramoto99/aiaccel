@@ -3,7 +3,7 @@ generic:
   job_command: "python user.py"
   # python_file: "./user.py"
   # function: "main"
-  batch_job_timeout: 600
+  job_timeout_seconds: 600
 
 resource:
   # type: "abci"

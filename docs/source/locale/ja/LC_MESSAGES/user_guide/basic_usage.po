@@ -149,7 +149,7 @@ msgid "**job_command** - ユーザプログラムを実行するコマンドを�
 msgstr ""
 
 #: ../../source/user_guide/basic_usage.md:112
-msgid "**batch_job_timeout** - jobのタイムアウト時間を設定します。[単位: 秒]"
+msgid "**job_timeout_seconds** - jobのタイムアウト時間を設定します。[単位: 秒]"
 msgstr ""
 
 #: ../../source/user_guide/basic_usage.md:114
