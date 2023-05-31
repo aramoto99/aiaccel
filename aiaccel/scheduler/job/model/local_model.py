@@ -29,7 +29,7 @@ class LocalModel(AbstractModel):
 
         obj.th_oh = OutputHandler(obj.proc)
         obj.th_oh.start()
-        self.is_firsttime_called: bool = False
+        self.is_firsttime_called = False
 
     def conditions_job_finished(self, obj: "Job") -> bool:
         if super().conditions_job_finished(obj):
