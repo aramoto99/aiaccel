@@ -28,10 +28,7 @@ class SobolOptimizer(AbstractOptimizer):
         self.sampler = qmc.Sobol(
             d=len(self.params.get_parameter_list()), scramble=self.config.optimize.sobol_scramble, seed=self._rng
         )
-<<<<<<< HEAD
-=======
         self.params: ConvertedParameterConfiguration = ConvertedParameterConfiguration(self.params)
->>>>>>> develop-version
 
     def generate_parameter(self) -> list[dict[str, float | int | str]]:
         """Generate parameters.

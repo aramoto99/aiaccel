@@ -12,21 +12,11 @@ if TYPE_CHECKING:
 
 
 class LocalModel(AbstractModel):
-<<<<<<< HEAD
-
-    def before_runner_create(self, obj: Job) -> None:
-        return None
-=======
->>>>>>> develop-version
 
     def runner_create(self, obj: Job) -> None:
         pass
 
-<<<<<<< HEAD
-    def before_job_submitted(self, obj: Job) -> None:
-=======
     def job_submitted(self, obj: Job) -> None:
->>>>>>> develop-version
         runner_command = self.create_runner_command(
             obj.config.generic.job_command,
             obj.content,
@@ -51,12 +41,9 @@ class LocalModel(AbstractModel):
             self.is_firsttime_called = True
             return False
 
-<<<<<<< HEAD
-=======
     def stop_job(self, obj: Job) -> None:
         obj.th_oh.enforce_kill()
 
->>>>>>> develop-version
     def create_runner_command(
         self,
         command: str,
@@ -91,11 +78,7 @@ class LocalModel(AbstractModel):
         commands.append(command_error_output)
         return commands
 
-<<<<<<< HEAD
-    def create_result_file(self, obj: "Job") -> None:
-=======
     def write_result_to_storage(self, obj: 'Job') -> None:
->>>>>>> develop-version
         """Create result file.
 
         Args:
