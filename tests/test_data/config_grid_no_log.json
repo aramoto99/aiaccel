@@ -4,11 +4,11 @@
     "job_command": "python original_main.py",
     "python_file": "original_main.py",
     "function": "main",
-    "batch_job_timeout": 600
+    "job_timeout_seconds": 600
   },
   "resource": {
     "type": "local",
-    "num_node": 10
+    "num_workers": 10
   },
   "ABCI": {
     "group": "[group]",

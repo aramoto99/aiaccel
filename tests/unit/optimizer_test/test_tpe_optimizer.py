@@ -33,7 +33,7 @@ class TestTpeOptimizer(BaseTest):
 
     def test_check_result(self):
         self.optimizer.pre_process()
-        self.optimizer.inner_loop_main_process()
+        self.optimizer.run_in_main_loop()
         with patch.object(
             self.optimizer.storage.result, "get_any_trial_objective", return_value=[1]
         ):
@@ -53,11 +53,11 @@ class TestTpeOptimizer(BaseTest):
                 with patch.object(self.optimizer, "parameter_pool", [{}, {}, {}]):
                     assert self.optimizer.generate_parameter() is None
 
-        # if len(self.parameter_pool) >= self.config.resource.num_node
-        _tmp_num_node = self.optimizer.config.resource.num_node
-        self.optimizer.config.resource.num_node = 0
+        # if len(self.parameter_pool) >= self.config.resource.num_workers
+        _tmp_num_workers = self.optimizer.config.resource.num_workers
+        self.optimizer.config.resource.num_workers = 0
         assert self.optimizer.generate_parameter() is None
-        self.optimizer.config.resource.num_node = _tmp_num_node
+        self.optimizer.config.resource.num_workers = _tmp_num_workers
 
     def test_generate_initial_parameter(self):
         optimizer = TpeOptimizer(self.load_config_for_test(self.configs['config_tpe_2.json']))

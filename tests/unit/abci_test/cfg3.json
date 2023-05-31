@@ -28,7 +28,7 @@
     "sleep_time_optimizer": 1
   },
   "scheduler": {
-    "name_length": 6,
+    "trial_id_digits": 6,
     "cancel_retry": 3,
     "cancel_timeout": 10,
     "expire_retry": 3,
@@ -48,9 +48,9 @@
   },
   "resource": {
     "type": "local",
-    "num_node": 1,
+    "num_workers": 1,
     "$type": "abci",
-    "$num_node": 4
+    "$num_workers": 4
   },
   "ABCI": {
     "job_script_preamble": "wrapper_abci.sh",

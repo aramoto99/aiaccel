@@ -113,9 +113,9 @@ class TestAbstractModule(BaseTest):
         except NotImplementedError:
             assert True
 
-    def test_inner_loop_main_process(self):
+    def test_run_in_main_loop(self):
         try:
-            self.module.inner_loop_main_process()
+            self.module.run_in_main_loop()
             assert False
         except NotImplementedError:
             assert True
@@ -129,8 +129,8 @@ class TestAbstractModule(BaseTest):
         self.module._serialize(1)
         assert self.module._deserialize(1) is None
 
-    def test_check_error(self):
-        assert self.module.check_error() is True
+    def test_is_error_free(self):
+        assert self.module.is_error_free() is True
 
     def test_resume(self):
         self.module = AbstractModule(self.load_config_for_test(self.configs["config.json"]), 'abstract')

@@ -25,7 +25,7 @@ class AdditionalGridTest(BaseTest):
 
         with self.create_main(python_file):
             subprocess.Popen(['aiaccel-start', '--config', str(config_file), '--clean']
-                             ).wait(timeout=config.generic.batch_job_timeout)
+                             ).wait(timeout=config.job_setting.job_timeout_seconds)
         self.evaluate(work_dir, storage, config)
 
     def evaluate(self, work_dir, storage, config):

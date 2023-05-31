@@ -149,7 +149,7 @@ msgid "**job_command** - ユーザプログラムを実行するコマンドを�
 msgstr ""
 
 #: ../../source/user_guide/basic_usage.md:112
-msgid "**batch_job_timeout** - jobのタイムアウト時間を設定します。[単位: 秒]"
+msgid "**job_timeout_seconds** - jobのタイムアウト時間を設定します。[単位: 秒]"
 msgstr ""
 
 #: ../../source/user_guide/basic_usage.md:114
@@ -161,7 +161,7 @@ msgid "**type** - 実行環境を指定します。 `ABCI` 、または `local` 
 msgstr ""
 
 #: ../../source/user_guide/basic_usage.md:125
-msgid "**num_node** - 使用するノード数を指定します。ローカルの場合はCPUコア数を指定してください。"
+msgid "**num_workers** - 使用するノード数を指定します。ローカルの場合はCPUコア数を指定してください。"
 msgstr ""
 
 #: ../../source/user_guide/basic_usage.md:127

@@ -19,7 +19,7 @@
     },
     "resource": {
         "type": "local",
-        "num_node": 10,
+        "num_workers": 10,
         "user_option_resource": "option"
     },
     "ABCI": {
@@ -233,7 +233,7 @@
         "user_option_optimize": "option"
     },
     "job_setting": {
-        "name_length": 6,
+        "trial_id_digits": 6,
         "cancel_retry": 3,
         "cancel_timeout": 60,
         "expire_retry": 3,

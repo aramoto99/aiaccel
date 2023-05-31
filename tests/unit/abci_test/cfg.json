@@ -1,7 +1,7 @@
 {
   "generic": {
     "init_fail_count": 100,
-    "name_length": 6,
+    "trial_id_digits": 6,
     "workspace": "./work",
     "user_program_name": "user.py",
     "objective_function_name": "main"
@@ -48,9 +48,9 @@
   },
   "resource": {
     "type": "local",
-    "num_node": 1,
+    "num_workers": 1,
     "$type": "abci",
-    "$num_node": 4
+    "$num_workers": 4
   },
   "ABCI": {
     "job_script_preamble": "wrapper_abci.sh",

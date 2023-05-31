@@ -104,12 +104,12 @@ import aiaccel
 generic:
     workspace: "./work"
     job_command: "python user.py"
-    batch_job_timeout: 600
+    job_timeout_seconds: 600
 ```
 
 - **workspace** - 途中経過の保存先を指定します。
 - **job_command** - ユーザプログラムを実行するコマンドを記述します。
-- **batch_job_timeout** - jobのタイムアウト時間を設定します。[単位: 秒]
+- **job_timeout_seconds** - jobのタイムアウト時間を設定します。[単位: 秒]
 
 ### resource
 
@@ -118,11 +118,11 @@ generic:
 ```yaml
 resource:
     type: "abci"
-    num_node: 4
+    num_workers: 4
 ```
 
 - **type** - 実行環境を指定します。 `abci` 、または `local` を指定します。
-- **num_node** - 使用するノード数を指定します。ローカルの場合はCPUコア数を指定してください。
+- **num_workers** - 使用するノード数を指定します。ローカルの場合はCPUコア数を指定してください。
 
 ### ABCI
 
@@ -375,11 +375,11 @@ config.yaml
 generic:
     workspace: "./work"
     job_command: "python user.py"
-    batch_job_timeout: 600
+    job_timeout_seconds: 600
 
 resource:
     type: "local"
-    num_node: 4
+    num_workers: 4
 
 ABCI:
     group: "[group]"
@@ -465,7 +465,7 @@ aiaccelでwrapperプログラムを最適化させる場合はコンフィグフ
     generic:
         workspace: "./work"
         job_command: "python wrapper.py"
-        batch_job_timeout: 600
+        job_timeout_seconds: 600
 ```
 
 5. job_script_preamble.shの作成
@@ -532,7 +532,7 @@ python -m aiaccel.cli.start --config config.yaml --clean
 ```yaml
 resource:
     type: "local"
-    num_node: 4
+    num_workers: 4
 ```
 
 #### ABCIの設定

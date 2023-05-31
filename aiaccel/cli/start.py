@@ -95,9 +95,9 @@ def main() -> None:  # pragma: no cover
     while True:
         try:
             for module in modules:
-                if not module.inner_loop_main_process():
+                if not module.run_in_main_loop():
                     break
-                if not module.check_error():
+                if not module.is_error_free():
                     break
             else:
                 nun_ready = modules[0].get_num_ready()
@@ -142,7 +142,7 @@ def main() -> None:  # pragma: no cover
                     buff.d['num_finished'].Clear()
                     buff.d['available_pool_size'].Clear()
 
-                time.sleep(config.generic.sleep_time)
+                time.sleep(config.generic.main_loop_sleep_seconds)
                 continue
             break
         except Exception as e:
@@ -167,15 +167,16 @@ def main() -> None:  # pragma: no cover
     config_name = Path(args.config).name
     shutil.copy(Path(args.config), dst / config_name)
 
-    with open(workspace.final_result_file, "r") as f:
-        final_results: list[dict[str, Any]] = yaml.load(f, Loader=yaml.UnsafeLoader)
+    if os.path.exists(workspace.final_result_file):
+        with open(workspace.final_result_file, "r") as f:
+            final_results: list[dict[str, Any]] = yaml.load(f, Loader=yaml.UnsafeLoader)
 
-    for i, final_result in enumerate(final_results):
-        best_id = final_result["trial_id"]
-        best_value = final_result["result"][i]
-        if best_id is not None and best_value is not None:
-            logger.info(f"Best result [{i}] : {dst}/{dict_result}/{best_id}.{extension_hp}")
-            logger.info(f"\tvalue : {best_value}")
+        for i, final_result in enumerate(final_results):
+            best_id = final_result["trial_id"]
+            best_value = final_result["result"][i]
+            if best_id is not None and best_value is not None:
+                logger.info(f"Best result [{i}] : {dst}/{dict_result}/{best_id}.{extension_hp}")
+                logger.info(f"\tvalue : {best_value}")
 
     logger.info(f"Total time [s] : {round(time.time() - time_s)}")
     logger.info("Done.")

@@ -18,7 +18,7 @@ optimize:
   trial_number: 10
   search_algorithm: 'aiaccel.optimizer.NelderMeadOptimizer'
 job_setting:
-  name_length: 32
+  trial_id_digits: 32
   runner_timeout: 10
   running_timeout: 10
   job_timeout: 60
@@ -37,10 +37,10 @@ job_setting:
 resource:
   # local settings
   type: "local"
-  num_node: 3
+  num_workers: 3
   # ABCI settings
   #type: "abci"
-  # num_node is the number how many ready files are allocated at a moment.
-  #num_node: 4
+  # num_workers is the number how many ready files are allocated at a moment.
+  #num_workers: 4
 ABCI:
   group: "[group]"

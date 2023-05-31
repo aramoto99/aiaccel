@@ -17,6 +17,7 @@ class ErrorTable(Base):
     __tablename__ = "errors"
     trial_id = Column(Integer, primary_key=True, nullable=False)
     error = Column(Text, nullable=True)
+    exitcode = Column(Integer, nullable=True)
 
 
 class TimestampTable(Base):
@@ -45,7 +46,7 @@ class ResultTable(Base):
 class ReturnCodeTable(Base):
     __tablename__ = "returncode"
     trial_id = Column(Integer, primary_key=True, nullable=False)
-    return_code = Column(Integer, nullable=False)
+    returncode = Column(Integer, nullable=False)
 
 
 class JobStateTable(Base):

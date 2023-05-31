@@ -16,8 +16,9 @@ class AbstractOptimizer(AiaccelCore):
     """An abstract class for Optimizer classes.
 
     Args:
-        options (dict[str, str | int | bool]): A dictionary containing
-            command line options.
+        config (DictConfig): A DictConfig object which contains optimization
+            settings specified by the configuration file and the command line
+            options.
 
     Attributes:
         options (dict[str, str | int | bool]): A dictionary containing
@@ -28,18 +29,18 @@ class AbstractOptimizer(AiaccelCore):
         num_of_generated_parameter (int): A number of generated hyperparamters.
         all_parameters_generated (bool): Whether all parameters are generated.
             True if all parameters are generated.
-        params (HyperParameterConfiguration): Loaded hyper parameter
-            configuration object.
-        trial_id (TrialId): TrialId object.
+        params (HyperParameterConfiguration): A loaded parameter configuration
+            object.
+        trial_id (TrialId): A TrialId object.
     """
 
     def __init__(self, config: DictConfig) -> None:
         super().__init__(config, "optimizer")
         self.set_logger(
             "root.optimizer",
-            self.workspace.log / self.config.logger.file.optimizer,
-            str_to_logging_level(self.config.logger.log_level.optimizer),
-            str_to_logging_level(self.config.logger.stream_level.optimizer),
+            self.workspace.log / "optimizer.log",
+            str_to_logging_level(self.config.generic.logging_level),
+            str_to_logging_level(self.config.generic.logging_level),
             "Optimizer",
         )
 

@@ -2,8 +2,8 @@
   "generic": {
     "config_path": "config.json",
     "init_fail_count": 10,
-    "$name_length": 32,
-    "name_length": 3,
+    "$trial_id_digits": 32,
+    "trial_id_digits": 3,
     "project_name": "sphere",
     "randseed": 1,
     "workspace": "/tmp/work",
@@ -11,7 +11,7 @@
   },
   "resource": {
     "type": "python_local",
-    "num_node": 10
+    "num_workers": 10
   },
   "ABCI": {
     "job_script_preamble": "wrapper_abci.sh",
@@ -302,7 +302,7 @@
     ]
   },
   "job_setting": {
-    "name_length": 6,
+    "trial_id_digits": 6,
     "init_fail_count": 100,
     "cancel_retry": 3,
     "cancel_timeout": 60,

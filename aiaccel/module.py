@@ -137,69 +137,69 @@ class AiaccelCore(object):
 class AbstractModule(AiaccelCore):
 
     def pre_process(self) -> None:
-        """Pre-procedure before executing processes.
+        """Perform setup or initialization tasks before the main loop starts.
+
+        This method should be implemented by subclasses to perform any necessary setup operations.
+
+        Raises:
+            NotImplementedError: If the subclass does not implement this method.
+        """
+        raise NotImplementedError
+
+    def run_in_main_loop(self) -> bool:
+        """Perform tasks that should be executed in every cycle of the main loop.
+
+        This method should be implemented by subclasses to define the operations executed in each cycle.
 
         Returns:
-            None
+            bool: True if the main process has been completed, False otherwise.
+
+        Raises:
+            NotImplementedError: If the subclass does not implement this method.
         """
         raise NotImplementedError
 
     def post_process(self) -> None:
-        """Post-procedure after executed processes.
+        """Perform cleanup tasks after the main loop ends.
 
-        Returns:
-            None
+        This method should be implemented by subclasses to perform any necessary cleanup operations.
 
         Raises:
-            NotImplementedError: Causes when he inherited class does not
-                implement.
+            NotImplementedError: If the subclass does not implement this method.
         """
         raise NotImplementedError
 
-    def inner_loop_main_process(self) -> bool:
-        """A main loop process. This process is repeated every main loop.
+    def is_error_free(self) -> bool:
+        """Check if there has been an error.
+
+        This method should be implemented by subclasses to define how to check for errors. 
 
         Returns:
-            None
+            bool: True if there has been no error, False otherwise.
 
         Raises:
-            NotImplementedError: Causes when the inherited class does not
-                implement.
-        """
-        raise NotImplementedError
-
-    def check_error(self) -> bool:
-        """Check to confirm if an error has occurred.
-
-        Args:
-            None
-
-        Returns:
-            bool: True if no error, False if with error.
-
-        Raises:
-            NotImplementedError: Causes when the inherited class does not
-                implement.
+            NotImplementedError: If the subclass does not implement this method.
         """
         return True
 
     def resume(self) -> None:
-        """When in resume mode, load the previous
-                optimization data in advance.
+        """Load previous optimization data when in resume mode.
 
-        Args:
-            None
-
-        Returns:
-            None
+        This method should be implemented by subclasses to define how to load previously saved optimization data.
 
         Raises:
-            NotImplementedError: Causes when the inherited class does not
-                implement.
+            NotImplementedError: If the subclass does not implement this method.
         """
         raise NotImplementedError
 
     def __getstate__(self) -> dict[str, Any]:
+        """Prepare the object for serialization.
+
+        Certain attributes may need to be removed or modified before serialization.
+
+        Returns:
+            dict[str, Any]: A dictionary that can be serialized.
+        """
         obj = self.__dict__.copy()
         del obj["storage"]
         del obj["config"]

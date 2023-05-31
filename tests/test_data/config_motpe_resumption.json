@@ -7,7 +7,7 @@
   },
   "resource": {
     "type": "python_local",
-    "num_node": 10
+    "num_workers": 10
   },
   "ABCI": {
     "group": "[group]",
@@ -106,7 +106,7 @@
     ]
   },
   "job_setting": {
-    "name_length": 6,
+    "trial_id_digits": 6,
     "init_fail_count": 100,
     "cancel_retry": 3,
     "cancel_timeout": 60,

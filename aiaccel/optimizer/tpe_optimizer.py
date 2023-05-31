@@ -8,8 +8,8 @@ import sqlalchemy.orm as sqlalchemy_orm
 from omegaconf.dictconfig import DictConfig
 from optuna.storages._rdb import models
 
-import aiaccel.parameter
 from aiaccel.optimizer import AbstractOptimizer
+from aiaccel.parameter import HyperParameterConfiguration
 
 
 class TPESamplerWrapper(optuna.samplers.TPESampler):
@@ -120,7 +120,7 @@ class TpeOptimizer(AbstractOptimizer):
         if (not self.is_startup_trials()) and (len(self.parameter_pool) >= 1):
             return None
 
-        if len(self.parameter_pool) >= self.config.resource.num_node:
+        if len(self.parameter_pool) >= self.config.resource.num_workers:
             return None
 
         self.logger.debug(f"generate_parameter requests {number} params, pool length: {len(self.parameter_pool)}")
@@ -152,7 +152,7 @@ class TpeOptimizer(AbstractOptimizer):
             parameters. None if `self.nelder_mead` is already defined.
         """
         enqueue_trial = {}
-        for hp in self.params.hps.values():
+        for hp in self.params.get_parameter_list():
             if hp.initial is not None:
                 enqueue_trial[hp.name] = hp.initial
 
@@ -167,7 +167,7 @@ class TpeOptimizer(AbstractOptimizer):
         for name, value in trial.params.items():
             new_param = {
                 "parameter_name": name,
-                "type": self.params.hps[name].type,
+                "type": self.params.get_hyperparameter(name).type,
                 "value": value,
             }
             new_params.append(new_param)
@@ -205,7 +205,6 @@ class TpeOptimizer(AbstractOptimizer):
         engine = sqlalchemy.create_engine(storage_path, echo=False)
         Session = sqlalchemy_orm.sessionmaker(bind=engine)
         session = Session()
-        print(f"debug: {optuna_trials}")
         for optuna_trial in optuna_trials:
             if optuna_trial.number >= self.config.resume:
                 resumed_trial = session.query(models.TrialModel).filter_by(number=optuna_trial.number).first()
@@ -242,12 +241,12 @@ class TpeOptimizer(AbstractOptimizer):
 
 
 def create_distributions(
-    parameters: aiaccel.parameter.HyperParameterConfiguration,
+    parameters: HyperParameterConfiguration,
 ) -> dict[str, Any]:
     """Create an optuna.distributions dictionary for the parameters.
 
     Args:
-        parameters(aiaccel.parameter.HyperParameterConfiguration): A
+        parameters(HyperParameterConfiguration): A
             parameter configuration object.
 
     Raises:

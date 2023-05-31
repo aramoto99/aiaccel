@@ -3,13 +3,13 @@ generic:
   job_command: "python user.py"
   # python_file: "./user.py"
   # function: "main"
-  batch_job_timeout: 600
+  job_timeout_seconds: 600
 
 resource:
   type: "abci"
   # type: "local"
   # type: "python_local"
-  num_node: 4
+  num_workers: 4
 
 ABCI:
   group: "[group]"
@@ -55,7 +55,7 @@ job_setting:
   running_retry: 3
   running_timeout: 60
   init_fail_count: 100
-  name_length: 6
+  trial_id_digits: 6
   random_scheduling: false
   #random_scheduling: true
 

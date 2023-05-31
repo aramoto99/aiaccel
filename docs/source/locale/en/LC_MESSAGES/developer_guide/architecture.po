@@ -281,7 +281,7 @@ msgstr ""
 #: ../../source/developer_guide/architecture.md:139
 msgid ""
 "では更に aiaccel/master/abstract_master.py の AbstractMaster クラスを見てみる． "
-"時間に関するコードや Evaluator などがあるが，inner_loop_main_process "
+"時間に関するコードや Evaluator などがあるが，run_in_main_loop "
 "メソッド内の以下のコードが終了判定をしている．"
 msgstr ""
 
@@ -316,7 +316,7 @@ msgstr ""
 #: ../../source/developer_guide/architecture.md:163
 msgid ""
 "では更に aiaccel/optimizer/abstract_optimizer.py の AbstractOptimizer "
-"クラスを見てみる． メインループである inner_loop_main_process "
+"クラスを見てみる． メインループである run_in_main_loop "
 "メソッドを見ると，以下のコードで新しいハイパーパラメータを生成している．"
 msgstr ""
 
@@ -343,7 +343,7 @@ msgstr ""
 
 #: ../../source/developer_guide/architecture.md:182
 msgid ""
-"inner_loop_main_process メソッドはメインループであり，ジョブをプロセスとして実行する． その際の execute "
+"run_in_main_loop メソッドはメインループであり，ジョブをプロセスとして実行する． その際の execute "
 "メソッドが実行コマンドを生成し実行する．"
 msgstr ""
 

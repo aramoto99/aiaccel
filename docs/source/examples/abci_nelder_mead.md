@@ -39,22 +39,22 @@
 generic:
   workspace: "./work"
   job_command: "python user.py"
-  batch_job_timeout: 7200
+  job_timeout_seconds: 7200
 ```
 - **workspace** - aiaccel の実行に必要な一時ファイルを保存するディレクトリを指定します．
 - **job_command** - ユーザープログラムを実行するためのコマンドです．
-- **batch_job_timeout** - ジョブのタイムアウト時間を設定します．[単位: 秒]
+- **job_timeout_seconds** - ジョブのタイムアウト時間を設定します．[単位: 秒]
     - 参考 - 100 epoch の学習に最長 60 分程かかるため，`7200` と長めに設定します．
 
 #### resource
 ```yaml
 resource:
   type: "abci"
-  num_node: 6
+  num_workers: 6
 ```
 
 - **type** - 実行環境を指定します．ABCI 環境で実行するためには `"abci"` で設定します．
-- **num_node** - 使用するノード数を指定します．
+- **num_workers** - 使用するノード数を指定します．
     - 参考 - 今回の例では，最適化アルゴリズムが `NelderMeadOptimizer`，パラメータ数が 5 のため，
     同時に計算されるシンプレックス頂点の最大数である `6` にノード数を設定します．
 

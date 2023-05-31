@@ -108,9 +108,9 @@ pre_processメソッドの後メインループが周り，メインループ後
 
     while True:
         for module in modules:
-            if not module.inner_loop_main_process():
+            if not module.run_in_main_loop():
                 break
-            if not module.check_error():
+            if not module.is_error_free():
                 break
         else:
             time.sleep(sleep_time)
@@ -136,7 +136,7 @@ aiaccel/master/create.py を見てみると，コンフィグに記述されたr
 aiaccel/master/local_master.py を見てみると，AbstractMasterクラスを継承しており特に追記はない．
 
 では更に aiaccel/master/abstract_master.py の AbstractMaster クラスを見てみる．
-時間に関するコードや Evaluator などがあるが，inner_loop_main_process メソッド内の以下のコードが終了判定をしている．
+時間に関するコードや Evaluator などがあるが，run_in_main_loop メソッド内の以下のコードが終了判定をしている．
 
 ```python
         if self.hp_finished >= self.trial_number:
@@ -160,7 +160,7 @@ RandomOptimizer クラスの generate_parameter メソッドは，以下のコ�
 ```
 
 では更に aiaccel/optimizer/abstract_optimizer.py の AbstractOptimizer クラスを見てみる．
-メインループである inner_loop_main_process メソッドを見ると，以下のコードで新しいハイパーパラメータを生成している．
+メインループである run_in_main_loop メソッドを見ると，以下のコードで新しいハイパーパラメータを生成している．
 
 ```python
         for _ in range(pool_size):
@@ -178,5 +178,5 @@ aiaccel/scheduler/local_scheduler.py は，AbstractScheduler クラスを継承�
 get_stats メソッドは，現在のジョブの状態を取得する役割を担う．
 LocalSchedulerクラスでは，ps コマンドをパースしてジョブの状態を取得していることが分かる．
 
-inner_loop_main_process メソッドはメインループであり，ジョブをプロセスとして実行する．
+run_in_main_loop メソッドはメインループであり，ジョブをプロセスとして実行する．
 その際の execute メソッドが実行コマンドを生成し実行する．

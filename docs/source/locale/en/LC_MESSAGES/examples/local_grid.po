@@ -74,7 +74,7 @@ msgid "**job_command** - ユーザープログラムを実行するためのコ�
 msgstr ""
 
 #: ../../source/examples/local_grid.md:36
-msgid "**batch_job_timeout** - ジョブのタイムアウト時間を設定します．[単位: 秒]"
+msgid "**job_timeout_seconds** - ジョブのタイムアウト時間を設定します．[単位: 秒]"
 msgstr ""
 
 #: ../../source/examples/local_grid.md:39
@@ -92,7 +92,7 @@ msgid "**type** - 実行環境を指定します．ローカル環境で実行�
 msgstr ""
 
 #: ../../source/examples/local_grid.md:50
-msgid "**num_node** - 使用するノード数を指定します．"
+msgid "**num_workers** - 使用するノード数を指定します．"
 msgstr ""
 
 #: ../../source/examples/local_grid.md:53
