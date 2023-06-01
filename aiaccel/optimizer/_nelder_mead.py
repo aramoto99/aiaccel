@@ -123,10 +123,10 @@ class NelderMead(object):
         self.yc = None
         self._storage = {"r": None, "ic": None, "oc": None, "e": None, "s": None}
         self._max_itr = iteration
-        self._total_itr = 0  # included out of boundary
+        self._total_itr = 0      # included out of boundary
         self._evaluated_itr = 0  # not included out of boundary
         self._history: dict[str, list[Any]] = {
-            "total_y": [],  # y each loop
+            "total_y": [],      # y each loop
             "evaluated_y": [],  # y each loop not included out of boundary
             "op": [],  # operations such as 'reflect' and so on.
             "total_sample": [],  # sampled point each loop
@@ -155,19 +155,20 @@ class NelderMead(object):
         return np.array(initial_values)
 
     def _create_initial_value(self, initial_parameters: Any, dim: int, num_of_initials: int) -> Any:
-        if initial_parameters is not None:
-            if isinstance(initial_parameters[dim]["value"], (int, float, np.integer, np.floating)):
-                initial_parameters[dim]["value"] = [initial_parameters[dim]["value"]]
+        val = self.params[dim].sample(rng=self._rng)["value"]
+        if initial_parameters is None:
+            val = self.params[dim].sample(rng=self._rng)["value"]
+            return val
 
-            if not isinstance(initial_parameters[dim]["value"], (list, ListConfig)):
-                raise TypeError("Default parameter should be set as list.")
+        val = initial_parameters[dim]["value"]
+        if not isinstance(val, (list, ListConfig)):
+            initial_parameters[dim]["value"] = [val]
 
-            if num_of_initials < len(initial_parameters[dim]["value"]):
-                val = initial_parameters[dim]["value"][num_of_initials]
-                return val
-            else:
-                val = self.params[dim].sample(rng=self._rng)["value"]
-                return val
+        vals = initial_parameters[dim]["value"]
+        assert isinstance(vals, (list, ListConfig))
+        if num_of_initials < len(vals):
+            val = initial_parameters[dim]["value"][num_of_initials]
+            return val
         else:
             val = self.params[dim].sample(rng=self._rng)["value"]
             return val
@@ -655,5 +656,5 @@ class NelderMead(object):
         else:
             self.logger.error(f"Invalid state: {self._state}")
             raise ValueError(f"Invalid state: {self._state}")
-
+        self.logger.debug(f"Nelder-Mead state: {self._state}")
         return self._executing

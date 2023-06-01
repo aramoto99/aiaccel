@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import shutil
 from pathlib import Path
-from typing import Any
 
 from aiaccel.common import (
     dict_error,
@@ -14,7 +13,10 @@ from aiaccel.common import (
     dict_storage,
     dict_tensorboard,
 )
-from aiaccel.util import Suffix, load_yaml, make_directories
+from aiaccel.util import Suffix, make_directories
+
+# from typing import Any
+
 
 
 class Workspace:
