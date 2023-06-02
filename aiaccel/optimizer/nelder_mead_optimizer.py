@@ -3,12 +3,15 @@ from __future__ import annotations
 import copy
 from typing import Any
 
+import numpy as np
 from omegaconf.dictconfig import DictConfig
+from omegaconf.listconfig import ListConfig
 
 from aiaccel.config import is_multi_objective
 from aiaccel.converted_parameter import ConvertedParameterConfiguration
 from aiaccel.optimizer._nelder_mead import NelderMead
 from aiaccel.optimizer.abstract_optimizer import AbstractOptimizer
+from aiaccel.parameter import HyperParameter
 
 
 class NelderMeadOptimizer(AbstractOptimizer):
@@ -22,8 +25,6 @@ class NelderMeadOptimizer(AbstractOptimizer):
     Attributes:
         nelder_mead (NelderMead): A class object implementing Nelder-Mead
             method.
-        parameter_pool (list): A pool of parameters waiting for the process.
-        order (list): A list of parameters being processed.
     """
 
     def __init__(self, config: DictConfig) -> None:
@@ -31,12 +32,46 @@ class NelderMeadOptimizer(AbstractOptimizer):
         self.params: ConvertedParameterConfiguration = ConvertedParameterConfiguration(
             self.params, convert_log=True, convert_int=True, convert_choices=True, convert_sequence=True
         )
+        self.n_params = len(self.params.get_parameter_list())
+        self.bdrys = np.array([[p.lower, p.upper] for p in self.params.get_parameter_list()])
+        self.n_dim = len(self.bdrys)
+        self.store = {
+            "reflect": None,
+            "inside_contract": None,
+            "outside_contract": None,
+            "expand": None,
+            "shrink": None
+        }
         self.nelder_mead: Any = None
-        self.parameter_pool: list[dict[str, Any]] = []
-        self.order: list[Any] = []
-
         if is_multi_objective(self.config):
             raise NotImplementedError("Nelder-Mead optimizer does not support multi-objective optimization.")
+
+    def create_initial_values(self, initial_parameters: list[dict[str, Any]]) -> np.ndarray[Any, Any]:
+        initial_values = [
+            [self.create_initial_value(initial_parameters, dim, num_of_initials) for dim in range(self.n_params)]
+            for num_of_initials in range(self.n_dim + 1)
+        ]
+        return np.array(initial_values)
+
+    def create_initial_value(self, initial_parameters: Any, dim: int, num_of_initials: int) -> Any:
+        params = self.params.get_parameter_list()
+        val = params[dim].sample(rng=self._rng)["value"]
+        if initial_parameters is None:
+            val = params[dim].sample(rng=self._rng)["value"]
+            return val
+
+        val = initial_parameters[dim]["value"]
+        if not isinstance(val, (list, ListConfig)):
+            initial_parameters[dim]["value"] = [val]
+
+        vals = initial_parameters[dim]["value"]
+        assert isinstance(vals, (list, ListConfig))
+        if num_of_initials < len(vals):
+            val = initial_parameters[dim]["value"][num_of_initials]
+            return val
+        else:
+            val = params[dim].sample(rng=self._rng)["value"]
+            return val
 
     def generate_initial_parameter(self) -> list[dict[str, float | int | str]] | None:
         """Generate initial parameters.
@@ -45,119 +80,13 @@ class NelderMeadOptimizer(AbstractOptimizer):
             list[dict[str, float | int | str]] | None: A list of new
             parameters. None if `self.nelder_mead` is already defined.
         """
-        initial_parameter = super().generate_initial_parameter()
+        initial_parameters = super().generate_initial_parameter()
+        initial_parameters = self.create_initial_values(initial_parameters)
+        self.logger.debug(f"initial_parameters: {initial_parameters}")
         if self.nelder_mead is not None:
             return None
-
-        self.nelder_mead = NelderMead(
-            self.params.get_parameter_list(), initial_parameters=initial_parameter, rng=self._rng
-        )
-
+        self.nelder_mead = NelderMead(initial_parameters=initial_parameters)
         return self.generate_parameter()
-
-    def check_result(self) -> None:
-        pass
-
-    def get_ready_parameters(self) -> list[Any]:
-        """Get the list of ready parameters.
-
-        Returns:
-            list
-        """
-        return self.nelder_mead._executing
-
-    def get_nm_results(self) -> list[dict[str, str | int | list[Any] | bool]]:
-        """Get the list of Nelder-Mead result.
-
-        Returns:
-            list[dict[str, str | int | list | bool]]: Results per trial.
-        """
-        nm_results = []
-        for p in self.get_ready_parameters():
-            try:
-                index = int(p["vertex_id"])
-            except ValueError:
-                continue
-            except KeyError:
-                continue
-
-            result = self.get_any_trial_objective(index)
-
-            if result is not None:
-                nm_result = copy.copy(p)
-                nm_result["result"] = result
-                nm_results.append(nm_result)
-
-        return nm_results
-
-    def _add_result(self, nm_results: list[Any]) -> None:
-        """Add a result parameter.
-
-        Args:
-            nm_results (list):
-
-        Returns:
-            None
-        """
-        if len(nm_results) == 0 or len(self.order) == 0:
-            return
-
-        # Store results in order of HP file generation
-        order = self.order[0]
-        for nm_result in nm_results:
-            if order["vertex_id"] == nm_result["vertex_id"]:
-                self.nelder_mead.add_result_parameters(nm_result)
-                self.order.pop(0)
-                break
-
-    def update_ready_parameter_name(
-        self, pool_p: dict[str, Any], name: Any  # old_param_name  # new_param_name
-    ) -> None:
-        """Update hyperparameter's names.
-
-        Args:
-            pool_p (str): old parameter name
-            name (str): New parameter name
-
-        Returns:
-            None
-
-        Note:
-            - before::
-
-                {
-                    'vertex_id': 'CMTrNe5P8a',
-                    'parameters': [
-                        {'parameter_name': 'x1', 'value': 3.37640289751353},
-                        {'parameter_name': 'x2', 'value': 1.6556037243290205}
-                    ],
-                    'state': 'WaitExpand',
-                    'itr': 5,
-                    'index': None,
-                    'out_of_boundary': False
-                }
-
-            - after::
-
-                {
-                    'vertex_id': '000014', <---- replace to trial_id
-                    'parameters': [
-                        {'parameter_name': 'x1', 'value': 3.37640289751353},
-                        {'parameter_name': 'x2', 'value': 1.6556037243290205}
-                    ],
-                    'state': 'WaitExpand',
-                    'itr': 5,
-                    'index': None,
-                    'out_of_boundary': False
-                }
-
-        """
-        old_param_name = pool_p["vertex_id"]
-        new_param_name = name
-        for e in self.nelder_mead._executing:
-            if e["vertex_id"] == old_param_name:
-                e["vertex_id"] = new_param_name
-                break
 
     def nelder_mead_main(self) -> list[Any] | None:
         """Nelder Mead's main module.
@@ -176,29 +105,6 @@ class NelderMeadOptimizer(AbstractOptimizer):
             return None
         return searched_params
 
-    def _get_all_trial_id(self) -> list[Any]:
-        """_get_all_trial_id.
-
-        Get trial_ids from DB: 'result', 'finished', 'running', 'ready'
-
-        Returns:
-            list: trial_id
-        """
-        trial_id = self.storage.trial.get_all_trial_id()
-        if trial_id is None:
-            return []
-
-        return trial_id
-
-    def _get_current_names(self) -> list[Any]:
-        """Get parameter trial_id.
-
-        Returns:
-            list: A list og parameter names in parameter_pool
-        """
-        # WARN: Always empty.
-        return [p["vertex_id"] for p in self.parameter_pool]
-
     def generate_parameter(self) -> list[dict[str, float | int | str]] | None:
         """Generate parameters.
 
@@ -209,43 +115,15 @@ class NelderMeadOptimizer(AbstractOptimizer):
         Raises:
             TypeError: Causes when an invalid parameter type is set.
         """
-
-        self._add_result(self.get_nm_results())
-
-        searched_params = self.nelder_mead_main()
-
-        if searched_params is None:
+        new_params = self.nelder_mead_main()
+        if new_params is None:
             return None
-
-        for p in searched_params:
-            if p["vertex_id"] not in self._get_all_trial_id() and p["vertex_id"] not in self._get_current_names():
-                self.parameter_pool.append(copy.copy(p))
-
-        new_params: list[Any] = []
-
-        if len(self.parameter_pool) == 0:
-            return new_params
-
-        pool_p = self.parameter_pool.pop(0)
-
-        for param in self.params.get_parameter_list():
-            i = [p["parameter_name"] for p in pool_p["parameters"]].index(param.name)
-            if param.type.lower() == "float":
-                value = float(pool_p["parameters"][i]["value"])
-            elif param.type.lower() == "int":
-                value = int(pool_p["parameters"][i]["value"])
-            elif param.type.lower() == "ordinal":
-                index = int(pool_p["parameters"][i]["value"])
-                value = param.sequence[index]
-            else:
-                raise TypeError(
-                    "Invalid parameter type for NelderMeadSearch."
-                    f"FLOAT or INT is required, but {param.type} is given."
-                )
-
-            new_params.append({"parameter_name": param.name, "type": param.type, "value": value})
-
-        self.update_ready_parameter_name(pool_p, self.trial_id.get())
-        self.order.append({"vertex_id": self.trial_id.get(), "parameters": new_params})
-
         return new_params
+
+    def out_of_boundary(self, y):  # TODO: fix
+        for yi, b in zip(y, self.bdrys):
+            if b[0] <= yi <= b[1]:
+                pass
+            else:
+                return True
+        return False
