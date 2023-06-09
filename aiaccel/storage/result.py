@@ -67,6 +67,24 @@ class Result(Abstract):
         return data.objective
 
     @retry(_MAX_NUM=60, _DELAY=1.0)
+    def get_any_trials_objective(self, trial_ids: list[int]) -> list[int | float | str]:
+        """Obtain the results of an arbitrary trial.
+
+        Args:
+            trial_ids (int): Any trial id
+
+        Returns:
+            int | float | None:
+        """
+        with self.create_session() as session:
+            datas = (
+                session.query(ResultTable)
+                .filter(ResultTable.trial_id.in_(trial_ids))
+                .with_for_update(read=True)
+            )
+        return [{'trial_id': data.trial_id, 'objective:': data.objective} for data in datas]
+
+    @retry(_MAX_NUM=60, _DELAY=1.0)
     def get_all_result(self) -> dict[int, list[Any]]:
         """Get all results
 

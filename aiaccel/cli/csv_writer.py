@@ -62,7 +62,7 @@ class CsvWriter:
         example = self.storage.get_hp_dict(trial_ids[0])
         header.append("trial_id")
         for param in example["parameters"]:
-            header.append(param["parameter_name"])
+            header.append(param["name"])
         header.append("objective")
 
         with InterProcessLock(self.lock_file["result_txt"]):

@@ -55,27 +55,27 @@ def test_set_any_trial_params():
     trial_id = 0
     params = [
         {
-            "parameter_name": "x1",
+            "name": "x1",
             "value": 0.01,
             "type": "float"
         },
         {
-            "parameter_name": "x2",
+            "name": "x2",
             "value": 0.02,
             "type": "float"
         },
         {
-            "parameter_name": "x3",
+            "name": "x3",
             "value": 0.03,
             "type": "float"
         },
         {
-            "parameter_name": "x4",
+            "name": "x4",
             "value": 0.04,
             "type": "float"
         },
         {
-            "parameter_name": "x5",
+            "name": "x5",
             "value": 0.05,
             "type": "float"
         }
@@ -94,27 +94,27 @@ def test_set_any_trial_params_exception():
     trial_id = 0
     params = [
         {
-            "parameter_name": "x1",
+            "name": "x1",
             "value": 0.01,
             "type": "float"
         },
         {
-            "parameter_name": "x2",
+            "name": "x2",
             "value": 0.02,
             "type": "float"
         },
         {
-            "parameter_name": "x3",
+            "name": "x3",
             "value": 0.03,
             "type": "float"
         },
         {
-            "parameter_name": "x4",
+            "name": "x4",
             "value": 0.04,
             "type": "float"
         },
         {
-            "parameter_name": "x5",
+            "name": "x5",
             "value": 0.05,
             "type": "float"
         }
@@ -216,12 +216,12 @@ def test_delete_any_trial_params():
     trial_id = 0
     params = [
         {
-            "parameter_name": "x1",
+            "name": "x1",
             "value": 0.01,
             "type": "float"
         },
         {
-            "parameter_name": "x2",
+            "name": "x2",
             "value": 0.02,
             "type": "float"
         }
@@ -234,12 +234,12 @@ def test_delete_any_trial_params():
     trial_id = 1
     params = [
         {
-            "parameter_name": "x1",
+            "name": "x1",
             "value": 0.01,
             "type": "float"
         },
         {
-            "parameter_name": "x2",
+            "name": "x2",
             "value": 0.02,
             "type": "float"
         }
@@ -252,12 +252,12 @@ def test_delete_any_trial_params():
     trial_id = 2
     params = [
         {
-            "parameter_name": "x1",
+            "name": "x1",
             "value": 0.01,
             "type": "float"
         },
         {
-            "parameter_name": "x2",
+            "name": "x2",
             "value": 0.02,
             "type": "float"
         }

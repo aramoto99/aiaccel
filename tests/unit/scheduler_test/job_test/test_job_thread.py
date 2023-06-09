@@ -1,20 +1,16 @@
 import asyncio
 import datetime
 import time
-
-from aiaccel.config import ResourceType
-
 from subprocess import Popen
 
 import pytest
 
-from aiaccel.common import (dict_hp_finished, dict_hp_ready, dict_hp_running,
-                            dict_runner)
-from aiaccel.scheduler import (AbciModel, CustomMachine, Job, LocalModel,
-                               LocalScheduler, create_scheduler)
+from aiaccel.common import dict_hp_finished, dict_hp_ready, dict_hp_running, dict_runner
+from aiaccel.config import ResourceType
+from aiaccel.scheduler import AbciModel, CustomMachine, Job, LocalModel, LocalScheduler, create_scheduler
 from aiaccel.util import get_time_now_object
-from tests.base_test import BaseTest
 from aiaccel.util.process import OutputHandler
+from tests.base_test import BaseTest
 
 
 async def async_start_job(job):
@@ -258,7 +254,7 @@ class TestModel(BaseTest):
             self.job.storage.hp.set_any_trial_params(
                 trial_id=i,
                 params=[
-                    {'parameter_name': f'x{j+1}', 'value': 0.0, 'type': 'float'}
+                    {'name': f'x{j+1}', 'value': 0.0, 'type': 'float'}
                     for j in range(10)
                 ]
             )
@@ -284,7 +280,7 @@ class TestModel(BaseTest):
             self.job.storage.hp.set_any_trial_params(
                 trial_id=i,
                 params=[
-                    {'parameter_name': f'x{j+1}', 'value': 0.0, 'type': 'float'}
+                    {'name': f'x{j+1}', 'value': 0.0, 'type': 'float'}
                     for j in range(10)
                 ]
             )

@@ -1,113 +1,173 @@
 from __future__ import annotations
 
+import copy
 from typing import Any
 
 import numpy as np
 
+coef: dict = {"r": 1.0, "ic": - 0.5, "oc": 0.5, "e": 2.0, "s": 0.5}
 
-class NelderMead():
-    def __init__(
-        self,
-        initial_parameters: Any = None,
-        coef: dict = {"r": 1.0, "ic": - 0.5, "oc": 0.5, "e": 2.0, "s": 0.5}
-    ):
+
+class NelderMeadCore():
+    def __init__(self, n_dim: int, initial_parameters: Any = None):
+        self.n_dim = n_dim
         self.coef = coef
-        self.f: Any = []
-        self.xs = initial_parameters
-        self.xc = None
-        # self.storage = {"r": None, "ic": None, "oc": None, "e": None, "s": None}
+        self.y = None
+        self.ys: Any = []
+        self.xs: Any = []
+        if initial_parameters is not None:
+            self.xs = initial_parameters
+        self.xc = None  # controid
+        self.store = {"r": None, "ic": None, "oc": None, "e": None, "s": None}
 
     def order_by(self):
-        order = np.argsort(self.f)
+        order = np.argsort(self.ys)
         self.xs = self.xs[order]
-        self.f = self.f[order]
+        self.ys = self.ys[order]
 
     def centroid(self):
-        # self.storage = {"r": None, "ic": None, "oc": None, "e": None, "s": None}
+        self.store = {"r": None, "ic": None, "oc": None, "e": None, "s": None}
         self.order_by()
-        self.yc = self.y[:-1].mean(axis=0)
+        self.xc = self.xs[:-1].mean(axis=0)
 
     def reflect(self):
         xr = self.xc + self.coef["r"] * (self.xc - self.xs[-1])
-        # self.storage["r"] = xr
-        # return self.F(xr)
-        return xr
+        self.store["r"] = xr
+        np.append(self.xs, xr)
 
     def expand(self):
         xe = self.xc + self.coef["e"] * (self.xc - self.xs[-1])
-        # self.storage["e"] = xe
-        # return self.F(xe)
-        return xe
+        self.store["e"] = xe
+        np.append(self.xs, xe)
 
     def inside_contract(self):
         xic = self.xc + self.coef["ic"] * (self.xc - self.xs[-1])
-        # self.storage["ic"] = xic
-        # return self.F(xic)
-        return xic
+        self.store["ic"] = xic
+        np.append(self.xs, xic)
 
     def outside_contract(self):
-        xoc = self.yc + self.coef["oc"] * (self.xc - self.xs[-1])
-        # self.storage["oc"] = xoc
-        # return self.F(xoc)
-        return xoc
+        xoc = self.xc + self.coef["oc"] * (self.xc - self.xs[-1])
+        self.store["oc"] = xoc
+        np.append(self.xs, xoc)
 
     def shrink(self):
         for i in range(1, len(self.xs)):
             self.xs[i] = self.xs[0] + self.coef["s"] * (self.xs[i] - self.xs[0])
             # self.f[i] = self.F(self.y[i])
-        return self.xs
 
-    # def F(self, y):
-    #     if not self.out_of_boundary(y):
-    #         return self.func(y)
-    #     else:
-    #         if self.maximize:
-    #             return float("inf") * -1.0
-    #         else:
-    #             return float("inf")
+    def search(self) -> np.ndarray | None:
+        if len(self.xs) > 0 and len(self.ys) == 0:  # initialize
+            return self.xs
+        if self.n_dim + 1 != len(self.ys):  # wait
+            return None
 
-    # def out_of_boundary(self, y):
-    #     for yi, b in zip(y, self.bdrys):
-    #         if b[0] <= yi <= b[1]:
-    #             pass
-    #         else:
-    #             return True
-    #     return False
-
-    def set_result(self, result):
-        self.f = np.append(self.f, result)
-
-    def search(self):
         self.centroid()
-        fr = self.reflect()
-        if self.f[0] <= fr < self.f[-2]:
-            # self.y[-1] = self.storage["r"]
-            self.f[-1] = fr
-        elif fr < self.f[0]:
-            fe = self.expand()
-            if fe < fr:
-                # self.y[-1] = self.storage["e"]
-                self.f[-1] = fe
+        self.reflect()
+
+        yr = copy.deepcopy(self.ys[-1])
+        if self.ys[0] <= yr < self.ys[-2]:
+            self.xs[-1] = self.store["r"]
+            self.ys[-1] = yr
+        elif yr < self.ys[0]:
+            self.expand()
+            ye = copy.deepcopy(self.ys[-1])
+            if ye < yr:
+                self.xs[-1] = self.store["e"]
+                self.ys[-1] = ye
             else:
-                # self.y[-1] = self.storage["r"]
-                self.f[-1] = fr
-        elif self.f[-2] <= fr < self.f[-1]:
-            foc = self.outside_contract()
-            if foc <= fr:
-                # self.y[-1] = self.storage["oc"]
-                self.f[-1] = foc
+                self.xs[-1] = self.store["r"]
+                self.ys[-1] = yr
+        elif self.ys[-2] <= yr < self.ys[-1]:
+            self.outside_contract()
+            yoc = copy.deepcopy(self.ys[-1])
+            if yoc <= yr:
+                self.xs[-1] = self.store["oc"]
+                self.ys[-1] = yoc
             else:
                 self.shrink()
-        elif self.f[-1] <= fr:
-            fic = self.inside_contract()
-            if fic < self.f[-1]:
-                # self.y[-1] = self.storage["ic"]
-                self.f[-1] = fic
+        elif self.ys[-1] <= yr:
+            self.inside_contract()
+            yic = copy.deepcopy(self.ys[-1])
+            if yic < self.ys[-1]:
+                self.xs[-1] = self.store["ic"]
+                self.ys[-1] = yic
             else:
                 self.shrink()
         return self.xs
 
 
+class NelderMead(NelderMeadCore):
+    def __init__(self, n_dim: int, initial_parameters: Any = None):
+        super().__init__(n_dim, initial_parameters)
+        self.state = "initialize"
+        self.n_completed = 1
+
+    def get_state(self) -> str:
+        return self.state
+
+    def get_xs(self) -> Any:
+        return copy.deepcopy(self.xs)
+
+    def change_state(self, state: str) -> None:
+        self.state = state
+
+    def update(self, xs, ys):
+        self.xs = xs
+        self.ys = ys
+
+    def reset(self):
+        self.xs = []
+        self.ys = []
+        self.change_state("idle")
+
+    def reflect(self):
+        super().reflect()
+        self.change_state("reflect")
+        self.n_completed = 1
+
+    def expand(self):
+        super().expand()
+        self.change_state("expand")
+        self.n_completed = 1
+
+    def inside_contract(self):
+        super().inside_contract()
+        self.change_state("inside_contract")
+        self.n_completed = 1
+
+    def outside_contract(self):
+        super().outside_contract()
+        self.change_state("outside_contract")
+        self.n_completed = 1
+
+    def shrink(self):
+        assert self.n_dim + 1 == len(self.xs)
+        super().shrink()
+        self.change_state("shrink")
+        self.n_completed = len(self.xs)
+
+    def search(self) -> np.ndarray | None:
+        super().search()
+        if self.state == "initialize":
+            return self.xs
+        elif self.state == "reflect":
+            for i in range( len(self.xs) -1):
+                self.xs.pop(i)
+            return self.xs
+        elif self.state == "expand":
+            for i in range( len(self.xs) -1):
+                self.xs.pop(i)
+            return self.xs
+        elif self.state == "inside_contract":
+            for i in range( len(self.xs) -1):
+                self.xs.pop(i)
+            return self.xs
+        elif self.state == "outside_contract":
+            for i in range( len(self.xs) -1):
+                self.xs.pop(i)
+            return self.xs
+        elif self.state == "shrink":
+            return self.xs
 
 # from __future__ import annotations
 
@@ -304,7 +364,7 @@ class NelderMead():
 #         params = []
 
 #         for yi, p in zip(y, self.params):
-#             params.append({"parameter_name": p.name, "value": yi})
+#             params.append({"name": p.name, "value": yi})
 
 #         self._executing.append(
 #             {

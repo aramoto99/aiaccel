@@ -325,42 +325,42 @@ class TestConvertedHyperparameterConfiguraion:
     def test_to_original_repr(self) -> None:
         params_in_internal_repr = [
             {
-                "parameter_name": float_parameter_dict["name"],
+                "name": float_parameter_dict["name"],
                 "type": float_parameter_dict["type"],
                 "value": float_parameter_dict["lower"],
             },
             {
-                "parameter_name": int_parameter_dict["name"],
+                "name": int_parameter_dict["name"],
                 "type": int_parameter_dict["type"],
                 "value": int_parameter_dict["lower"],
             },
             {
-                "parameter_name": f"{categorical_parameter_dict['name']}_0",
+                "name": f"{categorical_parameter_dict['name']}_0",
                 "type": categorical_parameter_dict["type"],
                 "value": 0.0,
             },
             {
-                "parameter_name": f"{categorical_parameter_dict['name']}_1",
+                "name": f"{categorical_parameter_dict['name']}_1",
                 "type": categorical_parameter_dict["type"],
                 "value": 0.0,
             },
             {
-                "parameter_name": f"{categorical_parameter_dict['name']}_2",
+                "name": f"{categorical_parameter_dict['name']}_2",
                 "type": categorical_parameter_dict["type"],
                 "value": 1.0,
             },
             {
-                "parameter_name": f"{ordinal_parameter_dict['name']}_0",
+                "name": f"{ordinal_parameter_dict['name']}_0",
                 "type": ordinal_parameter_dict["type"],
                 "value": 0.0,
             },
             {
-                "parameter_name": f"{ordinal_parameter_dict['name']}_1",
+                "name": f"{ordinal_parameter_dict['name']}_1",
                 "type": ordinal_parameter_dict["type"],
                 "value": 1.0,
             },
             {
-                "parameter_name": f"{ordinal_parameter_dict['name']}_2",
+                "name": f"{ordinal_parameter_dict['name']}_2",
                 "type": ordinal_parameter_dict["type"],
                 "value": 0.0,
             },
@@ -383,22 +383,22 @@ class TestConvertedHyperparameterConfiguraion:
 
         params_in_internal_repr = [
             {
-                "parameter_name": float_parameter_dict["name"],
+                "name": float_parameter_dict["name"],
                 "type": float_parameter_dict["type"],
                 "value": float_parameter_dict["lower"],
             },
             {
-                "parameter_name": int_parameter_dict["name"],
+                "name": int_parameter_dict["name"],
                 "type": int_parameter_dict["type"],
                 "value": int_parameter_dict["lower"],
             },
             {
-                "parameter_name": f"{categorical_parameter_dict['name']}",
+                "name": f"{categorical_parameter_dict['name']}",
                 "type": categorical_parameter_dict["type"],
                 "value": categorical_parameter_dict["choices"][2],
             },
             {
-                "parameter_name": f"{ordinal_parameter_dict['name']}",
+                "name": f"{ordinal_parameter_dict['name']}",
                 "type": ordinal_parameter_dict["type"],
                 "value": ordinal_parameter_dict["sequence"][1],
             },
@@ -551,6 +551,6 @@ def test_make_structured_value() -> None:
     param = ConvertedFloatParameter(HyperParameter(float_parameter_dict))
     value = param.lower
     structured_value = _make_structured_value(param, value)
-    assert structured_value.get("parameter_name") == param.name
+    assert structured_value.get("name") == param.name
     assert structured_value.get("type") == param.type
     assert structured_value.get("value") == value

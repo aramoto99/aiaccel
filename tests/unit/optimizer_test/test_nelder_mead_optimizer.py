@@ -4,10 +4,8 @@ import numpy as np
 import pytest
 
 from aiaccel.common import goal_maximize
+from aiaccel.optimizer import NelderMead, NelderMeadOptimizer
 from aiaccel.parameter import HyperParameterConfiguration
-from aiaccel.optimizer import NelderMead
-from aiaccel.optimizer import NelderMeadOptimizer
-
 from tests.base_test import BaseTest
 
 
@@ -21,16 +19,16 @@ class TestNelderMeadOptimizer(BaseTest):
 
     def test_generate_initial_parameter(self):
         expected = [
-            {'parameter_name': 'x1', 'type': 'FLOAT', 'value': 0.74},
-            {'parameter_name': 'x2', 'type': 'FLOAT', 'value': 2.98},
-            {'parameter_name': 'x3', 'type': 'FLOAT', 'value': 3.62},
-            {'parameter_name': 'x4', 'type': 'FLOAT', 'value': 0.9},
-            {'parameter_name': 'x5', 'type': 'FLOAT', 'value': 1.99},
-            {'parameter_name': 'x6', 'type': 'FLOAT', 'value': -2.78},
-            {'parameter_name': 'x7', 'type': 'FLOAT', 'value': 1.0},
-            {'parameter_name': 'x8', 'type': 'FLOAT', 'value': 4.97},
-            {'parameter_name': 'x9', 'type': 'FLOAT', 'value': 1.98},
-            {'parameter_name': 'x10', 'type': 'FLOAT', 'value': 4.03}
+            {'name': 'x1', 'type': 'FLOAT', 'value': 0.74},
+            {'name': 'x2', 'type': 'FLOAT', 'value': 2.98},
+            {'name': 'x3', 'type': 'FLOAT', 'value': 3.62},
+            {'name': 'x4', 'type': 'FLOAT', 'value': 0.9},
+            {'name': 'x5', 'type': 'FLOAT', 'value': 1.99},
+            {'name': 'x6', 'type': 'FLOAT', 'value': -2.78},
+            {'name': 'x7', 'type': 'FLOAT', 'value': 1.0},
+            {'name': 'x8', 'type': 'FLOAT', 'value': 4.97},
+            {'name': 'x9', 'type': 'FLOAT', 'value': 1.98},
+            {'name': 'x10', 'type': 'FLOAT', 'value': 4.03}
         ]
 
         _optimizer = NelderMeadOptimizer(self.load_config_for_test(self.configs["config.json"]))
@@ -153,14 +151,14 @@ class TestNelderMeadOptimizer(BaseTest):
         expected = [
             {
                 'vertex_id': 'abc',
-                'parameters': [{'parameter_name': 'x1', 'value': -4.87}, {'parameter_name': 'x2', 'value': -0.71}],
+                'parameters': [{'name': 'x1', 'value': -4.87}, {'name': 'x2', 'value': -0.71}],
                 'state': 'WaitInitialize',
                 'itr': 1,
                 'index': 1,
                 'out_of_boundary': False
             },
             {
-                'parameters': [{'parameter_name': 'x1', 'value': -4.87}, {'parameter_name': 'x2', 'value': -0.71}],
+                'parameters': [{'name': 'x1', 'value': -4.87}, {'name': 'x2', 'value': -0.71}],
                 'state': 'WaitInitialize',
                 'itr': 1,
                 'index': 1,
@@ -180,7 +178,7 @@ class TestNelderMeadOptimizer(BaseTest):
         nm_results = [
             {
                 'vertex_id': '0001',
-                'parameters': [{'parameter_name': 'x1', 'value': -4.87}, {'parameter_name': 'x2', 'value': -0.71}],
+                'parameters': [{'name': 'x1', 'value': -4.87}, {'name': 'x2', 'value': -0.71}],
                 'state': 'WaitInitialize',
                 'itr': 1,
                 'index': 1,
@@ -190,13 +188,13 @@ class TestNelderMeadOptimizer(BaseTest):
         order = [
             {
                 'vertex_id': '0001',
-                'parameters': [{'parameter_name': 'x1', 'value': -4.87}, {'parameter_name': 'x2', 'value': -0.71}]
+                'parameters': [{'name': 'x1', 'value': -4.87}, {'name': 'x2', 'value': -0.71}]
             }
         ]
         order2 = [
             {
                 'vertex_id': 'invalid',
-                'parameters': [{'parameter_name': 'x1', 'value': -4.87}, {'parameter_name': 'x2', 'value': -0.71}]
+                'parameters': [{'name': 'x1', 'value': -4.87}, {'name': 'x2', 'value': -0.71}]
             }
         ]
         assert self.optimizer._add_result(nm_results) is None

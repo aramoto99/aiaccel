@@ -131,7 +131,7 @@ class TpeOptimizer(AbstractOptimizer):
 
         for param in self.params.get_parameter_list():
             new_param = {
-                "parameter_name": param.name,
+                "name": param.name,
                 "type": param.type,
                 "value": trial.params[param.name],
             }
@@ -166,7 +166,7 @@ class TpeOptimizer(AbstractOptimizer):
 
         for name, value in trial.params.items():
             new_param = {
-                "parameter_name": name,
+                "name": name,
                 "type": self.params.get_hyperparameter(name).type,
                 "value": value,
             }

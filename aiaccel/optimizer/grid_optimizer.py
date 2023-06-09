@@ -65,7 +65,7 @@ def generate_grid_points(p: HyperParameter, config: DictConfig) -> dict[str, Any
     Raises:
         TypeError: Causes when an invalid parameter type is set.
     """
-    new_param = {"parameter_name": p.name, "type": p.type}
+    new_param = {"name": p.name, "type": p.type}
 
     if p.type.lower() in ["int", "float"]:
         base, log, step = get_grid_options(p.name, config)
@@ -166,7 +166,7 @@ class GridOptimizer(AbstractOptimizer):
         new_params: list[Any] = []
         for param, index in zip(self.ready_params, parameter_index):
             new_params.append(
-                {"parameter_name": param["parameter_name"], "type": param["type"], "value": param["parameters"][index]}
+                {"name": param["name"], "type": param["type"], "value": param["parameters"][index]}
             )
         return new_params
 

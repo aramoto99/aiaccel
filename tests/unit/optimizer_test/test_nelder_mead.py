@@ -34,31 +34,31 @@ class TestNelderMead(BaseTest):
         params = HyperParameterConfiguration(self.config.optimize.parameters)
         hps = params.get_parameter_list()
         initial_parameters = [
-            {'parameter_name': 'x1', 'type': 'uniform_float', 'value': 1},
-            {'parameter_name': 'x2', 'type': 'uniform_float', 'value': 1},
-            {'parameter_name': 'x3', 'type': 'uniform_float', 'value': 1},
-            {'parameter_name': 'x4', 'type': 'uniform_float', 'value': 1},
-            {'parameter_name': 'x5', 'type': 'uniform_float', 'value': 1},
-            {'parameter_name': 'x6', 'type': 'uniform_float', 'value': 1},
-            {'parameter_name': 'x7', 'type': 'uniform_float', 'value': 1},
-            {'parameter_name': 'x8', 'type': 'uniform_float', 'value': 1},
-            {'parameter_name': 'x9', 'type': 'uniform_float', 'value': 1},
-            {'parameter_name': 'x10', 'type': 'uniform_float', 'value': 1},
+            {'name': 'x1', 'type': 'uniform_float', 'value': 1},
+            {'name': 'x2', 'type': 'uniform_float', 'value': 1},
+            {'name': 'x3', 'type': 'uniform_float', 'value': 1},
+            {'name': 'x4', 'type': 'uniform_float', 'value': 1},
+            {'name': 'x5', 'type': 'uniform_float', 'value': 1},
+            {'name': 'x6', 'type': 'uniform_float', 'value': 1},
+            {'name': 'x7', 'type': 'uniform_float', 'value': 1},
+            {'name': 'x8', 'type': 'uniform_float', 'value': 1},
+            {'name': 'x9', 'type': 'uniform_float', 'value': 1},
+            {'name': 'x10', 'type': 'uniform_float', 'value': 1},
         ]
         rng = np.random.RandomState(0)
         NelderMead(hps, initial_parameters=initial_parameters, rng=rng)
 
         initial_parameters = [
-            {'parameter_name': 'x1', 'type': 'categorical', 'value': '1'},
-            {'parameter_name': 'x2', 'type': 'categorical', 'value': '1'},
-            {'parameter_name': 'x3', 'type': 'categorical', 'value': '1'},
-            {'parameter_name': 'x4', 'type': 'categorical', 'value': '1'},
-            {'parameter_name': 'x5', 'type': 'categorical', 'value': '1'},
-            {'parameter_name': 'x6', 'type': 'categorical', 'value': '1'},
-            {'parameter_name': 'x7', 'type': 'categorical', 'value': '1'},
-            {'parameter_name': 'x8', 'type': 'categorical', 'value': '1'},
-            {'parameter_name': 'x9', 'type': 'categorical', 'value': '1'},
-            {'parameter_name': 'x10', 'type': 'categorical', 'value': '1'},
+            {'name': 'x1', 'type': 'categorical', 'value': '1'},
+            {'name': 'x2', 'type': 'categorical', 'value': '1'},
+            {'name': 'x3', 'type': 'categorical', 'value': '1'},
+            {'name': 'x4', 'type': 'categorical', 'value': '1'},
+            {'name': 'x5', 'type': 'categorical', 'value': '1'},
+            {'name': 'x6', 'type': 'categorical', 'value': '1'},
+            {'name': 'x7', 'type': 'categorical', 'value': '1'},
+            {'name': 'x8', 'type': 'categorical', 'value': '1'},
+            {'name': 'x9', 'type': 'categorical', 'value': '1'},
+            {'name': 'x10', 'type': 'categorical', 'value': '1'},
         ]
         with pytest.raises(TypeError):
             NelderMead(hps, initial_parameters=initial_parameters, rng=rng)

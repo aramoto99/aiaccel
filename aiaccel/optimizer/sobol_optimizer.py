@@ -46,7 +46,7 @@ class SobolOptimizer(AbstractOptimizer):
             min_value = l_params[i].lower
             max_value = l_params[i].upper
             value = (max_value - min_value) * vec[i] + min_value
-            new_param = {"parameter_name": l_params[i].name, "type": l_params[i].type, "value": value}
+            new_param = {"name": l_params[i].name, "type": l_params[i].type, "value": value}
             new_params.append(new_param)
 
         return new_params
