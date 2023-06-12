@@ -364,7 +364,6 @@ class Job:
             auto_transitions=False,
             ordered_transitions=False,
         )
-        self.loop_count = 0
         self.scheduler = scheduler
         self.trial_id = trial_id
         self.trial_id_str = TrialId(self.config).zero_padding_any_trial_id(self.trial_id)

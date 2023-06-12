@@ -14,7 +14,10 @@ class SobolOptimizer(AbstractOptimizer):
             configuration file and command line options.
 
     Attributes:
+<<<<<<< HEAD
         num_generated_params (int): The number of generated hyper parameters.
+=======
+>>>>>>> 8876d0f (Refactoring #2)
         sampler (Sobol): Engine for generating (scrambled) Sobol' sequences.
 
     Todo:
@@ -28,8 +31,6 @@ class SobolOptimizer(AbstractOptimizer):
         self.sampler = qmc.Sobol(
             d=len(self.params.get_parameter_list()), scramble=self.config.optimize.sobol_scramble, seed=self._rng
         )
-        finished = self.storage.trial.get_finished()
-        self.num_generated_params = len(finished)
 
     def generate_parameter(self) -> list[dict[str, float | int | str]]:
         """Generate parameters.
@@ -39,6 +40,7 @@ class SobolOptimizer(AbstractOptimizer):
         """
         vec = self.sampler.random()[0]
 
+<<<<<<< HEAD
         self.num_generated_params += 1
         new_params = []
         for vec_i, param in zip(vec, self.params.get_parameter_list()):
@@ -46,6 +48,16 @@ class SobolOptimizer(AbstractOptimizer):
             new_params.append({"parameter_name": param.name, "type": param.type, "value": value})
 
         return self.params.to_original_repr(new_params)
+=======
+        for i in range(0, n_params):
+            min_value = l_params[i].lower
+            max_value = l_params[i].upper
+            value = (max_value - min_value) * vec[i] + min_value
+            new_param = {"parameter_name": l_params[i].name, "type": l_params[i].type, "value": value}
+            new_params.append(new_param)
+
+        return new_params
+>>>>>>> 8876d0f (Refactoring #2)
 
     def generate_initial_parameter(self) -> list[dict[str, float | int | str]]:
         """Generate initial parameters.
