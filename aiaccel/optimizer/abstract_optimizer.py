@@ -79,6 +79,8 @@ class AbstractOptimizer(AiaccelCore):
         self.storage.hp.set_any_trial_params(trial_id=self.trial_id.get(), params=params)
         self.storage.trial.set_any_trial_state(trial_id=self.trial_id.get(), state="ready")
         self.num_of_generated_parameter += 1
+        self.logger.debug(f"Generated parameters: {params}")
+        self.logger.debug(f"Num Of Generated parameters: {self.num_of_generated_parameter}")
 
     def generate_initial_parameter(self) -> Any:
         """Generate a list of initial parameters.

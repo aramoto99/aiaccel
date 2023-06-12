@@ -68,9 +68,15 @@ def main() -> None:  # pragma: no cover
     Scheduler = create_scheduler(config.resource.type.value)
     Optimizer = create_optimizer(config.optimize.search_algorithm)
 
+    # resume
     opt = Optimizer(config)
+    if config.resume is not None:
+        opt.resume()
+
+    tensorboard = TensorBoard(config)
+
     # modules: list[AbstractModule] = [Optimizer(config), Scheduler(config, Optimizer(config)), TensorBoard(config)]
-    modules: list[AiaccelCore] = [Scheduler(config, opt), TensorBoard(config)]
+    modules: list[AiaccelCore] = [Scheduler(config, opt)]
 
     time_s = time.time()
 
@@ -120,6 +126,8 @@ def main() -> None:  # pragma: no cover
                             f"running: {num_running}, "
                             f"end estimated time: {end_estimated_time}"
                         )
+                        # TensorBoard
+                        tensorboard.update()
 
                     buff.d['available_pool_size'].Add(available_pool_size)
                     if (

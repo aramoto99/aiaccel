@@ -9,7 +9,6 @@ from aiaccel.optimizer import AbstractOptimizer
 from aiaccel.scheduler.algorithm import RandomSampling
 from aiaccel.scheduler.job.job import Job
 from aiaccel.scheduler.job.model.local_model import LocalModel
-from aiaccel.storage import Storage
 from aiaccel.util import Buffer, create_yaml, str_to_logging_level
 
 
@@ -27,7 +26,7 @@ class AbstractScheduler(AiaccelCore):
             to select hyper parameters from a parameter pool.
         available_resource (int): An available current resource number.
         jobs (list[dict]): A list to store job dictionaries.
-        max_resource (int): A max resource number.
+        num_workers (int): A max resource number.
         stats (list[dict]): A list of current status which is updated using ps
             command or qstat command.
     """
@@ -41,28 +40,20 @@ class AbstractScheduler(AiaccelCore):
             str_to_logging_level(self.config.logger.stream_level.scheduler),
             "Scheduler",
         )
-<<<<<<< HEAD
-
-        self.max_resource = self.config.resource.num_workers
-=======
         self.optimizer = optimizer
-        self.max_resource = self.config.resource.num_node
->>>>>>> 4604ade (Remove master module)
-        self.available_resource = self.max_resource
+        self.num_workers = self.config.resource.num_workers
+        self.available_resource = self.num_workers
         self.stats: list[Any] = []
         self.jobs: list[Any] = []
         self.job_status: dict[Any, Any] = {}
         self.algorithm: Any = None
-<<<<<<< HEAD
         self.num_workers = self.config.resource.num_workers
-=======
-        self.num_node = self.config.resource.num_node
         self.buff = Buffer([trial_id for trial_id in range(self.config.optimize.trial_number)])
         for trial_id in range(self.config.optimize.trial_number):
             self.buff.d[trial_id].set_max_len(2)
         self.all_parameters_generated = False
 
-        self.max_pool_size = self.config.resource.num_node
+        self.max_pool_size = self.config.resource.num_workers
         self.trial_number = self.config.optimize.trial_number
         self.num_ready = 0
         self.num_running = 0
@@ -86,7 +77,6 @@ class AbstractScheduler(AiaccelCore):
 
     def get_available_pool_size(self) -> int:
         return self.available_pool_size
->>>>>>> 4604ade (Remove master module)
 
     def change_state_finished_trials(self) -> None:
         """Create finished hyper parameter files if result files can be found
@@ -145,7 +135,7 @@ class AbstractScheduler(AiaccelCore):
         succeed_jobs = [job for job in self.jobs if job.get_state_name() == "Success"]
         ready_jobs = [job for job in self.jobs if job.get_state_name() in state_names]
         num_running_jobs = len(self.jobs) - len(ready_jobs) - len(succeed_jobs)
-        self.available_resource = max(0, self.max_resource - num_running_jobs)
+        self.available_resource = max(0, self.num_workers - num_running_jobs)
 
     def pre_process(self) -> None:
         """Pre-procedure before executing processes.
@@ -165,7 +155,7 @@ class AbstractScheduler(AiaccelCore):
             self.logger.info(f"restart hp files in previous running directory: {running}")
 
             while job.get_state_name() != "Scheduling":
-                job.main()
+                job.maie()
             job.schedule()
 
     def is_job_all_finished(self) -> bool:
@@ -184,6 +174,32 @@ class AbstractScheduler(AiaccelCore):
         """
         self.logger.info("Scheduler finished.")
 
+    def search_hyperparameters(self, num_ready, num_running, num_finished) -> None:
+        """Start hyper parameter optimization.
+
+        Returns:
+            None
+        """
+        sum_status = num_ready + num_running + num_finished
+        if sum_status >= self.trial_number and not self.all_parameters_generated:
+            self.all_parameters_generated = True
+            self.available_pool_size = 0
+            self.logger.info(f"trial_number: {self.trial_number}, ready: {num_ready}, running: {num_running}, finished: {num_finished}")
+            self.logger.info("All parameters are generated.")
+        elif (self.trial_number - sum_status) < self.max_pool_size:
+            self.available_pool_size = self.trial_number - sum_status
+        else:
+            self.available_pool_size = self.max_pool_size - num_running - num_ready
+
+        if self.available_pool_size == 0:
+            return
+
+        if (
+            not self.all_parameters_processed(num_ready, num_running) and
+            not self.all_parameters_registered(num_ready, num_running, num_finished)
+        ):
+            self.optimizer.run_optimizer_multiple_times(self.available_pool_size)
+
     def inner_loop_main_process(self) -> bool:
         """A main loop process. This process is repeated every main loop.
 
@@ -192,13 +208,7 @@ class AbstractScheduler(AiaccelCore):
         """
 
         self.num_ready, self.num_running, self.num_finished = self.storage.get_num_running_ready_finished()
-        self.available_pool_size = self.max_pool_size - self.num_running - self.num_ready
-        if (
-            not self.all_parameters_processed(self.num_ready, self.num_running) and
-            not self.all_parameters_registered(self.num_ready, self.num_running, self.num_finished)
-        ):
-            self.optimizer.run_optimizer_multiple_times(self.available_pool_size)
-
+        self.search_hyperparameters(self.num_ready, self.num_running, self.num_finished)
         if self.num_finished >= self.config.optimize.trial_number:
             return False
 

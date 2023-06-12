@@ -3,7 +3,6 @@ from __future__ import annotations
 from omegaconf.dictconfig import DictConfig
 from scipy.stats import qmc
 
-from aiaccel.converted_parameter import ConvertedParameterConfiguration
 from aiaccel.optimizer import AbstractOptimizer
 
 
@@ -26,20 +25,9 @@ class SobolOptimizer(AbstractOptimizer):
 
     def __init__(self, config: DictConfig) -> None:
         super().__init__(config)
-        self.params: ConvertedParameterConfiguration = ConvertedParameterConfiguration(self.params)
-        self.num_generated_params = 0
         self.sampler = qmc.Sobol(
             d=len(self.params.get_parameter_list()), scramble=self.config.optimize.sobol_scramble, seed=self._rng
         )
-
-    def pre_process(self) -> None:
-        """Pre-procedure before executing processes.
-
-        Returns:
-            None
-        """
-        super().pre_process()
-
         finished = self.storage.trial.get_finished()
         self.num_generated_params = len(finished)
 
