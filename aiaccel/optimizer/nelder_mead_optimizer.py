@@ -9,9 +9,9 @@ from omegaconf.listconfig import ListConfig
 
 from aiaccel.config import is_multi_objective
 from aiaccel.converted_parameter import ConvertedParameterConfiguration
+from aiaccel.optimizer import AbstractOptimizer, NelderMead
 from aiaccel.optimizer._nelder_mead import NelderMead
 from aiaccel.optimizer.abstract_optimizer import AbstractOptimizer
-from aiaccel.parameter import HyperParameter
 
 
 class NelderMeadOptimizer(AbstractOptimizer):

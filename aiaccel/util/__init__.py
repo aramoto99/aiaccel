@@ -1,3 +1,4 @@
+from aiaccel.parameter import CategoricalParameter, FloatParameter, IntParameter, OrdinalParameter, Parameter
 from aiaccel.util.buffer import Buffer
 from aiaccel.util.easy_visualizer import EasyVisualizer
 from aiaccel.util.filesystem import (
@@ -54,4 +55,9 @@ __all__ = [
     "make_directory",
     "retry",
     "str_to_logging_level",
+    "CategoricalParameter",
+    "FloatParameter",
+    "IntParameter",
+    "OrdinalParameter",
+    "Parameter",
 ]

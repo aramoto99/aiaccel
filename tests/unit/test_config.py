@@ -1,6 +1,7 @@
+import omegaconf
+
 from aiaccel.config import load_config
 from tests.base_test import BaseTest
-import omegaconf
 
 
 class TestConfig(BaseTest):
