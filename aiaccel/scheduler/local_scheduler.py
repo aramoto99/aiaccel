@@ -11,28 +11,6 @@ from aiaccel.util import ps2joblist
 class LocalScheduler(AbstractScheduler):
     """A scheduler class running on a local computer."""
 
-    def get_stats(self) -> None:
-        """Get a current status and update.
-
-        Returns:
-            None
-        """
-        super().get_stats()
-
-        res = ps2joblist()
-        command = self.config.generic.job_command
-        self.stats = []
-        trial_id_list = [job.trial_id for job in self.jobs]
-
-        for r in res:
-            if command in r["name"]:
-                trial_id = int(self.parse_trial_id(r["name"]))
-
-                if trial_id in trial_id_list:
-                    self.stats.append(r)
-                else:
-                    self.logger.warning(f"**** Unknown process: {r}")
-
     def parse_trial_id(self, command: str) -> Any:
         """Parse a command string and extract an unique name.
 

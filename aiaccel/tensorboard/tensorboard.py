@@ -4,12 +4,12 @@ from omegaconf.dictconfig import DictConfig
 from tensorboardX import SummaryWriter
 
 from aiaccel.common import goal_maximize
-from aiaccel.module import AbstractModule
+from aiaccel.module import AiaccelCore
 from aiaccel.util.buffer import Buffer
 from aiaccel.util.trialid import TrialId
 
 
-class TensorBoard(AbstractModule):
+class TensorBoard(AiaccelCore):
     """A class for TensorBoard.
     Args:
         options (dict[str, str | int | bool]): A dictionary containing

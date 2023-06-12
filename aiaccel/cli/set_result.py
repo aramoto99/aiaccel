@@ -80,8 +80,6 @@ def main() -> None:
     if args.error == "":
         del contents["error"]
 
-    print(contents)
-
     create_yaml(args.file, contents)
 
 
