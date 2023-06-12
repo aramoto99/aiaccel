@@ -37,9 +37,8 @@ class AbstractScheduler(AbstractModule):
             str_to_logging_level(self.config.generic.logging_level),
             "Scheduler",
         )
-
         self.optimizer = optimizer
-        self.num_workers = self.config.resource.num_workers
+        self.max_resource = self.config.resource.num_node
         self.trial_number = self.config.optimize.trial_number
         self.num_ready = 0
         self.num_running = 0
@@ -54,6 +53,7 @@ class AbstractScheduler(AbstractModule):
         for trial_id in range(self.start_trial_id, self.config.optimize.trial_number):
             self.buff.d[trial_id].set_max_len(2)
         self.all_parameters_generated = False
+        self.job_completed_count = 0
 
     def updata_num_ready_running_finished(self) -> None:
         self.num_ready = len(self.storage.trial.get_ready())

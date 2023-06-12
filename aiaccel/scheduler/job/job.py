@@ -107,7 +107,6 @@ class Job:
             auto_transitions=False,
             ordered_transitions=False,
         )
-        self.scheduler = scheduler
         self.trial_id = trial_id
         self.proc: Any = None
         self.th_oh: Any = None
