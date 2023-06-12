@@ -10,10 +10,10 @@ from aiaccel.util import file_create
 def create_abci_batch_file(
     trial_id: int,
     param_content: dict[str, Any],
-    output_file_path: Path | str,
+    storage_file_path: Path | str,
     error_file_path: Path | str,
     config_file_path: Path | str,
-    batch_file: Path,
+    runner_file_path: Path,
     job_script_preamble: Path | str | None,
     command: str,
     dict_lock: Path,
@@ -22,15 +22,15 @@ def create_abci_batch_file(
 
     The 'job_script_preamble' is a base of the ABCI batch file. At first, loads
     'job_script_preamble', and adds the 'commands' to the loaded contents. Finally,
-    writes the contents to 'batch_file'.
+    writes the contents to 'runner_file_path'.
 
     Args:
         trial_id (int): A trial id.
         param_content (dict): A dictionary of parameters.
-        output_file_path (Path | str): A path of a output file.
+        storage_file_path (Path | str): A path of a db file.
         error_file_path (Path | str): A path of a error file.
         config_file_path (Path | str): A path of a config file.
-        batch_file (Path): A path of a creating file.
+        runner_file_path (Path): A path of a creating file.
         job_script_preamble (str): A wrapper file of ABCI batch file.
         command (str): A command to execute.
         dict_lock (Path): A directory to store lock files.
@@ -55,14 +55,14 @@ def create_abci_batch_file(
     set_retult = _generate_command_line(
         command="aiaccel-set-result",
         args=[
-            "--file $output_file_path",
+            "--storage_file_path $storage_file_path",
             "--trial_id $trial_id",
             "--config $config_file_path",
-            "--start_time $start_time",
-            "--end_time $end_time",
+            # "--start_time $start_time",
+            # "--end_time $end_time",
             "--objective $ys",
             "--error $error",
-            "--exitcode $exitcode",
+            "--returncode $returncode",
             _generate_param_args(param_content["parameters"]),
         ],
     )
@@ -70,13 +70,13 @@ def create_abci_batch_file(
     set_retult_no_error = _generate_command_line(
         command="aiaccel-set-result",
         args=[
-            "--file $output_file_path",
+            "--storage_file_path $storage_file_path",
             "--trial_id $trial_id",
             "--config $config_file_path",
-            "--start_time $start_time",
-            "--end_time $end_time",
+            # "--start_time $start_time",
+            # "--end_time $end_time",
             "--objective $ys",
-            "--exitcode $exitcode",
+            "--returncode $returncode",
             _generate_param_args(param_content["parameters"]),
         ],
     )
@@ -84,14 +84,14 @@ def create_abci_batch_file(
     main_parts = [
         f"trial_id={str(trial_id)}",
         f"config_file_path={str(config_file_path)}",
-        f"output_file_path={str(output_file_path)}",
+        f"storage_file_path={str(storage_file_path)}",
         f"error_file_path={str(error_file_path)}",
-        'start_time=`date "+%Y-%m-%d %H:%M:%S"`',
+        # 'start_time=`date "+%Y-%m-%d %H:%M:%S"`',
         f'result=`{" ".join(commands)}`',
-        "exitcode=$?",
+        "returncode=$?",
         'ys=$(echo $result | tr -d "[],")',
         "error=`cat $error_file_path`",
-        'end_time=`date "+%Y-%m-%d %H:%M:%S"`',
+        # 'end_time=`date "+%Y-%m-%d %H:%M:%S"`',
         'if [ -n "$error" ]; then',
         "\t" + set_retult,
         "else",
@@ -122,7 +122,7 @@ def create_abci_batch_file(
     for s in main_parts:
         script += s + "\n"
 
-    file_create(batch_file, script, dict_lock)
+    file_create(runner_file_path, script, dict_lock)
 
 
 def _generate_command_line(command: str, args: list[str]) -> str:

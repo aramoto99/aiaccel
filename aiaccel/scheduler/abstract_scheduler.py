@@ -22,7 +22,6 @@ class AbstractScheduler(AbstractModule):
         options (dict[str, str | int | bool]): A dictionary containing
             command line options.
             to select hyper parameters from a parameter pool.
-        available_resource (int): An available current resource number.
         jobs (list[dict]): A list to store job dictionaries.
         num_workers (int): A max resource number.
         stats (list[dict]): A list of current status which is updated using ps
@@ -38,9 +37,8 @@ class AbstractScheduler(AbstractModule):
             str_to_logging_level(self.config.logger.stream_level.scheduler),
             "Scheduler",
         )
-
         self.optimizer = optimizer
-        self.num_workers = self.config.resource.num_workers
+        self.max_resource = self.config.resource.num_node
         self.trial_number = self.config.optimize.trial_number
         self.num_ready = 0
         self.num_running = 0
@@ -55,6 +53,7 @@ class AbstractScheduler(AbstractModule):
         for trial_id in range(self.start_trial_id, self.config.optimize.trial_number):
             self.buff.d[trial_id].set_max_len(2)
         self.all_parameters_generated = False
+        self.job_completed_count = 0
 
     def updata_num_ready_running_finished(self) -> None:
         self.num_ready = len(self.storage.trial.get_ready())
@@ -73,21 +72,6 @@ class AbstractScheduler(AbstractModule):
 
     def get_available_pool_size(self) -> int:
         return self.available_pool_size
-
-    def change_state_finished_trials(self) -> None:
-        """Create finished hyper parameter files if result files can be found
-        and running files are in running directory.
-
-        Returns:
-            None
-        """
-        runnings = self.storage.trial.get_running()
-        result_names = self.storage.result.get_result_trial_id_list()
-        if result_names is None:
-            return
-        for running in runnings:
-            if running in result_names:
-                self.storage.trial.set_any_trial_state(trial_id=running, state="finished")
 
     def start_job(self, trial_id: int) -> Any:
         """Start a new job.
@@ -110,27 +94,6 @@ class AbstractScheduler(AbstractModule):
             self.logger.error(f"Specified trial {trial_id} is already running ")
             return None
 
-    def update_resource(self) -> None:
-        """Update an available current resource number.
-
-        Returns:
-            None
-        """
-        state_names = [
-            "Init",
-            "RunnerReady",
-            "RunnerChecking",
-            "RunnerConfirmed",
-            "RunnerFailed",
-            "RunnerFailure",
-            "Scheduling",
-        ]
-
-        succeed_jobs = [job for job in self.jobs if job.get_state_name() == "Success"]
-        ready_jobs = [job for job in self.jobs if job.get_state_name() in state_names]
-        num_running_jobs = len(self.jobs) - len(ready_jobs) - len(succeed_jobs)
-        self.available_resource = max(0, self.num_workers - num_running_jobs)
-
     def pre_process(self) -> None:
         """Pre-procedure before executing processes.
 
@@ -139,17 +102,6 @@ class AbstractScheduler(AbstractModule):
         """
         self.write_random_seed_to_debug_log()
         self.resume()
-
-        self.change_state_finished_trials()
-
-        runnings = self.storage.trial.get_running()
-        for running in runnings:
-            job = self.start_job(running)
-            self.logger.info(f"restart hp files in previous running directory: {running}")
-
-            while job.get_state_name() != "Scheduling":
-                job.maie()
-            job.schedule()
 
     def post_process(self) -> None:
         """Post-procedure after executed processes.
@@ -185,7 +137,7 @@ class AbstractScheduler(AbstractModule):
         ):
             self.optimizer.run_optimizer_multiple_times(self.available_pool_size)
 
-    def inner_loop_main_process(self) -> bool:
+    def run_in_main_loop(self) -> bool:
         """A main loop process. This process is repeated every main loop.
 
         Returns:
@@ -203,99 +155,23 @@ class AbstractScheduler(AbstractModule):
             if ready not in [job.trial_id for job in self.jobs]:
                 self.start_job(ready)
 
-        scheduled_candidates = []
-        for job in self.jobs:
-            if job.get_state_name() == "Scheduling":
-                scheduled_candidates.append(job)
-
-        if len(scheduled_candidates) > 0:
-            for job in scheduled_candidates:
-                if job.get_state_name() == "Scheduling":
-                    self._serialize(job.trial_id)
-                    job.schedule()
-                    self.logger.debug(f"trial id: {job.trial_id} has been scheduled.")
-                    scheduled_candidates.remove(job)
-
         for job in self.jobs:
             job.main()
+            state_name = job.get_state_name()
+            if state_name in {"success", "failed"}:
+                self.job_completed_count += 1
+                self.jobs.remove(job)
             # Only log if the state has changed.
             if job.trial_id in self.buff.d.keys():
-                self.buff.d[job.trial_id].Add(job.get_state_name())
+                self.buff.d[job.trial_id].Add(state_name)
                 if self.buff.d[job.trial_id].has_difference():
-                    self.logger.info(f"name: {job.trial_id}, state: {job.get_state_name()}")
+                    self.logger.info(f"name: {job.trial_id}, state: {state_name}")
 
-        self.update_resource()
-
-        if self.all_done() is True:
+        if self.trial_number == self.job_completed_count:
+            # All jobs are completed
+            self.logger.info("All jobs are completed.")
             return False
-
         return True
-
-    def parse_trial_id(self, command: str) -> str | None:
-        """Parse a command string and extract an unique name.
-
-        Args:
-            command (str): A command string from ps command.
-
-        Returns:
-            str: An unique name.
-        """
-        pass
-
-    def check_error(self) -> bool:
-        # Check state machin
-        jobstates = self.storage.jobstate.get_all_trial_jobstate()
-        for trial_id in self.job_status.keys():
-            for jobstate in jobstates:
-                if jobstate["trial_id"] == trial_id and "failure" in jobstate["jobstate"].lower():
-                    self.logger.info(
-                        f"Job: {trial_id} is Failed.({self.job_status[trial_id]})\n"
-                        f"This is a fatal internal error. "
-                        f"Please review the configuration file. "
-                        f"In particular, we recommend that you "
-                        f"review the following items: "
-                        f"{'cancel_timeout'}, "
-                        f"{'expire_timeout'}, "
-                        f"{'finished_timeout'}, "
-                        f"{'job_timeout'}, "
-                        f"{'kill_timeout'}, "
-                        f"{'batch_job_timeout'}, "
-                        f"{'runner_timeout'}, "
-                        f"{'running_timeout'}"
-                    )
-                    return False
-
-        # Get error trials
-        error_trial_ids = self.storage.error.get_error_trial_id()
-        if len(error_trial_ids) > 0:
-            return False
-
-        # Get error messages
-        for trial_id in error_trial_ids:
-            error_message = self.storage.error.get_any_trial_error(trial_id=trial_id)
-            self.logger.error(error_message)
-
-        return True
-
-    def all_done(self) -> bool:
-        done_states = [
-            "Success",
-            "HpCancelFailure",
-            "KillFailure",
-            "HpExpiredFailure",
-            "HpFinishedFailure",
-            "JobFailure",
-            "HpRunningFailure",
-            "RunnerFailure",
-        ]
-    
-        jobstates = [s['jobstate'] for s in self.storage.jobstate.get_all_trial_jobstate()]
-
-        num_trials = 0
-        for s in done_states:
-            num_trials += jobstates.count(s)
-
-        return num_trials >= self.config.optimize.trial_number
 
     def resume(self) -> None:
         """When in resume mode, load the previous optimization data in advance.
@@ -344,16 +220,12 @@ class AbstractScheduler(AbstractModule):
         if best_trial_ids is None:
             self.logger.error(f"Failed to output {self.workspace.final_result_file}.")
             return
-
         hp_results = []
-
         for best_trial_id in best_trial_ids:
             hp_results.append(self.storage.get_hp_dict(best_trial_id))
-
+        create_yaml(self.workspace.final_result_file, hp_results, self.workspace.lock)
         self.logger.info("Best hyperparameter is followings:")
         self.logger.info(hp_results)
-
-        create_yaml(self.workspace.final_result_file, hp_results, self.workspace.lock)
 
     def all_parameters_processed(self, num_ready, num_running) -> bool:
         """Checks whether any unprocessed parameters are left.

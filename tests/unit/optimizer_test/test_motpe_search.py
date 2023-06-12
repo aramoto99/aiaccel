@@ -26,7 +26,7 @@ class TestMOTpeOptimizer(BaseTest):
 
     def test_check_result(self, setup_hp_finished, setup_result, work_dir):
         self.optimizer.pre_process()
-        self.optimizer.inner_loop_main_process()
+        self.optimizer.run_in_main_loop()
         with warnings.catch_warnings():
             warnings.simplefilter('error', UserWarning)
             with patch.object(self.optimizer.storage.result, 'get_any_trial_objective', return_value=1):

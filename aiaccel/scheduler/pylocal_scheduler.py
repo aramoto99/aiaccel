@@ -32,7 +32,7 @@ class PylocalScheduler(AbstractScheduler):
         Pool_ = Pool if self.num_workers > 1 else ThreadPool
         self.pool = Pool_(self.num_workers, initializer=initializer, initargs=(self.config.config_path,))
 
-    def inner_loop_main_process(self) -> bool:
+    def run_in_main_loop(self) -> bool:
         """A main loop process. This process is repeated every main loop.
 
         Returns:
@@ -59,7 +59,7 @@ class PylocalScheduler(AbstractScheduler):
             self.report(trial_id, ys, err, start_time, end_time)
             self.storage.trial.set_any_trial_state(trial_id=trial_id, state="finished")
 
-            self.create_result_file(trial_id, xs, ys, err, start_time, end_time)
+            self.write_result_to_storage(trial_id, xs, ys, err, start_time, end_time)
 
         return True
 
@@ -114,22 +114,11 @@ class PylocalScheduler(AbstractScheduler):
         """
         return None
 
-    def get_result_file_path(self) -> Path:
-        """Get a path to the result file.
-
-        Args:
-            trial_id (int): Trial Id.
-
-        Returns:
-            PosixPath: A Path object which points to the result file.
-        """
-        return self.workspace.get_any_result_file_path(self.trial_id.get())
-
-    def create_result_file(
+    def write_result_to_storage(
         self, trial_id: int, xs: dict[str, Any], ys: list[Any], error: str, start_time: str, end_time: str
     ) -> None:
         args = {
-            "file": self.workspace.get_any_result_file_path(trial_id),
+            "storage_file_path": self.workspace.storage_file_path,
             "trial_id": str(trial_id),
             "config": self.config.config_path,
             "start_time": start_time,
