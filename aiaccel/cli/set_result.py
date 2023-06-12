@@ -33,14 +33,30 @@ def write_results_to_database(
         storage.error.set_any_trial_error(trial_id, error)
 
 
-def str_or_float_or_int(value: str | float | int) -> str | float | int:
-    try:
-        return int(value)
-    except ValueError:
-        try:
-            return float(value)
-        except ValueError:
-            return value
+def write_results_to_database(
+    storage_file_path: str | Path,
+    trial_id: int,
+    objective: float | None,
+    start_time: str | None,
+    end_time: str | None,
+    error: str,
+    returncode: int | None
+) -> None:
+
+    storage = Storage(storage_file_path)
+
+    if objective is None:
+        raise Exception("Could not get objective")
+    storage.result.set_any_trial_objective(trial_id, objective)
+
+    if start_time is not None:
+        storage.timestamp.set_any_trial_start_time(trial_id, start_time)
+    if end_time is not None:
+        storage.timestamp.set_any_trial_end_time(trial_id, end_time)
+    if returncode is not None:
+        storage.returncode.set_any_trial_returncode(trial_id, returncode)
+    if error != "":
+        storage.error.set_any_trial_error(trial_id, error)
 
 
 def main() -> None:

@@ -23,7 +23,7 @@ class AbstractScheduler(AbstractModule):
             command line options.
             to select hyper parameters from a parameter pool.
         jobs (list[dict]): A list to store job dictionaries.
-        max_resource (int): A max resource number.
+        num_workers (int): A max resource number.
         stats (list[dict]): A list of current status which is updated using ps
             command or qstat command.
     """
@@ -58,7 +58,7 @@ class AbstractScheduler(AbstractModule):
         self.num_ready = len(self.storage.trial.get_ready())
         self.num_running = len(self.storage.trial.get_running())
         self.num_finished = len(self.storage.trial.get_finished())
-        self.available_pool_size = self.max_resource - self.num_running
+        self.available_pool_size = self.num_workers - self.num_running
 
     def get_num_ready(self) -> int:
         return self.num_ready
@@ -122,10 +122,10 @@ class AbstractScheduler(AbstractModule):
             self.available_pool_size = 0
             self.logger.info(f"trial_number: {self.trial_number}, ready: {num_ready}, running: {num_running}, finished: {num_finished}")
             self.logger.info("All parameters are generated.")
-        elif (self.trial_number - sum_status) < self.max_resource:
+        elif (self.trial_number - sum_status) < self.num_workers:
             self.available_pool_size = self.trial_number - sum_status
         else:
-            self.available_pool_size = self.max_resource - num_running - num_ready
+            self.available_pool_size = self.num_workers - num_running - num_ready
 
         if self.available_pool_size == 0:
             return
