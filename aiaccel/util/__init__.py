@@ -15,7 +15,7 @@ from aiaccel.util.filesystem import (
     make_directory,
 )
 from aiaccel.util.logger import str_to_logging_level
-from aiaccel.util.process import OutputHandler, subprocess_ps
+from aiaccel.util.process import OutputHandler
 from aiaccel.util.retry import retry
 from aiaccel.util.suffix import Suffix
 from aiaccel.util.time_tools import (
@@ -55,7 +55,6 @@ __all__ = [
     "make_directory",
     "retry",
     "str_to_logging_level",
-    "subprocess_ps",
     "CategoricalParameter",
     "FloatParameter",
     "IntParameter",

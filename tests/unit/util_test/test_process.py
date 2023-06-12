@@ -2,18 +2,12 @@ import os
 import subprocess
 from subprocess import PIPE
 
-from aiaccel.util import (OutputHandler, exec_runner, is_process_running,
-                          kill_process, ps2joblist, subprocess_ps)
+from aiaccel.util import OutputHandler, exec_runner, is_process_running, kill_process, ps2joblist
 
 
 def test_exec_runner():
     assert type(exec_runner(['ps'])) is subprocess.Popen
     assert type(exec_runner(['ps'])) is subprocess.Popen
-
-
-def test_subprocess_ps():
-    ret = subprocess_ps()
-    assert type(ret) is list
 
 
 '''
