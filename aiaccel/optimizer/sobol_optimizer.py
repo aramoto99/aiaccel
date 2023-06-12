@@ -3,6 +3,7 @@ from __future__ import annotations
 from omegaconf.dictconfig import DictConfig
 from scipy.stats import qmc
 
+from aiaccel.converted_parameter import ConvertedParameterConfiguration
 from aiaccel.optimizer import AbstractOptimizer
 
 
@@ -28,6 +29,7 @@ class SobolOptimizer(AbstractOptimizer):
         self.sampler = qmc.Sobol(
             d=len(self.params.get_parameter_list()), scramble=self.config.optimize.sobol_scramble, seed=self._rng
         )
+        self.params: ConvertedParameterConfiguration = ConvertedParameterConfiguration(self.params)
 
     def generate_parameter(self) -> list[dict[str, float | int | str]]:
         """Generate parameters.
