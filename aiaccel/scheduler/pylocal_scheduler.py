@@ -13,7 +13,6 @@ from aiaccel.optimizer import AbstractOptimizer
 from aiaccel.scheduler.abstract_scheduler import AbstractScheduler
 from aiaccel.util import get_time_now
 from aiaccel.util.aiaccel import Run, set_logging_file_for_trial_id
-from aiaccel.util.cast import cast_y
 
 # These are for avoiding mypy-errors from initializer().
 # `global` does not work well.
@@ -208,18 +207,17 @@ def execute(args: Any) -> tuple[int, dict[str, Any], list[Any], str, str, str]:
     set_logging_file_for_trial_id(workspace, trial_id)
 
     try:
-        # y = cast_y(user_func(xs), y_data_type=None)
         y = user_func(xs)
         if isinstance(y, list):
-            y = [cast_y(yi, y_data_type=None) for yi in y]
+            ys = [yi for yi in y]
         else:
-            y = [cast_y(y, y_data_type=None)]
+            ys = [y]
     except BaseException as e:
         err = str(e)
-        y = [None]
+        ys = [None]
     else:
         err = ""
 
     end_time = get_time_now()
 
-    return trial_id, xs, y, err, start_time, end_time
+    return trial_id, xs, ys, err, start_time, end_time

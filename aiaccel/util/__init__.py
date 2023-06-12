@@ -1,6 +1,5 @@
 from aiaccel.parameter import CategoricalParameter, FloatParameter, IntParameter, OrdinalParameter, Parameter
 from aiaccel.util.buffer import Buffer
-from aiaccel.util.cast import cast_y
 from aiaccel.util.easy_visualizer import EasyVisualizer
 from aiaccel.util.filesystem import (
     create_yaml,
@@ -38,7 +37,6 @@ __all__ = [
     # 'Run',
     "Suffix",
     "TrialId",
-    "cast_y",
     "create_yaml",
     "exec_runner",
     "file_create",

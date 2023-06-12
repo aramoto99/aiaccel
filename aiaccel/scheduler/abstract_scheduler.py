@@ -6,7 +6,6 @@ from omegaconf.dictconfig import DictConfig
 
 from aiaccel.module import AbstractModule
 from aiaccel.optimizer import AbstractOptimizer
-from aiaccel.scheduler.algorithm import RandomSampling
 from aiaccel.scheduler.job.job import Job
 from aiaccel.scheduler.job.model.local_model import LocalModel
 from aiaccel.util import Buffer, create_yaml, str_to_logging_level
@@ -22,7 +21,6 @@ class AbstractScheduler(AbstractModule):
     Attributes:
         options (dict[str, str | int | bool]): A dictionary containing
             command line options.
-        algorithm (RandomSamplingSchedulingAlgorithm): A scheduling algorithm
             to select hyper parameters from a parameter pool.
         available_resource (int): An available current resource number.
         jobs (list[dict]): A list to store job dictionaries.
@@ -52,7 +50,6 @@ class AbstractScheduler(AbstractModule):
         self.stats: list[Any] = []
         self.jobs: list[Any] = []
         self.job_status: dict[Any, Any] = {}
-        self.algorithm: Any = None
         self.start_trial_id = self.config.resume if self.config.resume is not None else 0
         self.buff = Buffer([trial_id for trial_id in range(self.start_trial_id, self.trial_number)])
         for trial_id in range(self.start_trial_id, self.config.optimize.trial_number):
@@ -86,10 +83,8 @@ class AbstractScheduler(AbstractModule):
         """
         runnings = self.storage.trial.get_running()
         result_names = self.storage.result.get_result_trial_id_list()
-
         if result_names is None:
             return
-
         for running in runnings:
             if running in result_names:
                 self.storage.trial.set_any_trial_state(trial_id=running, state="finished")
@@ -145,7 +140,6 @@ class AbstractScheduler(AbstractModule):
         self.write_random_seed_to_debug_log()
         self.resume()
 
-        self.algorithm = RandomSampling(self.config)
         self.change_state_finished_trials()
 
         runnings = self.storage.trial.get_running()
@@ -214,15 +208,13 @@ class AbstractScheduler(AbstractModule):
             if job.get_state_name() == "Scheduling":
                 scheduled_candidates.append(job)
 
-        selected_jobs = self.algorithm.select_hp(scheduled_candidates, self.available_resource, rng=self._rng)
-
-        if len(selected_jobs) > 0:
-            for job in selected_jobs:
+        if len(scheduled_candidates) > 0:
+            for job in scheduled_candidates:
                 if job.get_state_name() == "Scheduling":
                     self._serialize(job.trial_id)
                     job.schedule()
                     self.logger.debug(f"trial id: {job.trial_id} has been scheduled.")
-                    selected_jobs.remove(job)
+                    scheduled_candidates.remove(job)
 
         for job in self.jobs:
             job.main()
