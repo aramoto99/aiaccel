@@ -32,9 +32,9 @@ class AbstractScheduler(AbstractModule):
         super().__init__(config, "scheduler")
         self.set_logger(
             "root.scheduler",
-            self.workspace.log / self.config.logger.file.scheduler,
-            str_to_logging_level(self.config.logger.log_level.scheduler),
-            str_to_logging_level(self.config.logger.stream_level.scheduler),
+            self.workspace.log / "scheduler.log",
+            str_to_logging_level(self.config.generic.logging_level),
+            str_to_logging_level(self.config.generic.logging_level),
             "Scheduler",
         )
         self.optimizer = optimizer
@@ -158,9 +158,10 @@ class AbstractScheduler(AbstractModule):
         for job in self.jobs:
             job.main()
             state_name = job.get_state_name()
-            if state_name in {"success", "failed"}:
+            if state_name in {"success", "failed", "timeout"}:
                 self.job_completed_count += 1
                 self.jobs.remove(job)
+                continue
             # Only log if the state has changed.
             if job.trial_id in self.buff.d.keys():
                 self.buff.d[job.trial_id].Add(state_name)

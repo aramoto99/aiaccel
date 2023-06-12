@@ -106,7 +106,7 @@
     ]
   },
   "job_setting": {
-    "name_length": 6,
+    "trial_id_digits": 6,
     "init_fail_count": 100,
     "cancel_retry": 3,
     "cancel_timeout": 60,

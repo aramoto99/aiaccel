@@ -45,7 +45,7 @@ class AdditionalBudgetSpecifiedGridTest(BaseTest):
             popen = Popen(
                 ['aiaccel-start', '--config', str(config_file), '--clean']
             )
-            popen.wait(timeout=config.generic.batch_job_timeout)
+            popen.wait(timeout=config.job_setting.job_timeout_seconds)
 
         return config, storage, popen
 

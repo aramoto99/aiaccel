@@ -18,8 +18,8 @@ def test_zero_padding_any_trial_id(create_tmp_config):
     config = load_config(config_path)
     trial_id = TrialId(config)
 
-    name_length = config.job_setting.name_length
-    file_hp_count_fmt = f'%0{name_length}d'
+    trial_id_digits = config.job_setting.trial_id_digits
+    file_hp_count_fmt = f'%0{trial_id_digits}d'
     assert trial_id.zero_padding_any_trial_id(trial_id=1) == file_hp_count_fmt % 1
 
 
@@ -73,8 +73,8 @@ def test_string(create_tmp_config):
     config = load_config(config_path)
     trial_id = TrialId(config)
 
-    name_length = config.job_setting.name_length
-    file_hp_count_fmt = f'%0{name_length}d'
+    trial_id_digits = config.job_setting.trial_id_digits
+    file_hp_count_fmt = f'%0{trial_id_digits}d'
 
     trial_id.initial(num=42)
     assert trial_id.string == file_hp_count_fmt % 42

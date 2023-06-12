@@ -45,9 +45,8 @@ class GenericConfig:
     job_command: str
     python_file: str
     function: str
-    batch_job_timeout: int
-    sleep_time: Union[float, int]
-    is_ignore_warning: bool
+    main_loop_sleep_seconds: Union[float, int]
+    logging_level: str
 
 
 @dataclass
@@ -61,7 +60,6 @@ class AbciConifig:
     group: str
     job_script_preamble: str
     job_execution_options: Optional[str]
-    runner_search_pattern: Optional[str]
 
 
 @dataclass
@@ -94,38 +92,9 @@ class OptimizeConifig:
 
 @dataclass
 class JobConfig:
-    cancel_retry: int
-    cancel_timeout: int
-    expire_retry: int
-    expire_timeout: int
-    finished_retry: int
-    finished_timeout: int
-    job_retry: int
-    job_timeout: int
-    kill_retry: int
-    kill_timeout: int
-    result_retry: int
-    runner_retry: int
-    runner_timeout: int
-    running_retry: int
-    running_timeout: int
-    init_fail_count: int
-    name_length: int
-    random_scheduling: bool
-
-
-@dataclass
-class LoggingItemConifig:
-    master: str
-    optimizer: str
-    scheduler: str
-
-
-@dataclass
-class LoggerConfig:
-    file: LoggingItemConifig
-    log_level: LoggingItemConifig
-    stream_level: LoggingItemConifig
+    job_timeout_seconds: float
+    max_failure_retries: int
+    trial_id_digits: int
 
 
 @dataclass
@@ -144,7 +113,6 @@ class Config:
     ABCI: AbciConifig
     optimize: OptimizeConifig
     job_setting: JobConfig
-    logger: Optional[LoggerConfig]
     clean: Optional[bool]
     resume: Optional[Union[None, int]]
     config_path: Optional[Union[None, Path, str]]

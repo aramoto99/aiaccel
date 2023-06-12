@@ -72,7 +72,7 @@ msgid "**job_command** - ユーザープログラムを実行するためのコ�
 msgstr ""
 
 #: ../../source/examples/local_random.md:36
-msgid "**batch_job_timeout** - ジョブのタイムアウト時間を設定します．[単位: 秒]"
+msgid "**job_timeout_seconds** - ジョブのタイムアウト時間を設定します．[単位: 秒]"
 msgstr ""
 
 #: ../../source/examples/local_random.md:39

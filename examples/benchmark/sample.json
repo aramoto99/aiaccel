@@ -50,7 +50,7 @@
   },
   "ABCI": {
     "abci_wrapper": "wrapper_abci.sh",
-    "group": "gaa50073",
+    "group": "",
     "runner_search_pattern": "run_*.sh"
   },
   "hyperparameter": {

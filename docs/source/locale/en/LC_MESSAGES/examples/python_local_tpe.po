@@ -86,7 +86,7 @@ msgid "**function** - 最適化対象の関数名を設定します．"
 msgstr ""
 
 #: ../../source/examples/python_local_tpe.md:40
-msgid "**batch_job_timeout** - ジョブのタイムアウト時間を設定します．[単位: 秒]"
+msgid "**job_timeout_seconds** - ジョブのタイムアウト時間を設定します．[単位: 秒]"
 msgstr ""
 
 #: ../../source/examples/python_local_tpe.md:42

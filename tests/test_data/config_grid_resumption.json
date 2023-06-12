@@ -4,7 +4,7 @@
     "job_command": "python original_main.py",
     "python_file": "original_main.py",
     "function": "main",
-    "batch_job_timeout": 600
+    "job_timeout_seconds": 600
   },
   "resource": {
     "type": "python_local",
@@ -114,7 +114,7 @@
     ]
   },
   "job_setting": {
-    "name_length": 6,
+    "trial_id_digits": 6,
     "init_fail_count": 100,
     "cancel_retry": 3,
     "cancel_timeout": 60,

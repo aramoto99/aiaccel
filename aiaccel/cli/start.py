@@ -142,7 +142,7 @@ def main() -> None:  # pragma: no cover
                     buff.d['num_finished'].Clear()
                     buff.d['available_pool_size'].Clear()
 
-                time.sleep(config.generic.sleep_time)
+                time.sleep(config.generic.main_loop_sleep_seconds)
                 continue
             break
         except Exception as e:

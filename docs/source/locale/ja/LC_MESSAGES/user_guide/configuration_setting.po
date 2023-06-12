@@ -65,7 +65,7 @@ msgid ""
 msgstr ""
 
 #: ../../source/user_guide/configuration_setting.md:20
-msgid "batch_job_timeout (int, optional):"
+msgid "job_timeout_seconds (int, optional):"
 msgstr ""
 
 #: ../../source/user_guide/configuration_setting.md:21
@@ -714,7 +714,7 @@ msgid "Defaults to 100."
 msgstr ""
 
 #: ../../source/user_guide/configuration_setting.md:323
-msgid "name_length (int, optional):"
+msgid "trial_id_digits (int, optional):"
 msgstr ""
 
 #: ../../source/user_guide/configuration_setting.md:324

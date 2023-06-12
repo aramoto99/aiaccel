@@ -65,7 +65,7 @@ class AdditionalNumsNodeTrialTest(BaseTest):
             popen = Popen(
                 ['aiaccel-start', '--config', str(config_file), '--clean']
             )
-            popen.wait(timeout=config.generic.batch_job_timeout)
+            popen.wait(timeout=config.job_setting.job_timeout_seconds)
         self.evaluate(work_dir, config, storage)
 
     def evaluate(self, work_dir: Path, config: DictConfig, storage: Storage) -> None:

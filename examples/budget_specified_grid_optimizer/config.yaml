@@ -1,7 +1,7 @@
 generic:
   workspace: "./work"
   job_command: "python user.py"
-  batch_job_timeout: 600
+  job_timeout_seconds: 600
 
 resource:
   type: "local"
