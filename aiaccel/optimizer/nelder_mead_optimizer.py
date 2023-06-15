@@ -12,6 +12,7 @@ from aiaccel.converted_parameter import ConvertedParameterConfiguration
 from aiaccel.optimizer import AbstractOptimizer, NelderMead
 from aiaccel.optimizer._nelder_mead import NelderMead
 from aiaccel.optimizer.abstract_optimizer import AbstractOptimizer
+from aiaccel.util.buffer import Buffer
 
 
 class NelderMeadOptimizer(AbstractOptimizer):
@@ -39,9 +40,24 @@ class NelderMeadOptimizer(AbstractOptimizer):
         self.n_dim = len(self.bdrys)
         self.n_vertices = self.n_dim + 1
         self.nelder_mead: Any = None
+        self.range_of_trials = [0] * 2
         if is_multi_objective(self.config):
             raise NotImplementedError("Nelder-Mead optimizer does not support multi-objective optimization.")
         self.single_or_multiple_trial_params = []
+        self.buff = Buffer(["finished"])
+        self.buff.d["finished"].set_max_len(2)
+
+    def new_finished(self) -> list[int]:
+        finished = self.storage.get_finished()
+        if len(finished) == 0:
+            return []
+        self.buff.d["finished"].add(self.storage.get_finished())
+        if self.buff.d["finished"].Len >= 2:
+            pre = self.buff.d["finished"].Pre
+            now = self.buff.d["finished"].Now
+            return list(set(pre) ^ set(now))
+        else:
+            return []
 
     def convert_ndarray_to_parameter(self, multiple_parameter_lists: list[np.ndarray]) -> list[dict[str, float | int | str]]:
         """Convert a list of numpy.ndarray to a list of parameters.
@@ -110,32 +126,77 @@ class NelderMeadOptimizer(AbstractOptimizer):
         Raises:
             TypeError: Causes when an invalid parameter type is set.
         """
+
+
+        nm_state = self.nelder_mead.get_state()
+        if nm_state in {
+            "wait_initialize_completed", "wait_reflect_completed", "wait_expand_completed",
+            "wait_inside_contract_completed", "wait_outside_contract_completed", "wait_shrink_completed"
+        }:
+            if not(self.storage.get_num_ready() == 0 and self.storage.get_num_running() == 0):
+                return None  # wait
+            n_waits = self.nelder_mead.get_n_waits()
+            current_trial_id = self.trial_id.integer
+            print(f"current_trial_id: {current_trial_id}")
+            print(f"n_waits: {n_waits}")
+            if current_trial_id >= n_waits:
+                self.range_of_trials[0] = current_trial_id - n_waits
+                self.range_of_trials[1] = current_trial_id
+                print(f"self.range_of_trials: {self.range_of_trials}")
+                trials = self.get_n_trials(self.range_of_trials[0], self.range_of_trials[1])
+                xs, ys = self.create_simplex(trials)
+                if n_waits == self.n_vertices:
+                    self.nelder_mead.update(xs, ys)
+                    if nm_state == "wait_initialize_completed":
+                        self.nelder_mead.after_initialize()
+                    elif nm_state == "wait_shrink_completed":
+                        self.nelder_mead.aftter_shrink()
+                else:
+                    print(f"xs: {xs}, ys: {ys}")
+                    for i in range(n_waits):
+                        self.nelder_mead.pop()
+                        self.nelder_mead.push(xs[i], ys[i])
+                    if nm_state == "wait_reflect_completed":
+                        self.nelder_mead.after_reflect()
+                    elif nm_state == "wait_expand_completed":
+                        self.nelder_mead.after_expand()
+                    elif nm_state == "wait_inside_contract_completed":
+                        self.nelder_mead.after_inside_contract()
+                    elif nm_state == "wait_outside_contract_completed":
+                        self.nelder_mead.after_outside_contract()
+        elif nm_state == "reflect":
+            ...
+        elif nm_state == "expand":
+            ...
+        elif nm_state == "inside_contract":
+            ...
+        elif nm_state == "outside_contract":
+            ...
+        elif nm_state == "shrink":
+            ...
+
         searched_params = self.nelder_mead_main()
         trial_params: list[dict] = self.convert_ndarray_to_parameter(searched_params)
         for param in trial_params:
             self.single_or_multiple_trial_params.append(param)
-
+    
         if len(self.single_or_multiple_trial_params) == 0:
-            if self.storage.get_num_ready() == 0 and self.storage.get_num_running() == 0:
-                current_trial_id = self.trial_id.integer
-                if current_trial_id >= self.n_vertices:
-                    target_trial_id_1 = current_trial_id - self.n_vertices
-                    target_trial_id_2 = current_trial_id
-                    trials = self.get_n_trials(target_trial_id_1, target_trial_id_2)
-                    xs, ys = self.create_simplex(trials)
-                    self.nelder_mead.update(xs, ys)
-                    return None
-                return None
             return None
+
         new_params = self.single_or_multiple_trial_params.pop(0)
         self.logger.debug(f"new_params: {new_params}")
         return new_params
 
     def get_n_trials(self, trial_id_1: int, trial_id_2: int) -> list[dict[str, Any]]:
-        target_trial_ids = list(range(trial_id_1, trial_id_2))
         trials = []
-        for trial_id in target_trial_ids:
-            trials.append(self.storage.get_hp_dict(trial_id))
+        if trial_id_1 == trial_id_2:
+            trials.append(self.storage.get_hp_dict(trial_id_1))
+            print(self.self.storage.get_finished())
+            print(f"trials: {trials}")
+        else:
+            target_trial_ids = list(range(trial_id_1, trial_id_2))
+            for trial_id in target_trial_ids:
+                trials.append(self.storage.get_hp_dict(trial_id))
         return trials
 
     def create_simplex(self, trials: list[dict[str, Any]]) -> list[Any]:
@@ -150,6 +211,14 @@ class NelderMeadOptimizer(AbstractOptimizer):
             ys.append(trial["result"][0])  # trial["result"] is a list of objective values
         return np.array([xs])[0], np.array([ys][0])
 
+    def to_ndarray_xs_and_y(self, trial: dict) -> list[Any]:
+        params = trial["parameters"]
+        xs = []
+        y = trial["result"][0]  # trial["result"] is a list of objective values
+        for param in params:
+            xs.append(param['value'])
+        return np.array([xs])[0], np.array([y][0])
+
     def nelder_mead_main(self) -> list[Any] | None:
         """Nelder Mead's main module.
 
@@ -160,18 +229,15 @@ class NelderMeadOptimizer(AbstractOptimizer):
             searched_params (list): Result of optimization.
         """
 
-        searched_params: np.ndarray = self.nelder_mead.search()
-        print(f"searched_params: {searched_params}, state: {self.nelder_mead.get_state()}")
+        searched_params: np.ndarray = self.nelder_mead.main()
+        # print(f"searched_params: {searched_params}, state: {self.nelder_mead.get_state()}")
         if searched_params is None:
             return []
         if len(searched_params) == 0:
             return []
-        else:
-            self.nelder_mead.reset()
+        # else:
+        #     self.nelder_mead.reset()
         return searched_params
-
-    def set_controid(self, xs, y):
-        self.nelder_mead.set_centroid(xs, y)
 
     def out_of_boundary(self, y):  # TODO: fix
         for yi, b in zip(y, self.bdrys):
