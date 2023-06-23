@@ -51,11 +51,13 @@ class OutputHandler(threading.Thread):
 
             stdout = self._proc.stdout.readline().decode().strip()
             if stdout:
+                print(stdout)
                 self._stdouts.append(stdout)
 
             if self._proc.stderr is not None:
                 stderr = self._proc.stderr.readline().decode().strip()
                 if stderr:
+                    print(stderr)
                     self._stderrs.append(stderr)
             else:
                 stderr = None
