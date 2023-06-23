@@ -8,7 +8,6 @@ import pytest
 from aiaccel.common import dict_hp_finished, dict_hp_ready, dict_hp_running, dict_runner
 from aiaccel.config import ResourceType
 from aiaccel.scheduler import AbciModel, CustomMachine, Job, LocalModel, LocalScheduler, create_scheduler
-from aiaccel.util import get_time_now_object
 from aiaccel.util.process import OutputHandler
 from tests.base_test import BaseTest
 
@@ -353,9 +352,8 @@ class TestJob(BaseTest):
     def test_run_2(self, database_remove):
         self.job.scheduler.pre_process()
         self.job.main()
-        self.job.threshold_timeout = get_time_now_object()
-        self.job.threshold_timeout =\
-            get_time_now_object() + datetime.timedelta(10)
+        self.job.threshold_timeout = datetime.datetime.now()
+        self.job.threshold_timeout = datetime.datetime.now() + datetime.timedelta(10)
         self.job.get_machine().set_state('Init')
         self.job.count_retry = 100
         self.job.threshold_retry = 10

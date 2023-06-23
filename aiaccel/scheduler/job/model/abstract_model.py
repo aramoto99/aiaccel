@@ -1,10 +1,19 @@
 from __future__ import annotations
 
 from collections.abc import Callable
+from datetime import datetime, timedelta
+from pathlib import Path
 from typing import TYPE_CHECKING, Any
+
+from aiaccel.util.process import kill_process
+from aiaccel.util.retry import retry
 
 if TYPE_CHECKING:
     from aiaccel.scheduler import Job
+
+
+def _threshold_timeout(timeout_seconds: float) -> datetime:
+    return datetime.now() + timedelta(seconds=timeout_seconds)
 
 
 class AbstractModel(object):
