@@ -17,7 +17,6 @@ from aiaccel.parameter import (
     IntParameter,
     OrdinalParameter,
 )
-from aiaccel.util import cast_y
 from aiaccel.util.data_type import str_or_float_or_int
 
 
