@@ -44,7 +44,6 @@ class NelderMeadOptimizer(AbstractOptimizer):
         self.map_trial_id_and_vertex_id = {}
         self.completed_trial_ids = []
 
-
     def create_initial_values(self, initial_parameters: list[dict[str, Any]]) -> np.ndarray[Any, Any]:
         initial_values = [
             [self.create_initial_value(initial_parameters, dim, num_of_initials) for dim in range(self.n_params)]
@@ -56,10 +55,14 @@ class NelderMeadOptimizer(AbstractOptimizer):
         """Convert a list of numpy.ndarray to a list of parameters.
         """
         new_params = copy.deepcopy(self.base_params)
-        for name, value in zip(self.param_names, ndarray):
+        for name, value, b in zip(self.param_names, ndarray, self.bdrys):
             for new_param in new_params:
                 if new_param["name"] == name:
                     new_param["value"] = value
+                if b[0] <= value <= b[1]:
+                    new_param["out_of_boundary"] = False
+                else:
+                    new_param["out_of_boundary"] = True
         return new_params
 
     def create_initial_value(self, initial_parameters: Any, dim: int, num_of_initials: int) -> Any:
@@ -122,6 +125,34 @@ class NelderMeadOptimizer(AbstractOptimizer):
         self.logger.debug(f"new_params: {new_param}")
         return new_param
 
+    def run_optimizer_multiple_times(self, available_pool_size) -> None:
+        if available_pool_size <= 0:
+            return
+        for _ in range(available_pool_size):
+            if new_params := self.generate_new_parameter():
+                if self.out_of_boundary(new_params):
+                    self.logger.debug(f"out of boundary: {new_params}")
+                    self.register_new_parameters(new_params, state="finished")
+                    objective = np.inf
+                    if self.goals[0] == "maximize":
+                        objective = -np.inf
+                    self.storage.result.set_any_trial_objective(
+                        trial_id=self.trial_id.integer,
+                        objective=[objective]
+                    )
+                    self.trial_id.increment()
+                    self._serialize(self.trial_id.integer)
+                    continue
+                self.register_new_parameters(new_params)
+                self.trial_id.increment()
+                self._serialize(self.trial_id.integer)
+
+    def out_of_boundary(self, params: list[dict[str, float | int | str]]) -> bool:
+        for param in params:
+            if param["out_of_boundary"]:
+                return True
+        return False
+
     def nelder_mead_main(self) -> list[np.ndarray] | None:
         """Nelder Mead's main module.
 
@@ -180,11 +211,3 @@ class NelderMeadOptimizer(AbstractOptimizer):
             ...
         searched_params = self.nelder_mead.search()
         return searched_params
-
-    # def out_of_boundary(self, y):  # TODO: fix
-    #     for yi, b in zip(y, self.bdrys):
-    #         if b[0] <= yi <= b[1]:
-    #             pass
-    #         else:
-    #             return True
-    #     return False

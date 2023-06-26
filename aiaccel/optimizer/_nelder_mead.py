@@ -25,9 +25,6 @@ class Vertex():
     def coordinates(self) -> np.ndarray:
         return self.xs
 
-    def is_computed(self) -> bool:
-        return self.value is not None
-
     def set_value(self, value: Any) -> None:
         self.value = value
 
@@ -212,12 +209,6 @@ class NelderMead():
 
     def set_value(self, vertex_id: str, value: float | int):
         self.simplex.set_value(vertex_id, value)
-
-    def wait_evaluated(self) -> bool:
-        for v in self.simplex.vertices:
-            if not v.is_computed():
-                return True
-        return False
 
     def initialize(self) -> list(Value):
         self.n_waits = self.waits["initialize"]
