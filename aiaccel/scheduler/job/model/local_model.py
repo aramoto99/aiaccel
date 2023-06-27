@@ -22,7 +22,8 @@ class LocalModel(AbstractModel):
             obj.content,
             obj.trial_id,
             str(obj.config.config_path),
-            str(obj.workspace.get_error_output_file(obj.trial_id))
+            str(obj.workspace.get_error_output_file(obj.trial_id)),
+            obj.config.generic.enable_command_argument
         )
         obj.logger.info(f'runner command: {" ".join(runner_command)}')
         obj.proc = Popen(runner_command, stdout=PIPE, stderr=PIPE)
@@ -50,7 +51,8 @@ class LocalModel(AbstractModel):
         param_content: dict[str, Any],
         trial_id: int,
         config_path: str,
-        command_error_output: str
+        command_error_output: str,
+        enable_command_argument: bool
     ) -> list[str]:
         """Create a list of command strings to run a hyper parameter.
 
@@ -64,16 +66,24 @@ class LocalModel(AbstractModel):
         """
         commands = re.split(" +", command)
         params = param_content["parameters"]
-        for param in params:
-            # Fix a bug related a negative exponential parameters
-            # Need to modify wrapper.py as follows:
-            if "name" in param.keys() and "value" in param.keys():
-                commands.append(f'--{param["name"]}')
-                commands.append(f'{param["value"]}')
-        commands.append("--trial_id")
-        commands.append(str(trial_id))
-        commands.append("--config")
-        commands.append(config_path)
+        if enable_command_argument:
+            """
+            --name=value
+            """
+            for param in params:
+                if "name" in param.keys() and "value" in param.keys():
+                    commands.append(f'--{param["name"]}={param["value"]}')
+            commands.append(f"--trial_id={str(trial_id)}")
+            commands.append(f"--config={config_path}")
+        else:
+            """
+            value
+            """
+            for param in params:
+                if "name" in param.keys() and "value" in param.keys():
+                    commands.append(f'{param["value"]}')
+            commands.append(str(trial_id))
+            commands.append(config_path)
         commands.append("2>")
         commands.append(command_error_output)
         return commands
@@ -128,8 +138,7 @@ class LocalModel(AbstractModel):
 
         for param in params:
             if 'name' in param.keys() and 'value' in param.keys():
-                commands.append('--' + param['name'])
-                commands.append(str(param['value']))
+                commands.append(f'--{param["name"]}={param["value"]}')
 
         obj.logger.debug(f'{" ".join(commands)}')
         Popen(commands)

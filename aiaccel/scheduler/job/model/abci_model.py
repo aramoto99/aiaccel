@@ -25,6 +25,7 @@ class AbciModel(AbstractModel):
             runner_file_path=runner_file_path,
             job_script_preamble=obj.config.ABCI.job_script_preamble,
             command=obj.config.generic.job_command,
+            enable_command_argument=obj.config.generic.enable_command_argument,
             dict_lock=obj.workspace.lock,
         )
 
@@ -58,6 +59,7 @@ class AbciModel(AbstractModel):
         runner_file_path: Path,
         job_script_preamble: Path | str | None,
         command: str,
+        enable_command_argument: bool,
         dict_lock: Path,
     ) -> None:
         """Create a ABCI batch file.
@@ -82,15 +84,21 @@ class AbciModel(AbstractModel):
         """
 
         commands = re.split(" +", command)
-
-        for param in param_content["parameters"]:
-            if "name" in param.keys() and "value" in param.keys():
-                commands.append(f'--{param["name"]}')
-                commands.append(f'${param["name"]}')
-        commands.append("--trial_id")
-        commands.append(str(trial_id))
-        commands.append("--config")
-        commands.append("$config_file_path")
+        if enable_command_argument:
+            for param in param_content["parameters"]:
+                if "name" in param.keys() and "value" in param.keys():
+                    commands.append(f'--{param["name"]}')
+                    commands.append(f'${param["name"]}')
+            commands.append("--trial_id")
+            commands.append(str(trial_id))
+            commands.append("--config")
+            commands.append("$config_file_path")
+        else:
+            for param in param_content["parameters"]:
+                if "name" in param.keys() and "value" in param.keys():
+                    commands.append(f'${param["name"]}')
+            commands.append(str(trial_id))
+            commands.append("$config_file_path")
         commands.append("2>")
         commands.append("$error_file_path")
 

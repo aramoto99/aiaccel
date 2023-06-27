@@ -45,6 +45,7 @@ class GenericConfig:
     job_command: str
     python_file: str
     function: str
+    enable_command_argument: bool
     main_loop_sleep_seconds: Union[float, int]
     logging_level: str
 
