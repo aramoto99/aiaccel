@@ -8,7 +8,7 @@ from tests.unit.storage_test.db.base import get_storage, init, t_base, ws
 
 
 @t_base()
-def test_serialize():
+def testserialize():
     storage = get_storage()
     storage.variable.register(process_name='optimizer', labels=['hoge', 'foo', 'bar'])
 

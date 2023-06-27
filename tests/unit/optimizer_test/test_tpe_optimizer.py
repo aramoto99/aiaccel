@@ -71,19 +71,19 @@ class TestTpeOptimizer(BaseTest):
     def test_create_study(self):
         assert self.optimizer.create_study() is None
 
-    def test_serialize(self):
+    def testserialize(self):
         self.optimizer.create_study()
         self.optimizer.trial_id.initial(num=0)
         self.optimizer.storage.trial.set_any_trial_state(trial_id=0, state="ready")
         self.optimizer._rng = np.random.RandomState(0)
-        assert self.optimizer._serialize(trial_id=0) is None
+        assert self.optimizer.serialize(trial_id=0) is None
 
-    def test_deserialize(self):
+    def testdeserialize(self):
         self.optimizer.pre_process()
         self.optimizer.trial_id.initial(num=0)
         self.optimizer.storage.trial.set_any_trial_state(trial_id=0, state="finished")
-        self.optimizer._serialize(trial_id=0)
-        assert self.optimizer._deserialize(trial_id=0) is None
+        self.optimizer.serialize(trial_id=0)
+        assert self.optimizer.deserialize(trial_id=0) is None
 
 
 def test_create_distributions(data_dir):

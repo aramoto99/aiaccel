@@ -122,7 +122,7 @@ class AbstractOptimizer(AiaccelCore):
             if new_params := self.generate_new_parameter():
                 self.register_new_parameters(new_params)
                 self.trial_id.increment()
-                self._serialize(self.trial_id.integer)
+                self.serialize(self.trial_id.integer)
 
     def resume(self) -> None:
         """When in resume mode, load the previous optimization data in advance.
@@ -135,7 +135,7 @@ class AbstractOptimizer(AiaccelCore):
         """
         self.logger.info(f"Resume mode: {self.config.resume}")
         self.trial_id.initial(num=self.config.resume)
-        super()._deserialize(self.config.resume)
+        super().deserialize(self.config.resume)
         self.trial_number = self.config.optimize.trial_number
 
     def get_any_trial_objective(self, trial_id: int) -> Any:

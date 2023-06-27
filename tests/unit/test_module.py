@@ -4,12 +4,10 @@ import time
 
 import numpy as np
 import pytest
-from aiaccel.common import (module_type_master, module_type_optimizer,
-                            module_type_scheduler)
 
+from aiaccel.common import module_type_master, module_type_optimizer, module_type_scheduler
 from aiaccel.master import LocalMaster
 from aiaccel.module import AbstractModule
-
 from aiaccel.optimizer import RandomOptimizer
 from aiaccel.scheduler import LocalScheduler
 from aiaccel.util import str_to_logging_level
@@ -120,14 +118,14 @@ class TestAbstractModule(BaseTest):
         except NotImplementedError:
             assert True
 
-    def test_serialize(self):
+    def testserialize(self):
         self.module._rng = np.random.RandomState(0)
-        assert self.module._serialize(0) is None
+        assert self.module.serialize(0) is None
 
-    def test_deserialize(self):
+    def testdeserialize(self):
         self.module._rng = np.random.RandomState(0)
-        self.module._serialize(1)
-        assert self.module._deserialize(1) is None
+        self.module.serialize(1)
+        assert self.module.deserialize(1) is None
 
     def test_is_error_free(self):
         assert self.module.is_error_free() is True
@@ -147,5 +145,5 @@ class TestAbstractModule(BaseTest):
             str_to_logging_level(self.module.config.logger.stream_level.master),
             'Abstract   '
         )
-        self.module._serialize(1)
+        self.module.serialize(1)
         assert self.module.resume() is None

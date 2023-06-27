@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+from datetime import datetime
 from enum import Enum
 from typing import TYPE_CHECKING, Any
 
@@ -8,8 +9,9 @@ from omegaconf.dictconfig import DictConfig
 from transitions import Machine
 from transitions.extensions.states import Tags, add_state_features
 
+from aiaccel.common import datetime_format
 from aiaccel.storage import Storage
-from aiaccel.util import Buffer, get_time_now_object, get_time_string_from_object
+from aiaccel.util import Buffer
 from aiaccel.workspace import Workspace
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -127,8 +129,8 @@ class Job:
     def write_start_time_to_storage(self) -> None:
         """Set a start time.
         """
-        self.start_time = get_time_now_object()
-        _start_time = get_time_string_from_object(self.start_time)
+        self.start_time = datetime.now()
+        _start_time = self.start_time.strftime(datetime_format)
         self.storage.timestamp.set_any_trial_start_time(
             trial_id=self.trial_id,
             start_time=_start_time
@@ -137,8 +139,8 @@ class Job:
     def write_end_time_to_storage(self) -> None:
         """Set an end time.
         """
-        self.end_time = get_time_now_object()
-        _end_time = get_time_string_from_object(self.end_time)
+        self.end_time = datetime.now()
+        _end_time = self.end_time.strftime(datetime_format)
         self.storage.timestamp.set_any_trial_end_time(
             trial_id=self.trial_id,
             end_time=_end_time

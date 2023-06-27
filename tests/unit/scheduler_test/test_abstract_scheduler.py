@@ -6,7 +6,6 @@ from unittest.mock import patch
 import numpy as np
 
 from aiaccel.scheduler import AbstractScheduler
-
 from tests.base_test import BaseTest
 
 
@@ -178,7 +177,7 @@ class TestAbstractScheduler(BaseTest):
         with patch.object(scheduler, 'all_done', return_value=True):
             assert scheduler.run_in_main_loop() is False
 
-    def test_serialize(
+    def testserialize(
         self,
         clean_work_dir,
         config_json,
@@ -188,9 +187,9 @@ class TestAbstractScheduler(BaseTest):
         scheduler = AbstractScheduler(self.load_config_for_test(self.configs['config.json']))
         scheduler._rng = np.random.RandomState(0)
         scheduler.storage.trial.set_any_trial_state(trial_id=0, state="finished")
-        assert scheduler._serialize(trial_id=0) is None
+        assert scheduler.serialize(trial_id=0) is None
 
-    def test_deserialize(
+    def testdeserialize(
         self,
         clean_work_dir,
         config_json,
@@ -200,8 +199,8 @@ class TestAbstractScheduler(BaseTest):
         scheduler = AbstractScheduler(self.load_config_for_test(self.configs['config.json']))
         scheduler.storage.trial.set_any_trial_state(trial_id=0, state="finished")
         scheduler._rng = np.random.RandomState(0)
-        scheduler._serialize(trial_id=0)
-        assert scheduler._deserialize(trial_id=0) is None
+        scheduler.serialize(trial_id=0)
+        assert scheduler.deserialize(trial_id=0) is None
 
     def test_parse_trial_id(self, config_json, database_remove):
         database_remove()
@@ -232,8 +231,8 @@ class TestAbstractScheduler(BaseTest):
     def test_resume(self, config_json):
         scheduler = AbstractScheduler(self.load_config_for_test(self.configs['config.json']))
         scheduler.pre_process()
-        scheduler._serialize(0)
-        scheduler._serialize(1)
+        scheduler.serialize(0)
+        scheduler.serialize(1)
 
         scheduler.config.resume = 1
         assert scheduler.resume() is None

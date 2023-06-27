@@ -104,7 +104,7 @@ class TestAbstractOptimizer(BaseTest):
         with monkeypatch.context() as m:
             m.setattr(self.optimizer, 'generate_initial_parameter', lambda: initial)
             m.setattr(self.optimizer, 'generate_parameter', lambda: param)
-            m.setattr(self.optimizer, '_serialize', lambda _: None)
+            m.setattr(self.optimizer, 'serialize', lambda _: None)
             assert self.optimizer.run_in_main_loop() is True
 
         with patch.object(self.optimizer, 'check_finished', return_value=True):
@@ -126,7 +126,7 @@ class TestAbstractOptimizer(BaseTest):
             m.setattr(self.optimizer, 'generate_new_parameter', lambda: param)
             m.setattr(self.optimizer, 'register_new_parameters', lambda _: None)
             m.setattr(self.optimizer.trial_id, 'increment', lambda: None)
-            m.setattr(self.optimizer, '_serialize', lambda _: None)
+            m.setattr(self.optimizer, 'serialize', lambda _: None)
             assert self.optimizer.run_in_main_loop() is True
 
             m.setattr(self.optimizer, 'generate_new_parameter', lambda: [])
@@ -172,11 +172,11 @@ class TestAbstractOptimizer(BaseTest):
         self.optimizer.storage.error.set_any_trial_error(trial_id=0, error_message="test_error")
         assert self.optimizer.is_error_free() is False
 
-    def test__serialize(self):
+    def test_serialize(self):
         self.optimizer._rng = np.random.RandomState(0)
-        assert self.optimizer._serialize(0) is None
+        assert self.optimizer.serialize(0) is None
 
-    def test__deserialize(self):
+    def test_deserialize(self):
         self.optimizer._rng = np.random.RandomState(0)
-        self.optimizer._serialize(1)
-        assert self.optimizer._deserialize(1) is None
+        self.optimizer.serialize(1)
+        assert self.optimizer.deserialize(1) is None

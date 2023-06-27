@@ -54,7 +54,7 @@ class PylocalScheduler(AbstractScheduler):
         for trial_id in trial_ids:
             self.storage.trial.set_any_trial_state(trial_id=trial_id, state="running")
             args.append([trial_id, self.get_any_trial_xs(trial_id)])
-            self._serialize(trial_id)
+            self.serialize(trial_id)
 
         for trial_id, xs, ys, err, start_time, end_time in self.pool.imap_unordered(execute, args):
             self.report(trial_id, ys, err, start_time, end_time)
