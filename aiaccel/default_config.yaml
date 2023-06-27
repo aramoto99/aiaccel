@@ -3,6 +3,7 @@ generic:
     job_command: ''
     python_file: ''
     function: ''
+    enable_command_argument: True
     main_loop_sleep_seconds: 0.01
     logging_level: INFO
 
