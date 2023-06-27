@@ -5,6 +5,7 @@ import pathlib
 import shutil
 import time
 from argparse import ArgumentParser
+from datetime import datetime
 from logging import StreamHandler, getLogger
 from pathlib import Path
 from typing import Any
@@ -12,7 +13,7 @@ from typing import Any
 import yaml
 
 from aiaccel.cli import CsvWriter
-from aiaccel.common import dict_result, extension_hp
+from aiaccel.common import datetime_format, dict_result, extension_hp
 from aiaccel.config import Config, load_config
 from aiaccel.module import AiaccelCore
 from aiaccel.optimizer import create_optimizer
@@ -20,7 +21,6 @@ from aiaccel.scheduler import create_scheduler
 from aiaccel.storage import Storage
 from aiaccel.tensorboard import TensorBoard
 from aiaccel.util.buffer import Buffer
-from aiaccel.util.time_tools import get_time_now_object, get_time_string_from_object
 from aiaccel.workspace import Workspace
 
 logger = getLogger(__name__)
@@ -82,7 +82,7 @@ def main() -> None:  # pragma: no cover
 
     time_s = time.time()
     max_trial_number = config.optimize.trial_number
-    loop_start_time = get_time_now_object()
+    loop_start_time = datetime.now()
     end_estimated_time = "Unknown"
     buff = Buffer(['num_finished', 'available_pool_size'])
     buff.d['num_finished'].set_max_len(2)
@@ -104,13 +104,13 @@ def main() -> None:  # pragma: no cover
                 num_running = modules[0].get_num_running()
                 num_finished = modules[0].get_num_finished()
                 available_pool_size = modules[0].get_available_pool_size()
-                now = get_time_now_object()
+                now = datetime.now()
                 looping_time = now - loop_start_time
 
                 if num_finished > 0:
                     one_loop_time = looping_time / num_finished
                     finishing_time = now + (max_trial_number - num_finished) * one_loop_time
-                    end_estimated_time = get_time_string_from_object(finishing_time)
+                    end_estimated_time = finishing_time.strftime(datetime_format)
 
                 if (
                     int((time.time() - time_s)) % 10 == 0 or

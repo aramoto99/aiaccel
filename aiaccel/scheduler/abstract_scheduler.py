@@ -155,6 +155,7 @@ class AbstractScheduler(AbstractModule):
         for ready in readies:
             if ready not in [job.trial_id for job in self.jobs]:
                 self.start_job(ready)
+                self.serialize(ready)
 
         for job in self.jobs:
             job.main()
@@ -185,7 +186,7 @@ class AbstractScheduler(AbstractModule):
             None
         """
         if self.config.resume is not None and self.config.resume > 0:
-            self._deserialize(self.config.resume)
+            self.deserialize(self.config.resume)
             self.trial_number = self.config.optimize.trial_number
 
     def __getstate__(self) -> dict[str, Any]:

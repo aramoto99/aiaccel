@@ -141,11 +141,11 @@ class NelderMeadOptimizer(AbstractOptimizer):
                         objective=[objective]
                     )
                     self.trial_id.increment()
-                    self._serialize(self.trial_id.integer)
+                    self.serialize(self.trial_id.integer)
                     continue
                 self.register_new_parameters(new_params)
                 self.trial_id.increment()
-                self._serialize(self.trial_id.integer)
+                self.serialize(self.trial_id.integer)
 
     def out_of_boundary(self, params: list[dict[str, float | int | str]]) -> bool:
         for param in params:

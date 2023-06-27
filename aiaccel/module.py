@@ -69,7 +69,7 @@ class AiaccelCore(object):
         self.logger.addHandler(fh)
         self.logger.addHandler(ch)
 
-    def _serialize(self, trial_id: int) -> None:
+    def serialize(self, trial_id: int) -> None:
         """Serialize this module.
 
         Returns:
@@ -82,7 +82,7 @@ class AiaccelCore(object):
         self.logger.debug(f"serialize random state")
         self.storage.variable.d["numpy_random_state"].set(trial_id, self.get_numpy_random_state())
 
-    def _deserialize(self, trial_id: int) -> None:
+    def deserialize(self, trial_id: int) -> None:
         """Deserialize this module.
 
         Returns:
