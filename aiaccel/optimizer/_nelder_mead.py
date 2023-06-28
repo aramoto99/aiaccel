@@ -31,6 +31,9 @@ class Vertex():
     def set_id(self, id: str):
         self.id = id
 
+    def set_new_id(self):
+        self.id = self.generate_random_name()
+
     def set_xs(self, xs: np.ndarray):
         self.xs = xs
 
@@ -41,11 +44,9 @@ class Vertex():
     def __add__(self, other):  # Add +
         if isinstance(other, Vertex):
             new_vertex = Vertex(self.coordinates + other.coordinates)
-            new_vertex.set_id(self.id)
             return new_vertex
         try:
             new_vertex = Vertex(self.coordinates + other)
-            new_vertex.set_id(self.id)
             return new_vertex
         except TypeError:
             raise TypeError("Unsupported operand type for +")
@@ -53,11 +54,9 @@ class Vertex():
     def __sub__(self, other):  # Subtract -
         if isinstance(other, Vertex):
             new_vertex = Vertex(self.coordinates - other.coordinates)
-            new_vertex.set_id(self.id)
             return new_vertex
         try:
             new_vertex = Vertex(self.xs - other)
-            new_vertex.set_id(self.id)
             return new_vertex
         except TypeError:
             raise TypeError("Unsupported operand type for -")
@@ -128,11 +127,12 @@ class Simplex():
     def get_simplex_coordinates(self) -> np.ndarray:
         return np.array([v.xs for v in self.vertices])
 
-    def set_value(self, vertex_id: str, value: Any) -> None:
+    def set_value(self, vertex_id: str, value: Any) -> bool:
         for v in self.vertices:
             if v.id == vertex_id:
                 v.set_value(value)
-                return
+                return True
+        return False
 
     def order_by(self):
         order = np.argsort([v.value for v in self.vertices])
@@ -285,7 +285,8 @@ class NelderMead():
 
     def aftter_shrink(self, yss: list[Value]):
         for ys in yss:
-            self.simplex.set_value(ys.id, ys.value)
+            if not self.simplex.set_value(ys.id, ys.value):
+                raise "Error: vertex is not found."
         self.change_state("reflect")
 
     def search(self) -> list[Vertex]:
@@ -327,8 +328,8 @@ class NelderMead():
 
         elif self.state == "outside_contract":
             x = self.outside_contract()
-            # print(f"outside_contract: {x.coordinates}")
             self.change_state("outside_contract_pending")
+            # print(f"outside_contract: {x.coordinates}")
             return [x]
 
         elif self.state == "outside_contract_pending":
