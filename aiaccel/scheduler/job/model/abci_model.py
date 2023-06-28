@@ -46,7 +46,7 @@ class AbciModel(AbstractModel):
         param_args = ""
         for param in params:
             if "name" in param.keys() and "value" in param.keys():
-                param_args += f'--{param["name"]} ${param["name"]} '
+                param_args += f'--{param["name"]}=${param["name"]} '
         return param_args
 
     def create_abci_batch_file(
