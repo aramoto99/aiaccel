@@ -87,12 +87,9 @@ class AbciModel(AbstractModel):
         if enable_command_argument:
             for param in param_content["parameters"]:
                 if "name" in param.keys() and "value" in param.keys():
-                    commands.append(f'--{param["name"]}')
-                    commands.append(f'${param["name"]}')
-            commands.append("--trial_id")
-            commands.append(str(trial_id))
-            commands.append("--config")
-            commands.append("$config_file_path")
+                    commands.append(f'--{param["name"]}=${param["name"]}')
+            commands.append(f"--trial_id={str(trial_id)}")
+            commands.append("--config=$config_file_path")
         else:
             for param in param_content["parameters"]:
                 if "name" in param.keys() and "value" in param.keys():
