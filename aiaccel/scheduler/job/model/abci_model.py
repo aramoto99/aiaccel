@@ -102,14 +102,12 @@ class AbciModel(AbstractModel):
         set_retult = self.generate_command_line(
             command="aiaccel-set-result",
             args=[
-                "--storage_file_path $storage_file_path",
-                "--trial_id $trial_id",
-                "--config $config_file_path",
-                # "--start_time $start_time",
-                # "--end_time $end_time",
-                "--objective $ys",
-                "--error $error",
-                "--returncode $returncode",
+                "--storage_file_path=$storage_file_path",
+                "--trial_id=$trial_id",
+                "--config=$config_file_path",
+                "--objective=$ys",
+                "--error=$error",
+                "--returncode=$returncode",
                 self.generate_param_args(param_content["parameters"]),
             ],
         )
@@ -117,13 +115,11 @@ class AbciModel(AbstractModel):
         set_retult_no_error = self.generate_command_line(
             command="aiaccel-set-result",
             args=[
-                "--storage_file_path $storage_file_path",
-                "--trial_id $trial_id",
-                "--config $config_file_path",
-                # "--start_time $start_time",
-                # "--end_time $end_time",
-                "--objective $ys",
-                "--returncode $returncode",
+                "--storage_file_path=$storage_file_path",
+                "--trial_id=$trial_id",
+                "--config=$config_file_path",
+                "--objective=$ys",
+                "--returncode=$returncode",
                 self.generate_param_args(param_content["parameters"]),
             ],
         )
