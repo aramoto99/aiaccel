@@ -1,4 +1,4 @@
-from aiaccel.util import aiaccel
+from aiaccel import aiaccel
 import numpy as np
 
 
