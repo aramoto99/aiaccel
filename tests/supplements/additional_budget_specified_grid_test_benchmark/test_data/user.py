@@ -1,6 +1,6 @@
 import numpy as np
 
-from aiaccel.util.aiaccel import Run
+from aiaccel.aiaccel import Run
 
 numbers = {'a': -5, 'b': 0, 'c': 5}
 

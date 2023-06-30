@@ -237,10 +237,10 @@ class BaseTest(object):
         self.test_result_data.append(d1)
         self.test_result_data.append(d2)
 
-        for d in self.test_result_data:
-            name = f"{d['trial_id']}.yml"
-            path = work_dir / 'result' / name
-            create_yaml(path, d)
+        # for d in self.test_result_data:
+        #     name = f"{d['trial_id']}.yml"
+        #     path = work_dir / 'result' / name
+        #     create_yaml(path, d)
 
         self.result_comparison = []
 

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import numpy as np
 
-from aiaccel.util.aiaccel import Run
+from aiaccel.aiaccel import Run
 
 
 def main(p: dict[str, float | int]) -> float:

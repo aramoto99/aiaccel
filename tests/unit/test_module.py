@@ -6,7 +6,6 @@ import numpy as np
 import pytest
 
 from aiaccel.common import module_type_master, module_type_optimizer, module_type_scheduler
-from aiaccel.master import LocalMaster
 from aiaccel.module import AbstractModule
 from aiaccel.optimizer import RandomOptimizer
 from aiaccel.scheduler import LocalScheduler

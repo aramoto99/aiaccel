@@ -4,7 +4,7 @@ from unittest.mock import patch
 import numpy as np
 import pytest
 
-from aiaccel.util.aiaccel import CommandLineArgs
+from aiaccel.aiaccel import CommandLineArgs
 from tests.base_test import BaseTest
 
 
