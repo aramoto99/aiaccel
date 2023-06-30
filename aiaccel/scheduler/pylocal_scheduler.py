@@ -13,7 +13,7 @@ from aiaccel.common import datetime_format
 from aiaccel.config import load_config
 from aiaccel.optimizer import AbstractOptimizer
 from aiaccel.scheduler.abstract_scheduler import AbstractScheduler
-from aiaccel.util.aiaccel import Run, set_logging_file_for_trial_id
+from aiaccel.aiaccel import Run, set_logging_file_for_trial_id
 
 # These are for avoiding mypy-errors from initializer().
 # `global` does not work well.

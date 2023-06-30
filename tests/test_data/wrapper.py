@@ -1,4 +1,4 @@
-from aiaccel.util import aiaccel
+from aiaccel import aiaccel
 
 # Create a wrapper
 run = aiaccel.Run()
