@@ -9,7 +9,7 @@ from omegaconf.dictconfig import DictConfig
 
 from aiaccel.common import datetime_format
 from aiaccel.module import AbstractModule
-from aiaccel.util.filesystem import create_yaml
+from aiaccel.util.file import create_yaml
 from aiaccel.util.logger import str_to_logging_level
 
 

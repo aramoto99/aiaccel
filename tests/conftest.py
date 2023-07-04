@@ -9,7 +9,7 @@ import pytest
 
 from aiaccel.config import load_config
 from aiaccel.storage import Storage
-from aiaccel.util import create_yaml, interprocess_lock_file, load_yaml
+from aiaccel.util import create_yaml, interprocess_lock_file
 from aiaccel.workspace import Workspace
 
 WORK_SUB_DIRECTORIES = [

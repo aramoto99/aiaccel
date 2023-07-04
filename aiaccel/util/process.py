@@ -12,21 +12,16 @@ class OutputHandler(threading.Thread):
     """A class to print subprocess outputs.
 
     Args:
-        proc (Popen): A reference for subprocess.Popen.
+        proc (subprocess.Popen): A reference to subprocess.Popen.
             For example, 'Optimizer'.
-    Attributes:
-        _proc (Popen): A reference for subprocess.Popen.
-            For example, 'Optimizer'.
-        _sleep_time (int): A sleep time each loop.
     """
 
     def __init__(self, proc: subprocess.Popen[bytes]) -> None:
-        super(OutputHandler, self).__init__()
+        super().__init__()
         self._proc = proc
         self._sleep_time = 1
         self._abort = False
 
-        self._returncode = None
         self._stdouts: list[str] = []
         self._stderrs: list[str] = []
         self._start_time: datetime.datetime | None = None
@@ -62,7 +57,7 @@ class OutputHandler(threading.Thread):
             else:
                 stderr = None
 
-            if not (stdout or stderr) and self.get_returncode() is not None:
+            if self.get_returncode() is not None:
                 break
 
             if self._abort:
@@ -77,14 +72,10 @@ class OutputHandler(threading.Thread):
         return copy.deepcopy(self._stderrs)
 
     def get_start_time(self) -> str | None:
-        if self._start_time is None:
-            return ""
-        return self._start_time.strftime(datetime_format)
+        return self._start_time.strftime(datetime_format) if self._start_time else ""
 
     def get_end_time(self) -> str | None:
-        if self._end_time is None:
-            return ""
-        return self._end_time.strftime(datetime_format)
+        return self._end_time.strftime(datetime_format) if self._end_time else ""
 
     def get_returncode(self) -> int | None:
         return self._proc.poll()
@@ -103,7 +94,7 @@ class OutputHandler(threading.Thread):
             )
 
     def enforce_kill(self) -> None:
-        """Enforce to kill the subprocess.
+        """Enforce killing the subprocess.
 
         Returns:
             None

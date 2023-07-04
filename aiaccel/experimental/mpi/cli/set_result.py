@@ -6,7 +6,7 @@ from pathlib import Path
 
 from aiaccel.experimental.mpi.config import load_config
 from aiaccel.parameter import HyperParameterConfiguration
-from aiaccel.util.filesystem import create_yaml
+from aiaccel.util.file import create_yaml
 
 
 def str_or_float_or_int(value: str | float | int) -> str | float | int:
