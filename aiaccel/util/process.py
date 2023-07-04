@@ -44,20 +44,22 @@ class OutputHandler(threading.Thread):
             if self._proc.stdout is None:
                 break
 
-            stdout = self._proc.stdout.readline().decode().strip()
+            stdout = self._proc.stdout.readline()
             if stdout:
-                print(stdout)
-                self._stdouts.append(stdout)
+                stdout_str = stdout.decode().strip()
+                print(stdout_str)
+                self._stdouts.append(stdout_str)
 
             if self._proc.stderr is not None:
-                stderr = self._proc.stderr.readline().decode().strip()
+                stderr = self._proc.stderr.readline()
                 if stderr:
-                    print(stderr)
-                    self._stderrs.append(stderr)
+                    stderr_str = stderr.decode().strip()
+                    print(stderr_str)
+                    self._stderrs.append(stderr_str)
             else:
                 stderr = None
 
-            if self.get_returncode() is not None:
+            if not (stdout or stderr) and self.get_returncode() is not None:
                 break
 
             if self._abort:
