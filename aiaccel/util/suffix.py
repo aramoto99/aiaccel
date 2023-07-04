@@ -1,4 +1,5 @@
 import datetime
+import uuid
 
 
 class Suffix:
@@ -20,3 +21,11 @@ class Suffix:
             f"{str(t.hour).zfill(2)}{str(t.minute).zfill(2)}{str(t.second).zfill(2)}"
         )
         return suffix
+
+    def random(self) -> str:
+        """Get the random suffix.
+
+        Returns:
+            str
+        """
+        return str(uuid.uuid4()).split("-")[0]
