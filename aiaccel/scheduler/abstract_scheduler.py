@@ -33,9 +33,9 @@ class AbstractScheduler(AbstractModule):
         self.set_logger(
             "root.scheduler",
             self.workspace.log / "scheduler.log",
-            str_to_logging_level(self.config.generic.logging_level),
-            str_to_logging_level(self.config.generic.logging_level),
-            "Scheduler",
+            self.config.generic.logging_level,
+            self.config.generic.logging_level,
+            "[Scheduler]:",
         )
         self.optimizer = optimizer
         self.num_workers = self.config.resource.num_workers

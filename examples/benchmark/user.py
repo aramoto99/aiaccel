@@ -1,4 +1,4 @@
-from aiaccel import aiaccel
+import aiaccel
 
 
 def main(p):

@@ -37,9 +37,9 @@ class AbstractOptimizer(AiaccelCore):
         self.set_logger(
             "root.optimizer",
             self.workspace.log / "optimizer.log",
-            str_to_logging_level(self.config.generic.logging_level),
-            str_to_logging_level(self.config.generic.logging_level),
-            "Optimizer",
+            self.config.generic.logging_level,
+            self.config.generic.logging_level,
+            "[Optimizer]:",
         )
 
         self.trial_number = self.config.optimize.trial_number

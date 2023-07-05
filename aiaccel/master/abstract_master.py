@@ -42,10 +42,10 @@ class AbstractMaster(AbstractModule):
         self.logger.setLevel(logging.DEBUG)
         self.set_logger(
             "root.master",
-            self.workspace.log / self.config.logger.file.master,
-            str_to_logging_level(self.config.logger.log_level.master),
-            str_to_logging_level(self.config.logger.stream_level.master),
-            "Master   ",
+            self.workspace.log / "master.log",
+            self.config.generic.logging_level,
+            self.config.generic.logging_level,
+            "[Master]:",
         )
 
         self.goals = [item.value for item in self.config.optimize.goal]

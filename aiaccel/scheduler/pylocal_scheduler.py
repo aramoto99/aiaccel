@@ -9,7 +9,7 @@ from typing import Any
 
 from omegaconf.dictconfig import DictConfig
 
-from aiaccel.aiaccel import Run, set_logging_file_for_trial_id
+from aiaccel.aiaccel_run import set_logging_file_for_trial_id
 from aiaccel.common import datetime_format
 from aiaccel.config import load_config
 from aiaccel.optimizer import AbstractOptimizer
@@ -27,7 +27,6 @@ class PylocalScheduler(AbstractScheduler):
 
     def __init__(self, config: DictConfig, optimizer: AbstractOptimizer) -> None:
         super().__init__(config, optimizer)
-        self.run = Run(self.config.config_path)
         self.processes: list[Any] = []
 
         Pool_ = Pool if self.num_workers > 1 else ThreadPool
@@ -149,7 +148,6 @@ class PylocalScheduler(AbstractScheduler):
 
     def __getstate__(self) -> dict[str, Any]:
         obj = super().__getstate__()
-        del obj["run"]
         del obj["pool"]
         del obj["processes"]
         return obj

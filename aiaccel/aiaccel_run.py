@@ -2,13 +2,12 @@ from __future__ import annotations
 
 import logging
 import sys
+import traceback
 from argparse import ArgumentParser
 from collections.abc import Callable
-from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-from aiaccel.common import datetime_format
 from aiaccel.config import load_config
 from aiaccel.parameter import (
     CategoricalParameter,
@@ -171,19 +170,14 @@ class Run:
         y = None
         err = ""
 
-        start_time = datetime.now().strftime(datetime_format)
-
         try:
             y = cast_y(func(xs), y_data_type)
-        except BaseException as e:
-            err = str(e)
+        except BaseException:
+            err = str(traceback.format_exc())
             y = None
         else:
             err = ""
-
-        end_time = datetime.now().strftime(datetime_format)
-
-        return xs, y, err, start_time, end_time
+        return xs, y, err
 
     def execute_and_report(
         self, func: Callable[[dict[str, float | int | str]], float], y_data_type: str | None = None
@@ -213,7 +207,7 @@ class Run:
 
         xs = self.args.get_xs_from_args()
         y: Any = None
-        _, y, err, _, _ = self.execute(func, xs, y_data_type)
+        _, y, err = self.execute(func, xs, y_data_type)
 
         self.report(y, err)
 
@@ -224,8 +218,8 @@ class Run:
             y (Any): Objective value.
             err (str): Error string.
         """
-
-        sys.stdout.write(f"{y}\n")
+        if y is not None:
+            sys.stdout.write(f"{y}\n")
         if err != "":
             sys.stderr.write(f"{err}\n")
             exit(1)

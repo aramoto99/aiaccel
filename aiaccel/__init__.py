@@ -12,6 +12,7 @@ from aiaccel import (
     util,
     workspace,
 )
+from aiaccel.aiaccel_run import Run
 
 __all__ = [
     "common",
@@ -26,4 +27,5 @@ __all__ = [
     "storage",
     "tensorboard",
     "util",
+    "Run"
 ]
