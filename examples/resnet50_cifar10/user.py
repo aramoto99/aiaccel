@@ -6,7 +6,7 @@ import torch.optim as optim
 from torch.optim.lr_scheduler import CosineAnnealingLR
 from torchvision import datasets, models, transforms
 
-from aiaccel import aiaccel
+import aiaccel
 
 
 # Train

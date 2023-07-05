@@ -8,7 +8,7 @@ import numpy as np
 from omegaconf.dictconfig import DictConfig
 
 from aiaccel.storage import Storage
-from aiaccel.util import TrialId
+from aiaccel.util import TrialId, str_to_logging_level
 from aiaccel.workspace import Workspace
 
 
@@ -40,15 +40,21 @@ class AiaccelCore(object):
             ]
         )
 
-    def set_logger(self, logger_name: str, logfile: Path, file_level: int, stream_level: int, module_type: str) -> None:
+    def set_logger(
+        self, logger_name: str,
+        logfile: Path,
+        file_level: str,
+        stream_level: str,
+        module_type: str
+    ) -> None:
         """Set a default logger options.
 
         Args:
             logger_name (str): A name of a logger.
             logfile (Path): A path to a log file.
-            file_level (int): A logging level for a log file output. For
+            file_level (str): A logging level for a log file output. For
                 example logging.DEBUG
-            stream_level (int): A logging level for a stream output.
+            stream_level (str): A logging level for a stream output.
             module_type (str): A module type of a caller.
 
         Returns:
@@ -59,12 +65,12 @@ class AiaccelCore(object):
         fh = logging.FileHandler(logfile, mode="w")
         fh_formatter = logging.Formatter("%(asctime)s %(levelname)-8s %(filename)-12s line " "%(lineno)-4s %(message)s")
         fh.setFormatter(fh_formatter)
-        fh.setLevel(file_level)
+        fh.setLevel(str_to_logging_level(file_level))
 
         ch = logging.StreamHandler()
         ch_formatter = logging.Formatter(f"{module_type} %(levelname)-8s %(message)s")
         ch.setFormatter(ch_formatter)
-        ch.setLevel(stream_level)
+        ch.setLevel(str_to_logging_level(stream_level))
 
         self.logger.addHandler(fh)
         self.logger.addHandler(ch)
