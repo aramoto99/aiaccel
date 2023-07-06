@@ -7,7 +7,6 @@ from omegaconf.dictconfig import DictConfig
 from aiaccel.config import is_multi_objective
 from aiaccel.module import AiaccelCore
 from aiaccel.parameter import HyperParameterConfiguration
-from aiaccel.util import str_to_logging_level
 
 
 class AbstractOptimizer(AiaccelCore):
