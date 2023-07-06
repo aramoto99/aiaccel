@@ -9,7 +9,6 @@ from aiaccel.parameter import HyperParameterConfiguration, is_categorical, is_or
 from aiaccel.util import str_to_logging_level
 from aiaccel.module import AiaccelCore
 from aiaccel.parameter import HyperParameterConfiguration
-from aiaccel.util import str_to_logging_level
 
 
 class AbstractOptimizer(AiaccelCore):
