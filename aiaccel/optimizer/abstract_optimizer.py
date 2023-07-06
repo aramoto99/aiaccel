@@ -35,11 +35,11 @@ class AbstractOptimizer(AiaccelCore):
     def __init__(self, config: DictConfig) -> None:
         super().__init__(config, "optimizer")
         self.set_logger(
-            "root.optimizer",
-            self.workspace.log / "optimizer.log",
-            self.config.generic.logging_level,
-            self.config.generic.logging_level,
-            "[Optimizer]:",
+            logger_name="root.optimizer",
+            logfile=self.workspace.log / "optimizer.log",
+            file_level=self.config.generic.logging_level,
+            stream_level=self.config.generic.logging_level,
+            module_type="Optimizer",
         )
 
         self.trial_number = self.config.optimize.trial_number

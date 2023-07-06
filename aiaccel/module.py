@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -8,7 +9,7 @@ import numpy as np
 from omegaconf.dictconfig import DictConfig
 
 from aiaccel.storage import Storage
-from aiaccel.util import TrialId, str_to_logging_level
+from aiaccel.util import ColoredHandler, TrialId, str_to_logging_level
 from aiaccel.workspace import Workspace
 
 
@@ -43,8 +44,24 @@ class AiaccelCore(object):
             ]
         )
 
+    def colored_by_logging_level(self, level: int, messeage: str) -> str:
+        c = Color()
+        color = c.default
+        if level == logging.DEBUG:
+            color = c.cyan
+        elif level == logging.INFO:
+            color = c.green
+        elif level == logging.WARNING:
+            color = c.yellow
+        elif level == logging.ERROR:
+            color = c.red
+        elif level == logging.CRITICAL:
+            color = c.magenta
+        return f"{color}{messeage}{c.reset}"
+
     def set_logger(
-        self, logger_name: str,
+        self, 
+        logger_name: str,
         logfile: Path,
         file_level: str,
         stream_level: str,
@@ -70,8 +87,8 @@ class AiaccelCore(object):
         fh.setFormatter(fh_formatter)
         fh.setLevel(str_to_logging_level(file_level))
 
-        ch = logging.StreamHandler()
-        ch_formatter = logging.Formatter(f"{module_type} %(levelname)-8s %(message)s")
+        ch = ColoredHandler(sys.stdout) 
+        ch_formatter = logging.Formatter(f"[{module_type}]: %(levelname)-8s %(message)s")
         ch.setFormatter(ch_formatter)
         ch.setLevel(str_to_logging_level(stream_level))
 

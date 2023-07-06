@@ -31,11 +31,11 @@ class AbstractScheduler(AbstractModule):
     def __init__(self, config: DictConfig, optimizer: AbstractOptimizer) -> None:
         super().__init__(config, "scheduler")
         self.set_logger(
-            "root.scheduler",
-            self.workspace.log / "scheduler.log",
-            self.config.generic.logging_level,
-            self.config.generic.logging_level,
-            "[Scheduler]:",
+            logger_name="root.scheduler",
+            logfile=self.workspace.log / "scheduler.log",
+            file_level=self.config.generic.logging_level,
+            stream_level=self.config.generic.logging_level,
+            module_type="Scheduler",
         )
         self.optimizer = optimizer
         self.num_workers = self.config.resource.num_workers
@@ -170,7 +170,6 @@ class AbstractScheduler(AbstractModule):
                     self.logger.info(f"name: {job.trial_id}, state: {state_name}")
 
         if self.trial_number == self.job_completed_count:
-            # All jobs are completed
             self.logger.info("All jobs are completed.")
             return False
         return True

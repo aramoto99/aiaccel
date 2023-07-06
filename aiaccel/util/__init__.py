@@ -2,7 +2,7 @@ from aiaccel.parameter import CategoricalParameter, FloatParameter, IntParameter
 from aiaccel.util.buffer import Buffer
 from aiaccel.util.easy_visualizer import EasyVisualizer
 from aiaccel.util.file import create_yaml
-from aiaccel.util.logger import str_to_logging_level
+from aiaccel.util.logger import ColoredHandler, str_to_logging_level
 from aiaccel.util.process import OutputHandler
 from aiaccel.util.retry import retry
 from aiaccel.util.suffix import Suffix
@@ -22,6 +22,7 @@ __all__ = [
     "generate_random_name",
     "retry",
     "str_to_logging_level",
+    "ColoredHandler",
     "CategoricalParameter",
     "FloatParameter",
     "IntParameter",
