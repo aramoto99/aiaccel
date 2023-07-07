@@ -180,7 +180,7 @@ class AbciModel(AbstractModel):
             with open(path, "w") as f:
                 f.write(content)
         else:
-            lock_file = self.workspace.lock / f"{path.parent.name}.lock"
+            lock_file = dict_lock / f"{path.parent.name}.lock"
             with fasteners.InterProcessLock(lock_file):
                 with open(path, "w") as f:
                     f.write(content)
