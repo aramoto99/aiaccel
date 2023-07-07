@@ -1,12 +1,19 @@
 from __future__ import annotations
 
+import copy
 from typing import Any
 
 from omegaconf.dictconfig import DictConfig
 
 from aiaccel.config import is_multi_objective
+from aiaccel.converted_parameter import (  # ConvertedCategoricalParameter,; ConvertedFloatParameter,; ConvertedNumericalParameter,; ConvertedOrdinalParameter,; ConvertedParameter,; ConvertedParameterConfiguration,
+    ConvertedIntParameter,
+)
 from aiaccel.module import AiaccelCore
-from aiaccel.parameter import HyperParameterConfiguration
+from aiaccel.parameter import (  # CategoricalParameter,; FloatParameter,; OrdinalParameter,
+    HyperParameterConfiguration,
+    IntParameter,
+)
 
 
 class AbstractOptimizer(AiaccelCore):
@@ -114,12 +121,33 @@ class AbstractOptimizer(AiaccelCore):
 
         return new_params
 
+    def convert_type_by_config(self, temp_new_params: list[dict[str, float | int | str]]) -> list[dict[str, float | int | str]]:
+        """Convert the type of parameters by the configuration file.
+
+        Args:
+            new_params (list[dict[str, float | int | str]]): A list of
+                parameters.
+
+        Returns:
+            list[dict[str, float | int | str]]: A list of converted parameters.
+        """
+        new_params = copy.deepcopy(temp_new_params)
+        config_params = self.params.get_parameter_dict()
+        for new_param in new_params:
+            name = new_param["name"]
+            if (
+                isinstance(config_params[name], IntParameter) or
+                isinstance(config_params[name], ConvertedIntParameter)
+            ):
+                new_param["value"] = int(new_param["value"])
+        return new_params
+
     def run_optimizer_multiple_times(self, available_pool_size) -> None:
         if available_pool_size <= 0:
             return
         for _ in range(available_pool_size):
             if new_params := self.generate_new_parameter():
-                self.register_new_parameters(new_params)
+                self.register_new_parameters(self.convert_type_by_config(new_params))
                 self.trial_id.increment()
                 self.serialize(self.trial_id.integer)
 

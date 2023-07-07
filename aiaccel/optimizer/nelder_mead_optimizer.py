@@ -132,7 +132,10 @@ class NelderMeadOptimizer(AbstractOptimizer):
             if new_params := self.generate_new_parameter():
                 if self.out_of_boundary(new_params):
                     self.logger.debug(f"out of boundary: {new_params}")
-                    self.register_new_parameters(new_params, state="finished")
+                    self.register_new_parameters(
+                        self.convert_type_by_config(new_params),
+                        state="finished"
+                    )
                     objective = np.inf
                     if self.goals[0] == "maximize":
                         objective = -np.inf
@@ -143,7 +146,7 @@ class NelderMeadOptimizer(AbstractOptimizer):
                     self.trial_id.increment()
                     self.serialize(self.trial_id.integer)
                     continue
-                self.register_new_parameters(new_params)
+                self.register_new_parameters(self.convert_type_by_config(new_params))
                 self.trial_id.increment()
                 self.serialize(self.trial_id.integer)
 

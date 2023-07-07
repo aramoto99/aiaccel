@@ -19,6 +19,14 @@ from aiaccel.parameter import (
 from aiaccel.util.data_type import str_or_float_or_int
 
 
+def set_logging_file_for_trial_id(workspace: Path, trial_id: int) -> None:
+    log_dir = workspace / "log"
+    log_path = log_dir / f"job_{trial_id}.log"
+    if not log_dir.exists():
+        log_dir.mkdir(parents=True)
+    logging.basicConfig(filename=log_path, level=logging.DEBUG, force=True)
+
+
 def cast_y(y_value: Any, y_data_type: str | None) -> float | int | str:
     """Casts y to the appropriate data type.
 
@@ -223,11 +231,3 @@ class Run:
         if err != "":
             sys.stderr.write(f"{err}\n")
             exit(1)
-
-
-def set_logging_file_for_trial_id(workspace: Path, trial_id: int) -> None:
-    log_dir = workspace / "log"
-    log_path = log_dir / f"job_{trial_id}.log"
-    if not log_dir.exists():
-        log_dir.mkdir(parents=True)
-    logging.basicConfig(filename=log_path, level=logging.DEBUG, force=True)
