@@ -30,7 +30,8 @@ class AiaccelCore(object):
         self.module_name = module_name
 
         self.storage.variable.register(
-            process_name=self.module_name, labels=["native_random_state", "numpy_random_state", "state"]
+            process_name=self.module_name,
+            labels=["native_random_state", "numpy_random_state", "state"]
         )
 
     def set_config(self, config: DictConfig) -> None:
@@ -39,25 +40,9 @@ class AiaccelCore(object):
     def set_storage(self, storage: Storage) -> None:
         self.storage = storage
         self.storage.variable.register(
-            process_name=self.module_name, labels=[
-                "native_random_state", "numpy_random_state", "state"
-            ]
+            process_name=self.module_name,
+            labels=["native_random_state", "numpy_random_state", "state"]
         )
-
-    def colored_by_logging_level(self, level: int, messeage: str) -> str:
-        c = Color()
-        color = c.default
-        if level == logging.DEBUG:
-            color = c.cyan
-        elif level == logging.INFO:
-            color = c.green
-        elif level == logging.WARNING:
-            color = c.yellow
-        elif level == logging.ERROR:
-            color = c.red
-        elif level == logging.CRITICAL:
-            color = c.magenta
-        return f"{color}{messeage}{c.reset}"
 
     def set_logger(
         self, 
