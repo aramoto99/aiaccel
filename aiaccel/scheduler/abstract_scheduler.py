@@ -49,7 +49,6 @@ class AbstractScheduler(AbstractModule):
         self.stats: list[Any] = []
         self.jobs: list[Any] = []
         self.job_status: dict[Any, Any] = {}
-        self.algorithm: Any = None
         self.start_trial_id = self.config.resume if self.config.resume is not None else 0
         self.buff = Buffer([trial_id for trial_id in range(self.start_trial_id, self.trial_number)])
         for trial_id in range(self.start_trial_id, self.config.optimize.trial_number):
