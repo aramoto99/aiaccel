@@ -44,7 +44,6 @@ class AbstractScheduler(AbstractModule):
         self.num_running = 0
         self.num_finished = 0
         self.available_pool_size = 0
-        self.available_resource = self.num_workers
         self.stats: list[Any] = []
         self.jobs: list[Any] = []
         self.job_status: dict[Any, Any] = {}
@@ -123,10 +122,10 @@ class AbstractScheduler(AbstractModule):
             self.available_pool_size = 0
             self.logger.info(f"trial_number: {self.trial_number}, ready: {num_ready}, running: {num_running}, finished: {num_finished}")
             self.logger.info("All parameters are generated.")
-        elif (self.trial_number - sum_status) < self.max_resource:
+        elif (self.trial_number - sum_status) < self.num_workers:
             self.available_pool_size = self.trial_number - sum_status
         else:
-            self.available_pool_size = self.max_resource - num_running - num_ready
+            self.available_pool_size = self.num_workers - num_running - num_ready
 
         if self.available_pool_size == 0:
             return

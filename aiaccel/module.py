@@ -34,7 +34,10 @@ class AiaccelCore(object):
             labels=["native_random_state", "numpy_random_state", "state"]
         )
 
-    def set_storage(self, storage: Storage):
+    def set_config(self, config: DictConfig) -> None:
+        self.config = config
+
+    def set_storage(self, storage: Storage) -> None:
         self.storage = storage
         self.storage.variable.register(
             process_name=self.module_name,
@@ -133,78 +136,6 @@ class AiaccelCore(object):
         self._rng.set_state(state)
 
     def __getstate__(self) -> dict[str, Any]:
-        obj = self.__dict__.copy()
-        del obj["storage"]
-        del obj["config"]
-        return obj
-
-
-class AbstractModule(AiaccelCore):
-
-    def pre_process(self) -> None:
-        """Perform setup or initialization tasks before the main loop starts.
-
-        This method should be implemented by subclasses to perform any necessary setup operations.
-
-        Raises:
-            NotImplementedError: If the subclass does not implement this method.
-        """
-        raise NotImplementedError
-
-    def run_in_main_loop(self) -> bool:
-        """Perform tasks that should be executed in every cycle of the main loop.
-
-        This method should be implemented by subclasses to define the operations executed in each cycle.
-
-        Returns:
-            bool: True if the main process has been completed, False otherwise.
-
-        Raises:
-            NotImplementedError: If the subclass does not implement this method.
-        """
-        raise NotImplementedError
-
-    def post_process(self) -> None:
-        """Perform cleanup tasks after the main loop ends.
-
-        This method should be implemented by subclasses to perform any necessary cleanup operations.
-
-        Raises:
-            NotImplementedError: If the subclass does not implement this method.
-        """
-        raise NotImplementedError
-
-    def is_error_free(self) -> bool:
-        """Check if there has been an error.
-
-        This method should be implemented by subclasses to define how to check for errors. 
-
-        Returns:
-            bool: True if there has been no error, False otherwise.
-
-        Raises:
-            NotImplementedError: If the subclass does not implement this method.
-        """
-        return True
-
-    def resume(self) -> None:
-        """Load previous optimization data when in resume mode.
-
-        This method should be implemented by subclasses to define how to load previously saved optimization data.
-
-        Raises:
-            NotImplementedError: If the subclass does not implement this method.
-        """
-        raise NotImplementedError
-
-    def __getstate__(self) -> dict[str, Any]:
-        """Prepare the object for serialization.
-
-        Certain attributes may need to be removed or modified before serialization.
-
-        Returns:
-            dict[str, Any]: A dictionary that can be serialized.
-        """
         obj = self.__dict__.copy()
         del obj["storage"]
         del obj["config"]

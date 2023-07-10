@@ -19,16 +19,16 @@ class TestNelderMeadOptimizer(BaseTest):
 
     def test_generate_initial_parameter(self):
         expected = [
-            {'name': 'x1', 'type': 'FLOAT', 'value': 0.74},
-            {'name': 'x2', 'type': 'FLOAT', 'value': 2.98},
-            {'name': 'x3', 'type': 'FLOAT', 'value': 3.62},
-            {'name': 'x4', 'type': 'FLOAT', 'value': 0.9},
-            {'name': 'x5', 'type': 'FLOAT', 'value': 1.99},
-            {'name': 'x6', 'type': 'FLOAT', 'value': -2.78},
-            {'name': 'x7', 'type': 'FLOAT', 'value': 1.0},
-            {'name': 'x8', 'type': 'FLOAT', 'value': 4.97},
-            {'name': 'x9', 'type': 'FLOAT', 'value': 1.98},
-            {'name': 'x10', 'type': 'FLOAT', 'value': 4.03}
+            {'name': 'x1', 'type': 'uniform_float', 'value': 0.74},
+            {'name': 'x2', 'type': 'uniform_float', 'value': 2.98},
+            {'name': 'x3', 'type': 'uniform_float', 'value': 3.62},
+            {'name': 'x4', 'type': 'uniform_float', 'value': 0.9},
+            {'name': 'x5', 'type': 'uniform_float', 'value': 1.99},
+            {'name': 'x6', 'type': 'uniform_float', 'value': -2.78},
+            {'name': 'x7', 'type': 'uniform_float', 'value': 1.0},
+            {'name': 'x8', 'type': 'uniform_float', 'value': 4.97},
+            {'name': 'x9', 'type': 'uniform_float', 'value': 1.98},
+            {'name': 'x10', 'type': 'uniform_float', 'value': 4.03}
         ]
 
         _optimizer = NelderMeadOptimizer(self.load_config_for_test(self.configs["config.json"]))

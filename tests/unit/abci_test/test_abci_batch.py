@@ -55,7 +55,7 @@ class TestCreateAbciBatchFile(BaseTest):
                 },
                 {
                     'name': 'x2',
-                    'type': 'FLOAT',
+                    'type': 'uniform_float',
                     'value': 123456
                 }
             ],
