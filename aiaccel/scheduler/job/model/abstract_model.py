@@ -14,11 +14,10 @@ class AbstractModel(object):
 
     # ready
     def before_ready(self, obj: Job) -> None:
-        obj.logger.debug(f"before_ready: {obj.trial_id}")
+        obj.logger.debug(f"ready: {obj.trial_id}")
         self.runner_create(obj)
 
     def after_ready(self, obj: Job) -> None:
-        obj.logger.debug(f"after_ready: {obj.trial_id}")
         obj.write_start_time_to_storage()
         self.job_submitted(obj)
 
@@ -30,7 +29,7 @@ class AbstractModel(object):
 
     # running
     def before_running(self, obj: Job) -> None:
-        obj.logger.debug(f"before_running: {obj.trial_id}")
+        obj.logger.debug(f"running: {obj.trial_id}")
         obj.write_state_to_storage("running")
 
     def after_running(self, obj: Job) -> None:
@@ -43,12 +42,23 @@ class AbstractModel(object):
 
     # finished
     def before_finished(self, obj: Job) -> None:
-        obj.logger.debug(f"before_finished: {obj.trial_id}")
+        obj.logger.debug(f"finished: {obj.trial_id}")
         obj.write_state_to_storage("finished")
         obj.write_end_time_to_storage()
 
     def after_finished(self, obj: Job) -> None:
-        obj.logger.debug(f"after_finished: {obj.trial_id}")
         obj.write_job_success_or_failed_to_storage()
+
+    # timeout  # TODO: implement timeout
+    def before_timeout(self, obj: Job) -> None:
+        obj.logger.debug(f"timeout: {obj.trial_id}")
+        obj.write_state_to_storage("timeout")
+        obj.write_end_time_to_storage()
+
+    def after_timeout(self, obj: Job) -> None:
+        self.stop_job(obj)
+
+    def stop_job(self, obj: Job) -> None:
+        ...
 
     ...

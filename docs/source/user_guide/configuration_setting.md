@@ -17,7 +17,7 @@ aiaccel の実行に必要な一時ファイルを保存するディレクトリ
 aiaccel は実行時，python_file に書かれたファイルから，ここで指定された名前の関数をインポートします．
 実行モードが ABCI または通常の Local の場合には指定する必要はありません．
 
-### batch_job_timeout (int, optional):
+### job_timeout_seconds (int, optional):
 ジョブのタイムアウト時間を秒単位で設定します．
 デフォルトでは 600 (秒) に設定されています．
 
@@ -314,7 +314,7 @@ Defaults to 60.
 ### init_fail_count (int, optional):
 Defaults to 100.
 
-### name_length (int, optional):
+### trial_id_digits (int, optional):
 文字列としてのジョブ ID の長さです．
 この文字列は，結果を .hp ファイルに保存する際にファイル名として使用されます．
 デフォルトでは 6 に設定されています．

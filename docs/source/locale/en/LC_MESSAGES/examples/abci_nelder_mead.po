@@ -92,7 +92,7 @@ msgid "**job_command** - ユーザープログラムを実行するためのコ�
 msgstr ""
 
 #: ../../source/examples/abci_nelder_mead.md:46
-msgid "**batch_job_timeout** - ジョブのタイムアウト時間を設定します．[単位: 秒]"
+msgid "**job_timeout_seconds** - ジョブのタイムアウト時間を設定します．[単位: 秒]"
 msgstr ""
 
 #: ../../source/examples/abci_nelder_mead.md:47

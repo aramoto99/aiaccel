@@ -40,9 +40,9 @@ class AbstractOptimizer(AiaccelCore):
         super().__init__(config, "optimizer")
         self.set_logger(
             "root.optimizer",
-            self.workspace.log / self.config.logger.file.optimizer,
-            str_to_logging_level(self.config.logger.log_level.optimizer),
-            str_to_logging_level(self.config.logger.stream_level.optimizer),
+            self.workspace.log / "optimizer.log",
+            str_to_logging_level(self.config.generic.logging_level),
+            str_to_logging_level(self.config.generic.logging_level),
             "Optimizer",
         )
 

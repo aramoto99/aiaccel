@@ -23,6 +23,7 @@ JOB_STATES = [
     {"name": "finished"},
     {"name": "success"},
     {"name": "failure"},
+    {"name": "timeout"},
 ]
 
 
@@ -58,6 +59,13 @@ JOB_TRANSITIONS: list[dict[str, str | list[str]]] = [
         "trigger": "expire",
         "source": ["init", "ready", "running", "finished"],
         "dest": "failure",
+    },
+    {
+        "trigger": "timeout",
+        "source": ["init", "ready", "running", "finished"],
+        "dest": "timeout",
+        "before": "before_timeout",
+        "after": "after_timeout",
     }
 ]
 
@@ -99,6 +107,8 @@ class Job:
             auto_transitions=False,
             ordered_transitions=False,
         )
+        self.start_time = None
+        self.end_time = None
         self.trial_id = trial_id
         self.proc: Any = None
         self.th_oh: Any = None
@@ -117,21 +127,21 @@ class Job:
     def write_start_time_to_storage(self) -> None:
         """Set a start time.
         """
-        start_time = get_time_now_object()
-        start_time = get_time_string_from_object(start_time)
+        self.start_time = get_time_now_object()
+        _start_time = get_time_string_from_object(self.start_time)
         self.storage.timestamp.set_any_trial_start_time(
             trial_id=self.trial_id,
-            start_time=start_time
+            start_time=_start_time
         )
 
     def write_end_time_to_storage(self) -> None:
         """Set an end time.
         """
-        end_time = get_time_now_object()
-        end_time = get_time_string_from_object(end_time)
+        self.end_time = get_time_now_object()
+        _end_time = get_time_string_from_object(self.end_time)
         self.storage.timestamp.set_any_trial_end_time(
             trial_id=self.trial_id,
-            end_time=end_time
+            end_time=_end_time
         )
 
     def write_state_to_storage(self, state: str) -> None:
@@ -154,6 +164,33 @@ class Job:
             trial_id=self.trial_id,
             state=end_state)
 
+    def get_job_elapsed_time_in_seconds(self) -> float:
+        """Get a job elapsed time in seconds.
+
+        Returns:
+            float: A job elapsed time in seconds.
+        """
+        if self.start_time is None:
+            return 0.0
+        if self.end_time is None:
+            return 0.0
+        return (self.end_time - self.start_time).total_seconds()
+
+    def is_timeout(self) -> bool:
+        """Check if a job is timeout.
+
+        Returns:
+            bool: True if a job is timeout.
+        """
+        if self.start_time is None:
+            return False
+        if self.end_time is None:
+            return False
+        elapsed_time = self.get_job_elapsed_time_in_seconds()
+        if elapsed_time > self.config.job_setting.job_timeout_seconds:
+            return True
+        return False
+
     def main(self) -> None:
         """Thread.run method.
 
@@ -171,6 +208,11 @@ class Job:
                 self.model.next(self)
             elif state.name.lower() == "finished":
                 self.model.next(self)
-        except BaseException:
+        except BaseException as e:
+            self.logger.error(
+                f"An error occurred in the job thread. {e}")
             self.model.expire(self)
+            return
+        if self.is_timeout():
+            self.model.timeout(self)
         return
