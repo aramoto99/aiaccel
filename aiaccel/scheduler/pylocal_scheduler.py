@@ -9,11 +9,11 @@ from typing import Any
 
 from omegaconf.dictconfig import DictConfig
 
+from aiaccel.aiaccel import Run, set_logging_file_for_trial_id
 from aiaccel.common import datetime_format
 from aiaccel.config import load_config
 from aiaccel.optimizer import AbstractOptimizer
 from aiaccel.scheduler.abstract_scheduler import AbstractScheduler
-from aiaccel.aiaccel import Run, set_logging_file_for_trial_id
 
 # These are for avoiding mypy-errors from initializer().
 # `global` does not work well.
@@ -132,16 +132,14 @@ class PylocalScheduler(AbstractScheduler):
 
         commands = ["aiaccel-set-result"]
         for key in args.keys():
-            commands.append("--" + key)
-            commands.append(str(args[key]))
+            commands.append(f"--{key}={args[key]}")
 
         commands.append("--objective")
         for y in ys:
             commands.append(str(y))
 
         for key in xs.keys():
-            commands.append("--" + key)
-            commands.append(str(xs[key]))
+            commands.append(f"--{key}={xs[key]}")
 
         self.logger.info(f"Job command: {' '.join(commands)}")
 

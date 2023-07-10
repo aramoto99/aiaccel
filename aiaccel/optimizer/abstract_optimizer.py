@@ -171,3 +171,16 @@ class AbstractOptimizer(AiaccelCore):
             list[dict[str, float | int | str]]: Any trial parameters.
         """
         return self.storage.hp.get_any_trial_params_dict(trial_id)
+
+    def is_error_free(self) -> bool:
+        """Check if all trials are error free.
+
+        Returns:
+            bool: True if all trials are error free.
+        """
+        error_trial_ids = self.storage.error.get_error_trial_id()
+        for trial_id in error_trial_ids:
+            error_message = self.storage.error.get_any_trial_error(trial_id=trial_id)
+            self.logger.error(error_message)
+            return False
+        return True

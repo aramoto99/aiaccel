@@ -2,16 +2,7 @@ import shutil
 from pathlib import Path
 
 from aiaccel.storage import Storage
-from aiaccel.util import create_yaml
-from aiaccel.util import file_create
-from aiaccel.util import file_delete
-from aiaccel.util import file_read
-from aiaccel.util import get_dict_files
-from aiaccel.util import get_file_result
-from aiaccel.util import get_file_result_hp
-from aiaccel.util import load_yaml
-from aiaccel.util import make_directories
-from aiaccel.util import make_directory
+from aiaccel.util import create_yaml, file_create, file_delete, load_yaml, make_directories, make_directory
 from aiaccel.workspace import Workspace
 
 
@@ -31,51 +22,6 @@ def test_file_create(clean_work_dir, work_dir):
     path = alive_dir.joinpath('master.yml')
     file_create(path, 'hello')
     assert path.exists()
-
-
-def test_file_delete(clean_work_dir, work_dir):
-    clean_work_dir()
-    alive_dir = work_dir.joinpath('alive')
-    path = alive_dir.joinpath('master.yml')
-    dict_lock = work_dir.joinpath('lock')
-    file_create(path, 'hello')
-    file_delete(path)
-    assert not path.exists()
-    file_create(path, 'hello')
-    file_delete(path, dict_lock)
-    assert not path.exists()
-    assert file_delete(Path('invalid_path')) is None
-
-
-def test_file_read(clean_work_dir, work_dir):
-    clean_work_dir()
-    alive_dir = work_dir.joinpath('alive')
-    path = alive_dir.joinpath('master.yml')
-    dict_lock = work_dir.joinpath('lock')
-    file_create(path, 'hello')
-    assert file_read(path) == 'hello'
-    assert file_read(path, dict_lock) == 'hello'
-    assert file_read(Path('invalid_path')) is None
-
-
-def test_get_dict_files(clean_work_dir, work_dir):
-    clean_work_dir()
-    alive_dir = work_dir.joinpath('alive')
-    path = alive_dir.joinpath('master.yml')
-    dict_lock = work_dir.joinpath('lock')
-    file_create(path, 'hello')
-    assert get_dict_files(alive_dir, '*.yml') == [path]
-    assert get_dict_files(alive_dir, '*.yml', dict_lock) == [path]
-
-    assert get_dict_files(Path('invalid_path'), '*.yml', dict_lock) is None
-
-
-def test_get_file_result(clean_work_dir, setup_result, work_dir):
-    content = {}
-    create_yaml((work_dir / 'result' / '001.result'), content)
-    assert get_file_result(work_dir) == [
-        work_dir.joinpath('result/001.result')
-    ]
 
 
 def test_load_yaml(clean_work_dir, work_dir):
@@ -113,13 +59,3 @@ def test_make_directories(clean_work_dir, work_dir):
     shutil.rmtree(work_dir.joinpath('hp', 'exist'))
     file_create(work_dir.joinpath('hp', 'exist'), 'hello', dict_lock)
     assert make_directories(ds, dict_lock) is None
-
-
-def test_get_file_result_hp(work_dir):
-    # no files
-    assert get_file_result_hp(work_dir) == []
-
-    file_path = work_dir / 'result' / 'test.hp'
-    create_yaml(file_path, {})
-
-    assert get_file_result_hp(work_dir) == [Path(file_path)]

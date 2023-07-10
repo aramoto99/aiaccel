@@ -3,6 +3,8 @@ from __future__ import annotations
 import shutil
 from pathlib import Path
 
+import fasteners
+
 from aiaccel.common import (
     dict_error,
     dict_hp,
@@ -13,10 +15,50 @@ from aiaccel.common import (
     dict_storage,
     dict_tensorboard,
 )
-from aiaccel.util import Suffix, make_directories
+from aiaccel.util import Suffix
 
-# from typing import Any
 
+def make_directory(d: Path, dict_lock: Path | None = None) -> None:
+    """Make a directory.
+    Args:
+        d (Path): A path of making directory.
+        dict_lock (Path | None, optional): A directory to store lock files.
+            Defaluts to None.
+
+    Returns:
+        None
+    """
+    if dict_lock is None:
+        if not d.exists():
+            d.mkdir()
+    else:
+        lock_file = dict_lock / d.parent.name
+        with fasteners.InterProcessLock(lock_file):
+            if not d.exists():
+                d.mkdir()
+
+
+def make_directories(ds: list[Path], dict_lock: Path | None = None) -> None:
+    """Make directories.
+    Args:
+        ds (list[Path]): A list of making directories.
+        dict_lock (Path | None, optional): A directory to store lock files.
+            Defaults to None.
+
+    Returns:
+        None
+    """
+    for d in ds:
+        if dict_lock is None:
+            if not d.is_dir() and d.exists():
+                d.unlink()
+            make_directory(d)
+        else:
+            lock_file = dict_lock / d.parent.name
+            with fasteners.InterProcessLock(lock_file):
+                if not d.is_dir() and d.exists():
+                    d.unlink()
+                make_directory(d)
 
 
 class Workspace:

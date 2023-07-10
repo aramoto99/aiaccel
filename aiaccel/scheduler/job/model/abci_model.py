@@ -5,9 +5,11 @@ from pathlib import Path
 from subprocess import PIPE, Popen
 from typing import TYPE_CHECKING, Any
 
+import fasteners
+
 from aiaccel.abci import create_qsub_command
 from aiaccel.scheduler.job.model.abstract_model import AbstractModel
-from aiaccel.util import OutputHandler, file_create
+from aiaccel.util import OutputHandler
 
 if TYPE_CHECKING:
     from aiaccel.scheduler.job import Job
@@ -25,7 +27,7 @@ class AbciModel(AbstractModel):
             runner_file_path=runner_file_path,
             job_script_preamble=obj.config.ABCI.job_script_preamble,
             command=obj.config.generic.job_command,
-            enable_command_argument=obj.config.generic.enable_command_argument,
+            enable_name_in_optional_argument=obj.config.generic.enable_name_in_optional_argument,
             dict_lock=obj.workspace.lock,
         )
 
@@ -59,7 +61,7 @@ class AbciModel(AbstractModel):
         runner_file_path: Path,
         job_script_preamble: Path | str | None,
         command: str,
-        enable_command_argument: bool,
+        enable_name_in_optional_argument: bool,
         dict_lock: Path,
     ) -> None:
         """Create a ABCI batch file.
@@ -84,7 +86,7 @@ class AbciModel(AbstractModel):
         """
 
         commands = re.split(" +", command)
-        if enable_command_argument:
+        if enable_name_in_optional_argument:
             for param in param_content["parameters"]:
                 if "name" in param.keys() and "value" in param.keys():
                     commands.append(f'--{param["name"]}=${param["name"]}')
@@ -160,4 +162,25 @@ class AbciModel(AbstractModel):
         for s in main_parts:
             script += s + "\n"
 
-        file_create(runner_file_path, script, dict_lock)
+        self.file_create(runner_file_path, script, dict_lock)
+
+
+    def file_create(self, path: Path, content: str, dict_lock: Path | None = None) -> None:
+        """Create a text file.
+        Args:
+            path (Path): The path of the created file.
+            content (str): The content of the created file.
+            dict_lock (Path | None, optional): The path to store lock files.
+                Defaults to None.
+
+        Returns:
+            None
+        """
+        if dict_lock is None:
+            with open(path, "w") as f:
+                f.write(content)
+        else:
+            lock_file = self.workspace.lock / f"{path.parent.name}.lock"
+            with fasteners.InterProcessLock(lock_file):
+                with open(path, "w") as f:
+                    f.write(content)
