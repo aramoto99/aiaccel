@@ -395,4 +395,8 @@ def _decode_weight_distribution(param: WeightOfChoice, weight_distribution: list
 
 
 def _make_structured_value(param: ConvertedParameter, value: Any) -> dict[str, Any]:
-    return {"name": param.name, "type": param.type, "value": value}
+    return {
+        "parameter_name": param.original_name if isinstance(param, WeightOfChoice) else param.name,
+        "type": param.type,
+        "value": value,
+    }
