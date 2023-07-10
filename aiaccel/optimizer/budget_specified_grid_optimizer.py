@@ -57,7 +57,7 @@ class BudgetSpecifiedGridOptimizer(AbstractOptimizer):
 
         new_params: list[dict[str, float | int | str]] = []
         for param, value in zip(self.params.get_parameter_list(), self._grid_point_generator.get_next_grid_point()):
-            new_params.append({"parameter_name": param.name, "type": param.type, "value": value})
+            new_params.append({"name": param.name, "type": param.type, "value": value})
         return new_params
 
     def generate_initial_parameter(self) -> list[dict[str, float | int | str]]:

@@ -44,8 +44,8 @@ class AbciModel(AbstractModel):
     def generate_param_args(self, params: list[dict[str, Any]]) -> str:
         param_args = ""
         for param in params:
-            if "parameter_name" in param.keys() and "value" in param.keys():
-                param_args += f'--{param["parameter_name"]} ${param["parameter_name"]} '
+            if "name" in param.keys() and "value" in param.keys():
+                param_args += f'--{param["name"]} ${param["name"]} '
         return param_args
 
     def create_abci_batch_file(
@@ -84,9 +84,9 @@ class AbciModel(AbstractModel):
         commands = re.split(" +", command)
 
         for param in param_content["parameters"]:
-            if "parameter_name" in param.keys() and "value" in param.keys():
-                commands.append(f'--{param["parameter_name"]}')
-                commands.append(f'${param["parameter_name"]}')
+            if "name" in param.keys() and "value" in param.keys():
+                commands.append(f'--{param["name"]}')
+                commands.append(f'${param["name"]}')
         commands.append("--trial_id")
         commands.append(str(trial_id))
         commands.append("--config")
@@ -152,8 +152,8 @@ class AbciModel(AbstractModel):
         script += "\n"
         # parameters
         for param in param_content["parameters"]:
-            if "parameter_name" in param.keys() and "value" in param.keys():
-                script += f'{param["parameter_name"]}={param["value"]}' + "\n"
+            if "name" in param.keys() and "value" in param.keys():
+                script += f'{param["name"]}={param["value"]}' + "\n"
         script += "\n"
         # main
         for s in main_parts:

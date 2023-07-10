@@ -209,7 +209,7 @@ class CustomOptimizer(AbstractOptimizer):
 
         for s in sample:
             new_param = {
-                'parameter_name': s['name'],
+                'name': s['name'],
                 'type': s['type'],
                 'value': s['value']
             }
@@ -285,7 +285,7 @@ class CustomOptimizer(AbstractOptimizer):
             value = self._rng.normal(0, 0.1)
             value = min(max(value, hp.lower), hp.upper)
             new_param = {
-                'parameter_name': hp.name,
+                'name': hp.name,
                 'type': hp.type,
                 'value': value
             }
@@ -397,7 +397,7 @@ class CustomOptimizer(AbstractOptimizer):
             value = value = self._rng.normal(self.mu, self.sigma)
             value = min(max(value, hp.lower), hp.upper)
             new_param = {
-                'parameter_name': hp.name,
+                'name': hp.name,
                 'type': hp.type,
                 'value': value
             }
@@ -510,7 +510,7 @@ class GradientDescent(AbstractOptimizer):
             new_params = copy.deepcopy(self.current_params)
             param = self.current_params[self.num_generated_forwards]
             forward = {
-                'parameter_name': param['parameter_name'],
+                'name': param['name'],
                 'type': param['type'],
                 'value': param['value'] + self.delta
             }
@@ -547,7 +547,7 @@ class GradientDescent(AbstractOptimizer):
                         ) / self.delta
                 value = param['value'] - self.learning_rate * grad
                 new_param = {
-                    'parameter_name': param['parameter_name'],
+                    'name': param['name'],
                     'type': param['type'],
                     'value': value
                 }
@@ -620,7 +620,7 @@ class SearchState(Enum):
             new_params = copy.deepcopy(self.current_params)
             param = self.current_params[self.num_generated_forwards]
             forward = {
-                'parameter_name': param['parameter_name'],
+                'name': param['name'],
                 'type': param['type'],
                 'value': param['value'] + self.delta
             }
@@ -644,7 +644,7 @@ class SearchState(Enum):
 続いて，項目 `value` を $W_n + \delta$ で置き換えます．
 ```python
             forward = {
-                'parameter_name': param['parameter_name'],
+                'name': param['name'],
                 'type': param['type'],
                 'value': param['value'] + self.delta
             }
@@ -765,7 +765,7 @@ class SearchState(Enum):
                         ) / self.delta
                 value = param['value'] - self.learning_rate * grad
                 new_param = {
-                    'parameter_name': param['parameter_name'],
+                    'name': param['name'],
                     'type': param['type'],
                     'value': value
                 }
@@ -789,7 +789,7 @@ Storage から読み出した $W_n$ における目的関数の値 $f(W_n)$ (`se
 ```python
                 value = param['value'] - self.learning_rate * grad
                 new_param = {
-                    'parameter_name': param['parameter_name'],
+                    'name': param['name'],
                     'type': param['type'],
                     'value': value
                 }

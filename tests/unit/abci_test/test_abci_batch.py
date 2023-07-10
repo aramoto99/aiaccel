@@ -49,13 +49,13 @@ class TestCreateAbciBatchFile(BaseTest):
             'trial_id': 99,
             'parameters': [
                 {
-                    'parameter_name': 'x1',
-                    'type': 'uniform_float',
+                    'name': 'x1',
+                    'type': 'FLOAT',
                     'value': -4.716525234779937
                 },
                 {
-                    'parameter_name': 'x2',
-                    'type': 'uniform_float',
+                    'name': 'x2',
+                    'type': 'FLOAT',
                     'value': 123456
                 }
             ],

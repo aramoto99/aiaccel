@@ -1,5 +1,6 @@
-import numpy as np
 from unittest.mock import patch
+
+import numpy as np
 
 from aiaccel.storage import Storage
 from tests.unit.storage_test.db.base import get_storage, t_base, ws
@@ -291,7 +292,7 @@ def test_get_hp_dict():
     exp = {
         'trial_id': str(trial_id),
         'parameters': [{
-            "parameter_name": param_name,
+            "name": param_name,
             "type": param_type,
             "value": param_value
         }],
@@ -339,7 +340,7 @@ def test_get_hp_dict_int():
     exp = {
         'trial_id': str(trial_id),
         'parameters': [{
-            "parameter_name": param_name,
+            "name": param_name,
             "type": param_type,
             "value": param_value
         }],
@@ -386,7 +387,7 @@ def test_get_hp_dict_categorical():
     exp = {
         'trial_id': str(trial_id),
         'parameters': [{
-            "parameter_name": param_name,
+            "name": param_name,
             "type": param_type,
             "value": param_value
         }],
@@ -432,7 +433,7 @@ def test_get_hp_dict_invalid_type():
     exp = {
         'trial_id': str(trial_id),
         'parameters': [{
-            "parameter_name": param_name,
+            "name": param_name,
             "type": param_type,
             "value": param_value
         }],
@@ -515,7 +516,7 @@ def test_get_best_trial_dict():
         'trial_id': trial_id,
         'parameters': [
             {
-                "parameter_name": param_name,
+                "name": param_name,
                 "type": param_type,
                 "value": param_value
 

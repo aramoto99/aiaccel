@@ -161,7 +161,7 @@ class Storage:
             else:  # pragma: no cover
                 pass  # not reached
 
-            hp.append({"parameter_name": param_name, "type": dtype, "value": value})
+            hp.append({"name": param_name, "type": dtype, "value": value})
         result = self.result.get_any_trial_objective(trial_id=trial_id)
         start_time = self.timestamp.get_any_trial_start_time(trial_id=trial_id)
         end_time = self.timestamp.get_any_trial_end_time(trial_id=trial_id)

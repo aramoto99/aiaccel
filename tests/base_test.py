@@ -1,13 +1,12 @@
+import shutil
 from contextlib import contextmanager
 from pathlib import Path
 
 import pytest
 
 from aiaccel.config import load_config
-
 from aiaccel.util import create_yaml
 from aiaccel.workspace import Workspace
-import shutil
 
 d0 = {
     "end_time": "11/03/2020 16:07:45",
@@ -15,52 +14,52 @@ d0 = {
     "parameters":
         [
             {
-                "parameter_name": "x1",
+                "name": "x1",
                 "type": "FLOAT",
                 "value": 0.9932890709584586
             },
             {
-                "parameter_name": "x10",
+                "name": "x10",
                 "type": "FLOAT",
                 "value": 3.599465287952899
             },
             {
-                "parameter_name": "x2",
+                "name": "x2",
                 "type": "FLOAT",
                 "value": -3.791100401941936
             },
             {
-                "parameter_name": "x3",
+                "name": "x3",
                 "type": "FLOAT",
                 "value": -1.6730481463987088
             },
             {
-                "parameter_name": "x4",
+                "name": "x4",
                 "type": "FLOAT",
                 "value": 2.2148440758326835
             },
             {
-                "parameter_name": "x5",
+                "name": "x5",
                 "type": "FLOAT",
                 "value": 2.111917696952796
             },
             {
-                "parameter_name": "x6",
+                "name": "x6",
                 "type": "FLOAT",
                 "value": 4.364405867994597
             },
             {
-                "parameter_name": "x7",
+                "name": "x7",
                 "type": "FLOAT",
                 "value": -0.7789300003858477
             },
             {
-                "parameter_name": "x8",
+                "name": "x8",
                 "type": "FLOAT",
                 "value": 3.30035693274327
             },
             {
-                "parameter_name": "x9",
+                "name": "x9",
                 "type": "FLOAT",
                 "value": 1.7030556641407104
             }
@@ -76,52 +75,52 @@ d1 = {
     "parameters":
         [
             {
-                "parameter_name": "x1",
+                "name": "x1",
                 "type": "FLOAT",
                 "value": 0.8521885935278827
             },
             {
-                "parameter_name": "x10",
+                "name": "x10",
                 "type": "FLOAT",
                 "value": -0.6723293209494665
             },
             {
-                "parameter_name": "x2",
+                "name": "x2",
                 "type": "FLOAT",
                 "value": 2.6228008245794197
             },
             {
-                "parameter_name": "x3",
+                "name": "x3",
                 "type": "FLOAT",
                 "value": -4.978939466488893
             },
             {
-                "parameter_name": "x4",
+                "name": "x4",
                 "type": "FLOAT",
                 "value": -0.546128059451986
             },
             {
-                "parameter_name": "x5",
+                "name": "x5",
                 "type": "FLOAT",
                 "value": 2.2154003234078257
             },
             {
-                "parameter_name": "x6",
+                "name": "x6",
                 "type": "FLOAT",
                 "value": -2.7123777872954733
             },
             {
-                "parameter_name": "x7",
+                "name": "x7",
                 "type": "FLOAT",
                 "value": 4.452706955539224
             },
             {
-                "parameter_name": "x8",
+                "name": "x8",
                 "type": "FLOAT",
                 "value": 4.014274576114836
             },
             {
-                "parameter_name": "x9",
+                "name": "x9",
                 "type": "FLOAT",
                 "value": -4.694100169664464
             }
@@ -137,52 +136,52 @@ d2 = {
     "parameters":
         [
             {
-                "parameter_name": "x1",
+                "name": "x1",
                 "type": "FLOAT",
                 "value": 0.2209278197011611
             },
             {
-                "parameter_name": "x10",
+                "name": "x10",
                 "type": "FLOAT",
                 "value": 3.4743373693723267
             },
             {
-                "parameter_name": "x2",
+                "name": "x2",
                 "type": "FLOAT",
                 "value": 2.6377461897661405
             },
             {
-                "parameter_name": "x3",
+                "name": "x3",
                 "type": "FLOAT",
                 "value": -2.449309742605783
             },
             {
-                "parameter_name": "x4",
+                "name": "x4",
                 "type": "FLOAT",
                 "value": -0.04564912908059071
             },
             {
-                "parameter_name": "x5",
+                "name": "x5",
                 "type": "FLOAT",
                 "value": -0.505089352112619
             },
             {
-                "parameter_name": "x6",
+                "name": "x6",
                 "type": "FLOAT",
                 "value": 1.515929727227629
             },
             {
-                "parameter_name": "x7",
+                "name": "x7",
                 "type": "FLOAT",
                 "value": 2.8872335113551317
             },
             {
-                "parameter_name": "x8",
+                "name": "x8",
                 "type": "FLOAT",
                 "value": -4.0614041322576515
             },
             {
-                "parameter_name": "x9",
+                "name": "x9",
                 "type": "FLOAT",
                 "value": -4.716525234779937
             }

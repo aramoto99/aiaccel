@@ -67,8 +67,8 @@ class LocalModel(AbstractModel):
         for param in params:
             # Fix a bug related a negative exponential parameters
             # Need to modify wrapper.py as follows:
-            if "parameter_name" in param.keys() and "value" in param.keys():
-                commands.append(f'--{param["parameter_name"]}')
+            if "name" in param.keys() and "value" in param.keys():
+                commands.append(f'--{param["name"]}')
                 commands.append(f'{param["value"]}')
         commands.append("--trial_id")
         commands.append(str(trial_id))
@@ -127,8 +127,8 @@ class LocalModel(AbstractModel):
             commands.append(str(objective))
 
         for param in params:
-            if 'parameter_name' in param.keys() and 'value' in param.keys():
-                commands.append('--' + param['parameter_name'])
+            if 'name' in param.keys() and 'value' in param.keys():
+                commands.append('--' + param['name'])
                 commands.append(str(param['value']))
         Popen(commands)
         return None

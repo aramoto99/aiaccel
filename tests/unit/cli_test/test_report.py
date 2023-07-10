@@ -30,12 +30,12 @@ def test_report(clean_work_dir, work_dir, create_tmp_config):
         'trial_id': '000000',
         'parameters': [
             {
-                'parameter_name': 'test_1',
+                'name': 'test_1',
                 'type': 'uniform_float',
                 'value': 2.155147371813655
             },
             {
-                'parameter_name': 'test_2',
+                'name': 'test_2',
                 'type': 'uniform_float',
                 'value': 4.071839861571789
             }
