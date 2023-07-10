@@ -1,12 +1,12 @@
 import subprocess
 from pathlib import Path
 
+import yaml
+
 from aiaccel.config import is_multi_objective
 from aiaccel.storage import Storage
 from aiaccel.workspace import Workspace
 from tests.integration.integration_test import IntegrationTest
-
-import yaml
 
 
 class ResumptionTest(IntegrationTest):
@@ -55,7 +55,7 @@ class ResumptionTest(IntegrationTest):
             )
             workspace = Workspace(config.generic.workspace)
             storage = Storage(workspace.storage_file_path)
-            subprocess.Popen(['aiaccel-start', '--config', str(new_config_file_path), '--resume', '3']).wait()
+            subprocess.Popen(['aiaccel-start', '--config', str(config.config_path), '--resume', '3']).wait()
             final_result_resumption = self.get_final_result(storage)
             print('resumption steps finished', final_result_resumption)
 

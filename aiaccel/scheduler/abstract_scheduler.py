@@ -155,7 +155,7 @@ class AbstractScheduler(AiaccelCore):
             self.logger.info(f"restart hp files in previous running directory: {running}")
 
             while job.get_state_name() != "Scheduling":
-                job.main()
+                job.maie()
             job.schedule()
 
     def is_job_all_finished(self) -> bool:
@@ -174,6 +174,32 @@ class AbstractScheduler(AiaccelCore):
         """
         self.logger.info("Scheduler finished.")
 
+    def search_hyperparameters(self, num_ready, num_running, num_finished) -> None:
+        """Start hyper parameter optimization.
+
+        Returns:
+            None
+        """
+        sum_status = num_ready + num_running + num_finished
+        if sum_status >= self.trial_number and not self.all_parameters_generated:
+            self.all_parameters_generated = True
+            self.available_pool_size = 0
+            self.logger.info(f"trial_number: {self.trial_number}, ready: {num_ready}, running: {num_running}, finished: {num_finished}")
+            self.logger.info("All parameters are generated.")
+        elif (self.trial_number - sum_status) < self.max_pool_size:
+            self.available_pool_size = self.trial_number - sum_status
+        else:
+            self.available_pool_size = self.max_pool_size - num_running - num_ready
+
+        if self.available_pool_size == 0:
+            return
+
+        if (
+            not self.all_parameters_processed(num_ready, num_running) and
+            not self.all_parameters_registered(num_ready, num_running, num_finished)
+        ):
+            self.optimizer.run_optimizer_multiple_times(self.available_pool_size)
+
     def inner_loop_main_process(self) -> bool:
         """A main loop process. This process is repeated every main loop.
 
@@ -182,13 +208,7 @@ class AbstractScheduler(AiaccelCore):
         """
 
         self.num_ready, self.num_running, self.num_finished = self.storage.get_num_running_ready_finished()
-        self.available_pool_size = self.max_pool_size - self.num_running - self.num_ready
-        if (
-            not self.all_parameters_processed(self.num_ready, self.num_running) and
-            not self.all_parameters_registered(self.num_ready, self.num_running, self.num_finished)
-        ):
-            self.optimizer.run_optimizer_multiple_times(self.available_pool_size)
-
+        self.search_hyperparameters(self.num_ready, self.num_running, self.num_finished)
         if self.num_finished >= self.config.optimize.trial_number:
             return False
 
@@ -307,9 +327,9 @@ class AbstractScheduler(AiaccelCore):
         """
         if self.config.resume is not None and self.config.resume > 0:
             self._deserialize(self.config.resume)
-        self.optimizer.set_config(self.config)
-        self.optimizer.set_storage(self.storage)
-        self.optimizer.resume()
+        # self.optimizer.set_config(self.config)
+        # self.optimizer.set_storage(self.storage)
+        # self.optimizer.resume()
 
     def __getstate__(self) -> dict[str, Any]:
         obj = super().__getstate__()

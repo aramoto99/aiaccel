@@ -79,9 +79,11 @@ class AiaccelCore(object):
         Returns:
             None
         """
+        self.logger.debug(f"serialize {self.__class__.__name__} module:")
         self.storage.variable.d["state"].set(trial_id, self)
 
         # random state
+        self.logger.debug(f"serialize random state")
         self.storage.variable.d["numpy_random_state"].set(trial_id, self.get_numpy_random_state())
 
     def _deserialize(self, trial_id: int) -> None:
@@ -90,10 +92,16 @@ class AiaccelCore(object):
         Returns:
             None
         """
-        self.__dict__.update(self.storage.variable.d["state"].get(trial_id).__dict__.copy())
+        __dict__ = self.storage.variable.d["state"].get(trial_id).__dict__.copy()
+        self.logger.debug(f"deserialize {self.__class__.__name__} module:")
+        self.logger.debug(f"  {__dict__}")
+        self.__dict__.update(__dict__)
 
         # random state
-        self.set_numpy_random_state(self.storage.variable.d["numpy_random_state"].get(trial_id))
+        _random_state = self.storage.variable.d["numpy_random_state"].get(trial_id)
+        self.set_numpy_random_state(_random_state)
+        self.logger.debug(f"deserialize random state")
+        self.logger.debug(f"{_random_state}")
 
     def write_random_seed_to_debug_log(self) -> None:
         """Writes the random seed to the logger as debug information."""

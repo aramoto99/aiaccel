@@ -4,12 +4,13 @@ from omegaconf.dictconfig import DictConfig
 from tensorboardX import SummaryWriter
 
 from aiaccel.common import goal_maximize
-from aiaccel.module import AiaccelCore
+from aiaccel.storage import Storage
 from aiaccel.util.buffer import Buffer
 from aiaccel.util.trialid import TrialId
+from aiaccel.workspace import Workspace
 
 
-class TensorBoard(AiaccelCore):
+class TensorBoard:
     """A class for TensorBoard.
     Args:
         options (dict[str, str | int | bool]): A dictionary containing
@@ -22,35 +23,30 @@ class TensorBoard(AiaccelCore):
     """
 
     def __init__(self, config: DictConfig) -> None:
-        super().__init__(config, "tensorboard")
-
-        self.writer = SummaryWriter(str(self.workspace.tensorboard))
-
+        self.config = config
+        self.goals = [item.value for item in self.config.optimize.goal]
+        self.workspace = Workspace(self.config.generic.workspace)
+        self.storage = Storage(self.workspace.storage_file_path)
         self.buff = Buffer(["finished"])
         self.buff.d["finished"].set_max_len(2)
 
-    def pre_process(self) -> None:
-        return None
-
-    def inner_loop_main_process(self) -> bool:
+    def update(self):
         self.buff.d["finished"].Add(self.storage.get_finished())
 
         if self.buff.d["finished"].Len == 0:
             return True
-
         if self.buff.d["finished"].Len >= 2 and self.buff.d["finished"].has_difference() is False:
             return True
-
         if self.buff.d["finished"].Len == 1:
             trial_ids = self.buff.d["finished"].Now
         else:
             trial_ids = list(set(self.buff.d["finished"].Now) - set(self.buff.d["finished"].Pre))
 
+        self.writer = SummaryWriter(str(self.workspace.tensorboard))
         for trial_id in trial_ids:
             objective_ys, best_values = self.storage.result.get_any_trial_objective_and_best_value(
                 trial_id, goals=self.goals
             )
-
             if objective_ys is None or best_values is None:
                 continue
 
@@ -73,9 +69,4 @@ class TensorBoard(AiaccelCore):
             self.writer.add_hparams(params, objectives, name=_trial_id)
 
             self.writer.flush()
-
-        return True
-
-    def post_process(self) -> None:
         self.writer.close()
-        return None

@@ -42,12 +42,7 @@ class PylocalScheduler(AbstractScheduler):
         """
 
         self.num_ready, self.num_running, self.num_finished = self.storage.get_num_running_ready_finished()
-        self.available_pool_size = self.max_pool_size - self.num_running - self.num_ready
-        if (
-            not self.all_parameters_processed(self.num_ready, self.num_running) and
-            not self.all_parameters_registered(self.num_ready, self.num_running, self.num_finished)
-        ):
-            self.optimizer.run_optimizer_multiple_times(self.available_pool_size)
+        self.search_hyperparameters(self.num_ready, self.num_running, self.num_finished)
 
         if self.check_finished():
             return False
