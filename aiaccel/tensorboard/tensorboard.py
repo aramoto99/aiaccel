@@ -3,11 +3,9 @@ from __future__ import annotations
 from omegaconf.dictconfig import DictConfig
 from tensorboardX import SummaryWriter
 
-from aiaccel import TrialId
 from aiaccel.common import goal_maximize
 from aiaccel.module import AiaccelCore
 from aiaccel.util.buffer import Buffer
-from aiaccel.util.trialid import TrialId
 
 
 class TensorBoard(AiaccelCore):
