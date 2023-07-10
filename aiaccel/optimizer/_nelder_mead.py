@@ -1,15 +1,199 @@
 from __future__ import annotations
 
+import copy
 import logging
 import string
 from typing import Any
 
 import numpy as np
 from numpy.random import RandomState
-from omegaconf.listconfig import ListConfig
 
 coef: dict = {"r": 1.0, "ic": - 0.5, "oc": 0.5, "e": 2.0, "s": 0.5}
+name_rng = np.random.RandomState()  
 
+class Vertex():
+    def __init__(self, xs: np.ndarray, value = None):
+        self.xs = xs
+        self.value = value
+        self.id = self.generate_random_name()
+
+    def generate_random_name(length: int = 10) -> str:
+        if length < 1:
+            raise ValueError("Name length should be greater than 0.")
+        rands = [name_rng.choice(list(string.ascii_letters + string.digits))[0] for _ in range(length)]
+        return "".join(rands)
+
+    @property
+    def coordinates(self) -> np.ndarray:
+        return self.xs
+
+    def is_computed(self) -> bool:
+        return self.value is not None
+
+    def set_value(self, value: Any) -> None:
+        self.value = value
+
+    def update(self, xs: np.ndarray) -> None:
+        self.xs = xs
+
+    # def __repr__(self):
+    #     return str(self.value)
+
+    # +
+    def __add__(self, other):
+        if isinstance(other, Vertex):
+            return Vertex(self.xs + other.xs)
+        elif isinstance(other, (int, float)):
+            return Vertex(self.xs + other)
+        else:
+            raise TypeError("Unsupported operand type for +")
+
+    # -
+    def __sub__(self, other):
+        if isinstance(other, Vertex):
+            return Vertex(self.xs - other.xs)
+        elif isinstance(other, (int, float)):
+            return Vertex(self.xs - other)
+        else:
+            raise TypeError("Unsupported operand type for -")
+
+    # Less Than：未満 <
+    def __lt__(self, other):
+        if isinstance(other, Vertex):
+            return self.value < other.value
+        elif isinstance(other, (int, float)):
+            return self.value < other
+        else:
+            raise TypeError("Unsupported operand type for <")
+
+    # Equal：同じ ==
+    def __eq__(self, other):
+        if isinstance(other, Vertex):
+            return self.value == other.value
+        elif isinstance(other, (int, float)):
+            return self.value == other
+        else:
+            raise TypeError("Unsupported operand type for ==")
+
+
+
+class Simplex():
+    def __init__(self, simplex_coordinates: np.ndarray):
+        self.n_dim = simplex_coordinates.shape[1]
+        self.vertices: list[Vertex] = []
+        self.centroid: Vertex = None
+        self.coef = coef
+        self.store = {"r": None, "ic": None, "oc": None, "e": None, "s": None}
+        for xs in simplex_coordinates:
+            self.vertices.append(Vertex(xs))
+
+    def get_simplex_coordinates(self) -> np.ndarray:
+        return np.array([v.xs for v in self.vertices])
+
+    def set_value(self, vertex_id: str, value: Any) -> None:
+        for v in self.vertices:
+            if v.id == vertex_id:
+                v.set_value(value)
+                return
+
+    def order_by(self):
+        order = np.argsort([v.value for v in self.vertices])
+        self.vertices = self.vertices[order]
+
+    def calc_centroid(self):
+        # self.store = {"r": None, "ic": None, "oc": None, "e": None, "s": None}
+        self.order_by()
+        xs = self.get_simplex_coordinates()
+        self.centroid = Vertex(xs[:-1].mean(axis=0))
+
+    def reflect(self) -> Vertex:
+        xr = self.centroid + ((self.centroid - self.xs[-1]) * self.coef["r"])
+        self.store["r"] = xr
+        return xr
+
+    def expand(self) -> Vertex:
+        xe = self.centroid + ((self.centroid - self.xs[-1]) * self.coef["e"])
+        self.store["e"] = xe
+        return xe
+
+    def inside_contract(self) -> Vertex:
+        xic = self.centroid + ((self.centroid - self.xs[-1]) * self.coef["ic"])
+        self.store["ic"] = xic
+        return xic
+
+    def outside_contract(self) -> Vertex:
+        xoc = self.centroid + ((self.centroid - self.xs[-1]) *  self.coef["oc"])
+        self.store["oc"] = xoc
+        return xoc
+
+    def shrink(self) -> list[Vertex]:
+        for i in range(1, len(self.vertices)):
+            self.vertices[i] = self.vertices[0] + ((self.xs[i] - self.xs[0]) * self.coef["s"])
+        return self.vertices
+
+
+class NelderMead():
+    def __init__(self, initial_parameters: Any = None):
+        self.simplex: Simplex = Simplex(initial_parameters)
+        self.r: Vertex | None = None   # reflect 
+        self.e: Vertex | None = None   # expand
+        self.ic: Vertex | None = None  # inside_contract
+        self.oc: Vertex | None = None  # outside_contract
+        self.s: list[Vertex] | None = []
+
+        self.store = {"r": None, "ic": None, "oc": None, "e": None, "s": None}
+
+    def set_value(self, vertex_id: str, value: float | int):
+        self.simplex.set_value(vertex_id, value)
+
+    def wait_evaluated(self) -> bool:
+        for v in self.simplex.vertices:
+            if not v.is_computed():
+                return True
+        return False
+
+    def reflect(self) -> np.ndarray:
+        self.simplex.calc_centroid()
+        r = self.simplex.reflect()
+        return r.coordinates
+
+    def after_reflect(self):
+        self.yr = copy.deepcopy(self.ys[-1])
+        print(f"ys: {self.ys}")
+        print(f"yr: {self.yr}")
+        print(f"ys[0]: {self.ys[0]}")
+        print(f"ys[-2]: {self.ys[-2]}")
+        if self.ys[0] <= self.yr < self.ys[-2]:
+            self.xs[-1] = self.store["r"]
+            self.ys[-1] = self.yr
+        elif self.yr < self.ys[0]:
+            self.change_state("expand")
+        elif self.ys[-2] <= self.yr < self.ys[-1]:
+            self.change_state("outside_contract")
+        elif self.ys[-1] <= self.yr:
+            self.change_state("inside_contract")
+
+
+    def expand(self):
+        e = self.simplex.expand()
+        return e.coordinates
+
+    def inside_contract(self):
+        ic = self.simplex.inside_contract()
+        return ic.coordinates
+
+    def outside_contract(self):
+        oc = self.simplex.outside_contract()
+        return oc.coordinates
+
+    def shrink(self):
+        s = self.simplex.shrink()
+        return np.array([v.coordinates for v in s])
+
+    def approach(self) -> np.ndarray:
+        self.simplex.calc_centroid()
+        self.r = self.simplex.reflect()
+        return np.array([self.r])
 
 def generate_random_name(rng: RandomState, length: int = 10) -> str:
     """Generate random name using alphanumeric.
@@ -97,7 +281,10 @@ class NelderMead(object):
         self.params = params
         self.bdrys = np.array([[p.lower, p.upper] for p in self.params])
         self.coef = coef
-        self.y = None
+        self.yr: Any = None   # reflect 
+        self.ye: Any = None   # expand
+        self.yic: Any = None  # inside_contract
+        self.yoc: Any = None  # outside_contract
         self.ys: Any = []
         self.xs: Any = []
         if initial_parameters is not None:
@@ -111,81 +298,86 @@ class NelderMead(object):
         self.ys = self.ys[order]
 
     def centroid(self):
-        self.store = {"r": None, "ic": None, "oc": None, "e": None, "s": None}
+        # self.store = {"r": None, "ic": None, "oc": None, "e": None, "s": None}
         self.order_by()
         self.xc = self.xs[:-1].mean(axis=0)
 
     def reflect(self):
         xr = self.xc + self.coef["r"] * (self.xc - self.xs[-1])
         self.store["r"] = xr
-        np.append(self.xs, xr)
+        return xr
 
     def expand(self):
+        print(f"xs:{self.xs}")
         xe = self.xc + self.coef["e"] * (self.xc - self.xs[-1])
         self.store["e"] = xe
-        np.append(self.xs, xe)
+        return xe
 
     def inside_contract(self):
         xic = self.xc + self.coef["ic"] * (self.xc - self.xs[-1])
         self.store["ic"] = xic
-        np.append(self.xs, xic)
+        return xic
 
     def outside_contract(self):
         xoc = self.xc + self.coef["oc"] * (self.xc - self.xs[-1])
         self.store["oc"] = xoc
-        np.append(self.xs, xoc)
+        return xoc
 
     def shrink(self):
         for i in range(1, len(self.xs)):
             self.xs[i] = self.xs[0] + self.coef["s"] * (self.xs[i] - self.xs[0])
-            # self.f[i] = self.F(self.y[i])
-
-    def search(self) -> np.ndarray | None:
-        if len(self.xs) > 0 and len(self.ys) == 0:  # initialize
-            return self.xs
-        if self.n_dim + 1 != len(self.ys):  # wait
-            return None
-
-        self.centroid()
-        self.reflect()
-
-        yr = copy.deepcopy(self.ys[-1])
-        if self.ys[0] <= yr < self.ys[-2]:
-            self.xs[-1] = self.store["r"]
-            self.ys[-1] = yr
-        elif yr < self.ys[0]:
-            self.expand()
-            ye = copy.deepcopy(self.ys[-1])
-            if ye < yr:
-                self.xs[-1] = self.store["e"]
-                self.ys[-1] = ye
-            else:
-                self.xs[-1] = self.store["r"]
-                self.ys[-1] = yr
-        elif self.ys[-2] <= yr < self.ys[-1]:
-            self.outside_contract()
-            yoc = copy.deepcopy(self.ys[-1])
-            if yoc <= yr:
-                self.xs[-1] = self.store["oc"]
-                self.ys[-1] = yoc
-            else:
-                self.shrink()
-        elif self.ys[-1] <= yr:
-            self.inside_contract()
-            yic = copy.deepcopy(self.ys[-1])
-            if yic < self.ys[-1]:
-                self.xs[-1] = self.store["ic"]
-                self.ys[-1] = yic
-            else:
-                self.shrink()
         return self.xs
+
+    # def search(self) -> np.ndarray | None:
+    #     if len(self.xs) > 0 and len(self.ys) == 0:  # initialize
+    #         return self.xs
+    #     if self.n_dim + 1 != len(self.ys):  # wait
+    #         return None
+
+    #     self.centroid()
+    #     self.reflect()
+
+    #     yr = copy.deepcopy(self.ys[-1])
+    #     if self.ys[0] <= yr < self.ys[-2]:
+    #         self.xs[-1] = self.store["r"]
+    #         self.ys[-1] = yr
+    #     elif yr < self.ys[0]:
+    #         self.expand()
+    #         ye = copy.deepcopy(self.ys[-1])
+    #         if ye < yr:
+    #             self.xs[-1] = self.store["e"]
+    #             self.ys[-1] = ye
+    #         else:
+    #             self.xs[-1] = self.store["r"]
+    #             self.ys[-1] = yr
+    #     elif self.ys[-2] <= yr < self.ys[-1]:
+    #         self.outside_contract()
+    #         yoc = copy.deepcopy(self.ys[-1])
+    #         if yoc <= yr:
+    #             self.xs[-1] = self.store["oc"]
+    #             self.ys[-1] = yoc
+    #         else:
+    #             self.shrink()
+    #     elif self.ys[-1] <= yr:
+    #         self.inside_contract()
+    #         yic = copy.deepcopy(self.ys[-1])
+    #         if yic < self.ys[-1]:
+    #             self.xs[-1] = self.store["ic"]
+    #             self.ys[-1] = yic
+    #         else:
+    #             self.shrink()
+    #     return self.xs
 
 
 class NelderMead(NelderMeadCore):
     def __init__(self, n_dim: int, initial_parameters: Any = None):
         super().__init__(n_dim, initial_parameters)
         self.state = "initialize"
-        self.n_completed = 1
+        self.n_vertices = self.n_dim + 1
+        self.n_waits = 1
+
+    def get_n_waits(self):
+        return self.n_waits
 
     def get_state(self) -> str:
         return self.state
@@ -196,63 +388,189 @@ class NelderMead(NelderMeadCore):
     def change_state(self, state: str) -> None:
         self.state = state
 
+    def push(self, x: Any, y: any) -> None:
+        np.append(self.xs, x)
+        np.append(self.ys, y)
+
+    def pop(self) -> None:
+        np.delete(self.xs, 0)
+        np.delete(self.ys, 0)
+
     def update(self, xs, ys):
         self.xs = xs
         self.ys = ys
 
-    def reset(self):
-        self.xs = []
-        self.ys = []
-        self.change_state("idle")
+    def initialize(self):
+        self.n_waits = self.n_vertices
+        xs = copy.deepcopy(self.xs)
+        return xs
+
+    def after_initialize(self):
+        self.change_state("reflect")
 
     def reflect(self):
-        super().reflect()
-        self.change_state("reflect")
-        self.n_completed = 1
+        self.n_waits = 1
+        return super().reflect()
+
+    def after_reflect(self):
+        self.yr = copy.deepcopy(self.ys[-1])
+        print(f"ys: {self.ys}")
+        print(f"yr: {self.yr}")
+        print(f"ys[0]: {self.ys[0]}")
+        print(f"ys[-2]: {self.ys[-2]}")
+        if self.ys[0] <= self.yr < self.ys[-2]:
+            self.xs[-1] = self.store["r"]
+            self.ys[-1] = self.yr
+        elif self.yr < self.ys[0]:
+            self.change_state("expand")
+        elif self.ys[-2] <= self.yr < self.ys[-1]:
+            self.change_state("outside_contract")
+        elif self.ys[-1] <= self.yr:
+            self.change_state("inside_contract")
 
     def expand(self):
-        super().expand()
-        self.change_state("expand")
-        self.n_completed = 1
+        self.n_waits = 1
+        return super().expand()
+
+    def after_expand(self):
+        self.ye = copy.deepcopy(self.ys[-1])
+        if self.ye < self.yr:
+            self.xs[-1] = self.store["e"]
+            self.ys[-1] = self.ye
+        else:
+            self.xs[-1] = self.store["r"]
+            self.ys[-1] = self.yr
+        self.change_state("reflect")
 
     def inside_contract(self):
-        super().inside_contract()
-        self.change_state("inside_contract")
-        self.n_completed = 1
+        self.n_waits = 1
+        return super().inside_contract()
+
+    def after_inside_contract(self):
+        self.yic = copy.deepcopy(self.ys[-1])
+        if self.yic < self.ys[-1]:
+            self.xs[-1] = self.store["ic"]
+            self.ys[-1] = self.yic
+            self.change_state("reflect")
+        else:
+            self.change_state("shrink")
 
     def outside_contract(self):
-        super().outside_contract()
-        self.change_state("outside_contract")
-        self.n_completed = 1
+        self.n_waits = 1
+        return super().outside_contract()
+
+    def after_outside_contract(self):
+        self.yic = copy.deepcopy(self.ys[-1])
+        if self.yic < self.ys[-1]:
+            self.xs[-1] = self.store["ic"]
+            self.ys[-1] = self.yic
+            self.change_state("reflect")
+        else:
+            self.change_state("shrink")
 
     def shrink(self):
-        assert self.n_dim + 1 == len(self.xs)
-        super().shrink()
-        self.change_state("shrink")
-        self.n_completed = len(self.xs)
+        self.n_waits = self.n_vertices
+        return super().shrink()
 
-    def search(self) -> np.ndarray | None:
-        super().search()
+    def aftter_shrink(self):
+        self.change_state("reflect")
+
+    def main(self) -> np.ndarray | None:
         if self.state == "initialize":
-            return self.xs
+            xs = self.initialize()
+            print(f"initialize: {xs}")
+            self.change_state("wait_initialize_completed")
+            return xs
+
+        elif self.state == "wait_initialize_completed":
+            return
+
         elif self.state == "reflect":
-            for i in range( len(self.xs) -1):
-                self.xs.pop(i)
-            return self.xs
+            self.centroid()
+            x = self.reflect()
+            self.change_state("wait_reflect_completed")
+            print(f"reflect: {x}")
+            return np.array([x])
+
+        elif self.state == "wait_reflect_completed":
+            return
+
         elif self.state == "expand":
-            for i in range( len(self.xs) -1):
-                self.xs.pop(i)
-            return self.xs
+            x = self.expand()
+            print(f"expand: {x}")
+            return np.array([x])
+
+        elif self.state == "wait_expand_completed":
+            return
+
         elif self.state == "inside_contract":
-            for i in range( len(self.xs) -1):
-                self.xs.pop(i)
-            return self.xs
+            x = self.inside_contract()
+            self.change_state("wait_inside_contract_completed")
+            print(f"inside_contract: {x}")
+            return np.array([x])
+
+        elif self.state == "wait_inside_contract_completed":
+            return
+
         elif self.state == "outside_contract":
-            for i in range( len(self.xs) -1):
-                self.xs.pop(i)
-            return self.xs
+            x = self.outside_contract()
+            print(f"outside_contract: {x}")
+            self.change_state("wait_outside_contract_completed")
+            return np.array([x])
+
+        elif self.state == "wait_outside_contract_completed":
+            return
+
         elif self.state == "shrink":
-            return self.xs
+            xs = self.shrink()
+            self.change_state("wait_shrink_completed")
+            print(f"shrink: {xs}")
+            return xs
+
+        elif self.state == "wait_shrink_completed":
+            return
+
+
+
+    # def search(self) -> np.ndarray | None:
+    #     if len(self.xs) > 0 and len(self.ys) == 0:  # initialize
+    #         return self.xs
+    #     if self.n_dim + 1 != len(self.ys):  # wait
+    #         return None
+
+    #     self.centroid()
+    #     self.reflect()
+
+    #     yr = copy.deepcopy(self.ys[-1])
+    #     if self.ys[0] <= yr < self.ys[-2]:
+    #         self.xs[-1] = self.store["r"]
+    #         self.ys[-1] = yr
+    #     elif yr < self.ys[0]:
+    #         self.expand()
+    #         ye = copy.deepcopy(self.ys[-1])
+    #         if ye < yr:
+    #             self.xs[-1] = self.store["e"]
+    #             self.ys[-1] = ye
+    #         else:
+    #             self.xs[-1] = self.store["r"]
+    #             self.ys[-1] = yr
+    #     elif self.ys[-2] <= yr < self.ys[-1]:
+    #         self.outside_contract()
+    #         yoc = copy.deepcopy(self.ys[-1])
+    #         if yoc <= yr:
+    #             self.xs[-1] = self.store["oc"]
+    #             self.ys[-1] = yoc
+    #         else:
+    #             self.shrink()
+    #     elif self.ys[-1] <= yr:
+    #         self.inside_contract()
+    #         yic = copy.deepcopy(self.ys[-1])
+    #         if yic < self.ys[-1]:
+    #             self.xs[-1] = self.store["ic"]
+    #             self.ys[-1] = yic
+    #         else:
+    #             self.shrink()
+    #     return self.xs
 
 # from __future__ import annotations
 
