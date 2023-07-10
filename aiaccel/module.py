@@ -32,10 +32,7 @@ class AiaccelCore(object):
             process_name=self.module_name, labels=["native_random_state", "numpy_random_state", "state"]
         )
 
-    def set_config(self, config: DictConfig) -> None:
-        self.config = config
-
-    def set_storage(self, storage: Storage) -> None:
+    def set_storage(self, storage: Storage):
         self.storage = storage
         self.storage.variable.register(
             process_name=self.module_name, labels=[

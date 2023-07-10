@@ -134,7 +134,6 @@ class AbstractScheduler(AbstractModule):
             not self.all_parameters_processed(num_ready, num_running) and
             not self.all_parameters_registered(num_ready, num_running, num_finished)
         ):
-            self.logger.debug(f"optimizer run {self.available_pool_size} times")
             self.optimizer.run_optimizer_multiple_times(self.available_pool_size)
 
     def run_in_main_loop(self) -> bool:
