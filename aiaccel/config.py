@@ -45,7 +45,7 @@ class GenericConfig:
     job_command: str
     python_file: str
     function: str
-    enable_name_in_optional_argument: bool
+    enabled_variable_name_argumentation: bool
     main_loop_sleep_seconds: Union[float, int]
     logging_level: str
 
