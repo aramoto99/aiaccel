@@ -92,8 +92,8 @@ class MpiModel(LocalModel):
             commands.append(str(objective))
 
         for param in params:
-            if "parameter_name" in param.keys() and "value" in param.keys():
-                commands.append(f"--{param['parameter_name']}={param['value']}")
+            if "name" in param.keys() and "value" in param.keys():
+                commands.append(f"--{param['name']}={param['value']}")
         print(commands)
         Popen(commands)
 
