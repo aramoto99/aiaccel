@@ -13,19 +13,16 @@ if TYPE_CHECKING:
 
 class LocalModel(AbstractModel):
 
-    def before_runner_create(self, obj: Job) -> None:
-        return None
+    def runner_create(self, obj: Job) -> None:
+        pass
 
-    def conditions_runner_confirmed(self, obj: Job) -> bool:
-        return True
-
-    def before_job_submitted(self, obj: Job) -> None:
+    def job_submitted(self, obj: Job) -> None:
         runner_command = self.create_runner_command(
             obj.config.generic.job_command,
             obj.content,
             obj.trial_id,
             str(obj.config.config_path),
-            str(obj.command_error_output),
+            str(obj.workspace.get_error_output_file(obj.trial_id))
         )
         obj.logger.info(f'runner command: {" ".join(runner_command)}')
         obj.proc = Popen(runner_command, stdout=PIPE, stderr=PIPE)
@@ -34,14 +31,13 @@ class LocalModel(AbstractModel):
         obj.th_oh.start()
         self.is_firsttime_called = False
 
-    def conditions_result(self, obj: "Job") -> bool:
-        if super().conditions_result(obj):
+    def conditions_job_finished(self, obj: "Job") -> bool:
+        if super().conditions_job_finished(obj):
             return True
-
         if obj.th_oh.get_returncode() is None or self.is_firsttime_called:
             return False
         else:
-            self.create_result_file(obj)
+            self.write_result_to_storage(obj)
             self.is_firsttime_called = True
             return False
 
@@ -79,7 +75,7 @@ class LocalModel(AbstractModel):
         commands.append(command_error_output)
         return commands
 
-    def create_result_file(self, obj: "Job") -> None:
+    def write_result_to_storage(self, obj: 'Job') -> None:
         """Create result file.
 
         Args:
@@ -91,11 +87,11 @@ class LocalModel(AbstractModel):
         trial_id: str = str(obj.trial_id)
         stdouts: list[str] = obj.th_oh.get_stdouts()
         stderrs: list[str] = obj.th_oh.get_stderrs()
-        start_time: str = str(obj.th_oh.get_start_time())
-        end_time: str = str(obj.th_oh.get_end_time())
-        exitcode: str = str(obj.th_oh.get_returncode())
-        params: list[dict[str, Any]] = obj.content["parameters"]
-        objective: str = "nan"
+        # start_time: str = str(obj.th_oh.get_start_time())
+        # end_time: str = str(obj.th_oh.get_end_time())
+        returncode: int = obj.th_oh.get_returncode()
+        params: list[dict[str, Any]] = obj.content['parameters']
+        objective: str = 'nan'
         objectives: list[str] = []
 
         if len(stdouts) > 0:
@@ -104,38 +100,34 @@ class LocalModel(AbstractModel):
             objective = objective.replace(" ", "")
             objectives = objective.split(",")
 
-        error = "\n".join(stderrs)
-        output_file_path = str(obj.get_result_file_path())
-        config_file_path = str(obj.config.config_path)
+        error = '\n'.join(stderrs)
 
         args = {
-            "file": output_file_path,
-            "trial_id": trial_id,
-            "config": config_file_path,
-            "start_time": start_time,
-            "end_time": end_time,
-            "error": error,
-            "exitcode": exitcode,
+            'storage_file_path': str(obj.workspace.storage_file_path),
+            'trial_id': str(trial_id),
+            # 'start_time': start_time,
+            # 'end_time': end_time,
+            'error': error,
+            'returncode': returncode
         }
 
         if len(error) == 0:
-            del args["error"]
+            del args['error']
 
-        commands = ["aiaccel-set-result"]
+        commands = ['aiaccel-set-result']
         for key in args.keys():
-            commands.append("--" + key)
+            commands.append('--' + key)
             commands.append(str(args[key]))
 
-        commands.append("--objective")
+        commands.append('--objective')
         for objective in objectives:
             commands.append(str(objective))
 
         for param in params:
-            if "parameter_name" in param.keys() and "value" in param.keys():
-                commands.append("--" + param["parameter_name"])
-                commands.append(str(param["value"]))
-
-        obj.logger.info(" ".join(commands))
+            if 'parameter_name' in param.keys() and 'value' in param.keys():
+                commands.append('--' + param['parameter_name'])
+                commands.append(str(param['value']))
+        print(commands)
         Popen(commands)
 
         return None

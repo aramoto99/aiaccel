@@ -1,38 +1,13 @@
 from __future__ import annotations
 
-import re
 from typing import Any
 
 from aiaccel.scheduler.abstract_scheduler import AbstractScheduler
 from aiaccel.scheduler.job.model.local_model import LocalModel
-from aiaccel.util import ps2joblist
 
 
 class LocalScheduler(AbstractScheduler):
     """A scheduler class running on a local computer."""
-
-    def parse_trial_id(self, command: str) -> Any:
-        """Parse a command string and extract an unique name.
-
-        Args:
-            command (str): A command string from ps command.
-
-        Returns:
-            str | None: An unique name.
-        """
-        args = re.split(" +", command)
-        # args:
-        # ['2', 'python', 'user.py', '--trial_id', '2',
-        # '--config', 'config.yaml',
-        #  '--x1=3.65996970905703', '--x2=2.99329242098518']
-        #
-        trial_id_index = args.index("--trial_id")
-        index_offset = 1
-
-        if trial_id_index is None:
-            return None
-
-        return args[trial_id_index + index_offset]
 
     def create_model(self) -> LocalModel:
         """Creates model object of state machine.

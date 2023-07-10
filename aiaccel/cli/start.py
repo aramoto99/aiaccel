@@ -95,9 +95,9 @@ def main() -> None:  # pragma: no cover
     while True:
         try:
             for module in modules:
-                if not module.inner_loop_main_process():
+                if not module.run_in_main_loop():
                     break
-                if not module.check_error():
+                if not module.is_error_free():
                     break
             else:
                 nun_ready = modules[0].get_num_ready()

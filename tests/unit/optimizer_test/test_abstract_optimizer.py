@@ -95,42 +95,42 @@ class TestAbstractOptimizer(BaseTest):
         self.optimizer.pre_process()
         assert self.optimizer.post_process() is None
 
-    def test_inner_loop_main_process(self, monkeypatch: pytest.MonkeyPatch) -> None:
-        initial = [{'parameter_name': 'x1', 'type': 'uniform_float', 'value': 0.1},
-                   {'parameter_name': 'x2', 'type': 'uniform_float', 'value': 0.1}]
-        param = [{'parameter_name': 'x1', 'type': 'uniform_float', 'value': 0.2},
-                 {'parameter_name': 'x2', 'type': 'uniform_float', 'value': 0.2}]
+    def test_run_in_main_loop(self, monkeypatch: pytest.MonkeyPatch) -> None:
+        initial = [{'parameter_name': 'x1', 'type': 'FLOAT', 'value': 0.1},
+                   {'parameter_name': 'x2', 'type': 'FLOAT', 'value': 0.1}]
+        param = [{'parameter_name': 'x1', 'type': 'FLOAT', 'value': 0.2},
+                 {'parameter_name': 'x2', 'type': 'FLOAT', 'value': 0.2}]
 
         with monkeypatch.context() as m:
             m.setattr(self.optimizer, 'generate_initial_parameter', lambda: initial)
             m.setattr(self.optimizer, 'generate_parameter', lambda: param)
             m.setattr(self.optimizer, '_serialize', lambda _: None)
-            assert self.optimizer.inner_loop_main_process() is True
+            assert self.optimizer.run_in_main_loop() is True
 
         with patch.object(self.optimizer, 'check_finished', return_value=True):
-            assert self.optimizer.inner_loop_main_process() is False
+            assert self.optimizer.run_in_main_loop() is False
 
         with monkeypatch.context() as m:
             m.setattr(self.optimizer, 'all_parameters_processed', lambda: True)
-            assert self.optimizer.inner_loop_main_process() is False
+            assert self.optimizer.run_in_main_loop() is False
 
         with monkeypatch.context() as m:
             m.setattr(self.optimizer, 'all_parameters_registered', lambda: True)
-            assert self.optimizer.inner_loop_main_process() is True
+            assert self.optimizer.run_in_main_loop() is True
 
         with monkeypatch.context() as m:
             m.setattr(self.optimizer, 'get_pool_size', lambda: 0)
-            assert self.optimizer.inner_loop_main_process() is True
+            assert self.optimizer.run_in_main_loop() is True
 
         with monkeypatch.context() as m:
             m.setattr(self.optimizer, 'generate_new_parameter', lambda: param)
             m.setattr(self.optimizer, 'register_new_parameters', lambda _: None)
             m.setattr(self.optimizer.trial_id, 'increment', lambda: None)
             m.setattr(self.optimizer, '_serialize', lambda _: None)
-            assert self.optimizer.inner_loop_main_process() is True
+            assert self.optimizer.run_in_main_loop() is True
 
             m.setattr(self.optimizer, 'generate_new_parameter', lambda: [])
-            assert self.optimizer.inner_loop_main_process() is True
+            assert self.optimizer.run_in_main_loop() is True
 
     def test_cast(self):
         org_params = [{'parameter_name': 'x1', 'type': 'uniform_int', 'value': 0.1},
@@ -165,20 +165,12 @@ class TestAbstractOptimizer(BaseTest):
         new_params = self.optimizer.cast(org_params)
         assert new_params is None
 
-    def test_check_error(self):
+    def test_is_error_free(self):
         self.optimizer.storage.error.all_delete()
-        assert self.optimizer.check_error() is True
+        assert self.optimizer.is_error_free() is True
 
-        self.optimizer.storage.error.set_any_trial_error(trial_id=0, error_message="test warning")
-        assert self.optimizer.check_error() is True
-
-        self.optimizer.storage.error.set_any_trial_exitcode(trial_id=0, exitcode=1)
-        assert self.optimizer.check_error() is False
-
-        self.optimizer.storage.error.all_delete()
-        self.optimizer.config.generic.is_ignore_warning = False
-        self.optimizer.storage.error.set_any_trial_error(trial_id=0, error_message="test warning")
-        assert self.optimizer.check_error() is False
+        self.optimizer.storage.error.set_any_trial_error(trial_id=0, error_message="test_error")
+        assert self.optimizer.is_error_free() is False
 
     def test__serialize(self):
         self.optimizer._rng = np.random.RandomState(0)

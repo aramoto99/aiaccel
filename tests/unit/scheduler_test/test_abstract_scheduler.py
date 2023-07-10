@@ -147,7 +147,7 @@ class TestAbstractScheduler(BaseTest):
         with patch.object(scheduler, 'check_finished', return_value=True):
             assert scheduler.post_process() is None
 
-    def test_inner_loop_main_process(
+    def test_run_in_main_loop(
         self,
         clean_work_dir,
         config_json,
@@ -159,13 +159,13 @@ class TestAbstractScheduler(BaseTest):
         scheduler.pre_process()
         setup_hp_ready(1)
 
-        assert scheduler.inner_loop_main_process()
+        assert scheduler.run_in_main_loop()
 
         for job in scheduler.jobs:
             machine = job.get_machine()
             machine.set_state('Scheduling')
 
-        assert scheduler.inner_loop_main_process()
+        assert scheduler.run_in_main_loop()
 
         for job in scheduler.jobs:
             machine = job.get_machine()
@@ -173,10 +173,10 @@ class TestAbstractScheduler(BaseTest):
             job.main()
 
         with patch.object(scheduler, 'check_finished', return_value=True):
-            assert scheduler.inner_loop_main_process() is False
+            assert scheduler.run_in_main_loop() is False
 
         with patch.object(scheduler, 'all_done', return_value=True):
-            assert scheduler.inner_loop_main_process() is False
+            assert scheduler.run_in_main_loop() is False
 
     def test_serialize(
         self,
@@ -212,10 +212,10 @@ class TestAbstractScheduler(BaseTest):
         # assert name in '001'
         assert trial_id is None
 
-    def test_check_error(self, config_json, database_remove):
+    def test_is_error_free(self, config_json, database_remove):
         database_remove()
         scheduler = AbstractScheduler(self.load_config_for_test(self.configs['config.json']))
-        assert scheduler.check_error() is True
+        assert scheduler.is_error_free() is True
 
         jobstates = [
             {'trial_id': 0, 'jobstate': 'failure'}
@@ -223,11 +223,11 @@ class TestAbstractScheduler(BaseTest):
 
         with patch.object(scheduler, 'job_status', {1: 'failure'}):
             with patch.object(scheduler.storage.jobstate, 'get_all_trial_jobstate', return_value=jobstates):
-                assert scheduler.check_error() is True
+                assert scheduler.is_error_free() is True
 
         with patch.object(scheduler, 'job_status', {0: 'failure'}):
             with patch.object(scheduler.storage.jobstate, 'get_all_trial_jobstate', return_value=jobstates):
-                assert scheduler.check_error() is False
+                assert scheduler.is_error_free() is False
 
     def test_resume(self, config_json):
         scheduler = AbstractScheduler(self.load_config_for_test(self.configs['config.json']))
