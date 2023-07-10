@@ -7,55 +7,12 @@ from typing import Any
 import numpy as np
 from omegaconf.dictconfig import DictConfig
 
-from aiaccel.common import (
-    class_master,
-    class_optimizer,
-    class_scheduler,
-    module_type_master,
-    module_type_optimizer,
-    module_type_scheduler,
-)
 from aiaccel.storage import Storage
 from aiaccel.util import TrialId
 from aiaccel.workspace import Workspace
 
 
-class AbstractModule(object):
-    """An abstract class for Master, Optimizer and Scheduler.
-
-    The procedure of this class is as follows:
-
-    1. At first, deserialize() is called.
-    2. start() is called.
-    3. pre_process() is called.
-    4. loop() is called.
-
-        | 4-1. in while loop, inner_loop_main_process() is called.
-        | 4-2. in while loop, loop_count is incremented.
-
-    5. call post_process()
-
-     Args:
-        options (dict[str, str | int | bool]): A dictionary containing
-            command line options.
-
-    Attributes:
-        options (dict[str, str | int | bool]): A dictionary containing
-            command line options.
-        config_path (Path): Path to the configuration file.
-        config (Config): A config object.
-        ws (Path): A path to a current workspace.
-        dict_hp (Path): A path to hp directory.
-        dict_lock (Path): A path to lock directory.
-        dict_output (Path): A path to output directory.
-        dict_runner (Path): A path to runner directory.
-        hp_finished (int): A number of files in hp/finished directory.
-        hp_ready (int): A number of files in hp/ready directory.
-        hp_running (int): A number of files in hp/running directory.
-        logger (logging.Logger): A logger object.
-        loop_count (int): A loop count that is incremented in loop method.
-    """
-
+class AiaccelCore(object):
     def __init__(self, config: DictConfig, module_name: str) -> None:
         self.config = config
         self.workspace = Workspace(self.config.generic.workspace)
@@ -65,9 +22,6 @@ class AbstractModule(object):
         self.ch: Any = None
         self.ch_formatter: Any = None
         self.loop_count = 0
-        self.hp_ready = 0
-        self.hp_running = 0
-        self.hp_finished = 0
         self.seed = self.config.optimize.rand_seed
         self.storage = Storage(self.workspace.storage_file_path)
         self.trial_id = TrialId(self.config)
@@ -79,54 +33,12 @@ class AbstractModule(object):
             process_name=self.module_name, labels=["native_random_state", "numpy_random_state", "state"]
         )
 
-    def update_each_state_count(self) -> None:
-        """Updates hyperparameter counters for ready, runnning, and finished
-        states.
-        """
-        self.hp_ready = self.storage.get_num_ready()
-        self.hp_running = self.storage.get_num_running()
-        self.hp_finished = self.storage.get_num_finished()
-
-    def get_module_type(self) -> str | None:
-        """Get this module type.
-
-        Returns:
-            str: Name of this module type.
-        """
-
-        if class_master in self.__class__.__name__:
-            return module_type_master
-        elif class_optimizer in self.__class__.__name__:
-            return module_type_optimizer
-        elif class_scheduler in self.__class__.__name__:
-            return module_type_scheduler
-        else:
-            return None
-
-    def check_finished(self) -> bool:
-        """Checks whether all optimization finished.
-
-        Returns:
-            bool: True if all optimizations are finished.
-        """
-        self.hp_finished = self.storage.get_num_finished()
-
-        if self.hp_finished >= self.config.optimize.trial_number:
-            return True
-
-        return False
-
-    def print_dict_state(self) -> None:
-        """Print hp(hyperparameter) directory states.
-
-        Returns:
-            None
-        """
-        self.logger.info(
-            f"{self.hp_finished}/{self.config.optimize.trial_number}, "
-            f"finished, "
-            f"ready: {self.hp_ready}, "
-            f"running: {self.hp_running}"
+    def set_storage(self, storage: Storage):
+        self.storage = storage
+        self.storage.variable.register(
+            process_name=self.module_name, labels=[
+                "native_random_state", "numpy_random_state", "state"
+            ]
         )
 
     def set_logger(self, logger_name: str, logfile: Path, file_level: int, stream_level: int, module_type: str) -> None:
@@ -158,38 +70,6 @@ class AbstractModule(object):
         self.logger.addHandler(fh)
         self.logger.addHandler(ch)
 
-    def pre_process(self) -> None:
-        """Pre-procedure before executing processes.
-
-        Returns:
-            None
-        """
-        raise NotImplementedError
-
-    def post_process(self) -> None:
-        """Post-procedure after executed processes.
-
-        Returns:
-            None
-
-        Raises:
-            NotImplementedError: Causes when he inherited class does not
-                implement.
-        """
-        raise NotImplementedError
-
-    def inner_loop_main_process(self) -> bool:
-        """A main loop process. This process is repeated every main loop.
-
-        Returns:
-            None
-
-        Raises:
-            NotImplementedError: Causes when the inherited class does not
-                implement.
-        """
-        raise NotImplementedError
-
     def _serialize(self, trial_id: int) -> None:
         """Serialize this module.
 
@@ -207,6 +87,9 @@ class AbstractModule(object):
         Returns:
             None
         """
+        print(self.storage.variable.d["state"])
+        print(type(self.storage.variable.d["state"]))
+        print(self.storage.variable.d["state"].get(trial_id))
         self.__dict__.update(self.storage.variable.d["state"].get(trial_id).__dict__.copy())
 
         # random state
@@ -237,17 +120,6 @@ class AbstractModule(object):
         """
         self._rng.set_state(state)
 
-    def check_error(self) -> bool:
-        """Check to confirm if an error has occurred.
-
-        Args:
-            None
-
-        Returns:
-            bool: True if no error, False if with error.
-        """
-        return True
-
     def resume(self) -> None:
         """When in resume mode, load the previous
                 optimization data in advance.
@@ -260,6 +132,9 @@ class AbstractModule(object):
         """
         if self.config.resume is not None and self.config.resume > 0:
             self._deserialize(self.config.resume)
+
+    def check_error(self) -> bool:
+        return True
 
     def __getstate__(self) -> dict[str, Any]:
         obj = self.__dict__.copy()

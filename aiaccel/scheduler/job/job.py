@@ -501,10 +501,6 @@ class Job:
         elif state.name.lower() != "scheduling":
             self.model.next(self)
 
-        self.logger.debug(
-            f"Running job, " f"trial id: {self.trial_id}, " f"state: {state.name} ," f"count retry: {self.count_retry}"
-        )
-
         self.check_job_command_error()
 
         return

@@ -6,14 +6,6 @@ Example: ::
 
 """
 
-alive_master = "master.yml"
-alive_optimizer = "optimizer.yml"
-alive_scheduler = "scheduler.yml"
-
-class_master = "Master"
-class_optimizer = "Optimizer"
-class_scheduler = "Scheduler"
-
 dict_work = "work_aiaccel"
 dict_alive = "alive"
 dict_pid = "pid"

@@ -11,6 +11,7 @@ from omegaconf.dictconfig import DictConfig
 
 from aiaccel.common import datetime_format
 from aiaccel.config import load_config
+from aiaccel.optimizer import AbstractOptimizer
 from aiaccel.scheduler.abstract_scheduler import AbstractScheduler
 from aiaccel.util.aiaccel import Run, set_logging_file_for_trial_id
 from aiaccel.util.cast import cast_y
@@ -25,8 +26,8 @@ workspace: Path
 class PylocalScheduler(AbstractScheduler):
     """A scheduler class running on a local computer."""
 
-    def __init__(self, config: DictConfig) -> None:
-        super().__init__(config)
+    def __init__(self, config: DictConfig, optimizer: AbstractOptimizer) -> None:
+        super().__init__(config, optimizer)
         self.run = Run(self.config.config_path)
         self.processes: list[Any] = []
 
@@ -39,6 +40,17 @@ class PylocalScheduler(AbstractScheduler):
         Returns:
             bool: The process succeeds or not. The main loop exits if failed.
         """
+
+        self.num_ready, self.num_running, self.num_finished = self.storage.get_num_running_ready_finished()
+        self.available_pool_size = self.max_pool_size - self.num_running - self.num_ready
+        if (
+            not self.all_parameters_processed(self.num_ready, self.num_running) and
+            not self.all_parameters_registered(self.num_ready, self.num_running, self.num_finished)
+        ):
+            self.optimizer.run_optimizer_multiple_times(self.available_pool_size)
+
+        if self.check_finished():
+            return False
 
         trial_ids = self.storage.trial.get_ready()
         if trial_ids is None or len(trial_ids) == 0:
@@ -147,6 +159,8 @@ class PylocalScheduler(AbstractScheduler):
         for key in xs.keys():
             commands.append("--" + key)
             commands.append(str(xs[key]))
+
+        self.logger.info(f"Job command: {' '.join(commands)}")
 
         self.processes.append(Popen(commands))
 

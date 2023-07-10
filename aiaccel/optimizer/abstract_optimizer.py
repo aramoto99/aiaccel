@@ -7,12 +7,15 @@ from numpy import str_
 from omegaconf.dictconfig import DictConfig
 
 from aiaccel.config import is_multi_objective
-from aiaccel.module import AbstractModule
 from aiaccel.parameter import HyperParameterConfiguration, is_categorical, is_ordinal, is_uniform_float, is_uniform_int
-from aiaccel.util import TrialId, str_to_logging_level
+from aiaccel.util import str_to_logging_level
+from aiaccel.module import AiaccelCore
+from aiaccel.parameter import HyperParameterConfiguration
+from aiaccel.storage import Storage
+from aiaccel.util import str_to_logging_level
 
 
-class AbstractOptimizer(AbstractModule):
+class AbstractOptimizer(AiaccelCore):
     """An abstract class for Optimizer classes.
 
     Args:
@@ -21,16 +24,12 @@ class AbstractOptimizer(AbstractModule):
             options.
 
     Attributes:
-        hp_ready (int): The number of ready parameters which are registered
-            with the storage and are not tried yet in the user program. The
-            state label in the storage is "ready".
-        hp_running (int): The number of parameters which the user program is
-            running with. The state label in the storage is "running".
-        hp_finished (int): The number of finished parameters which objective
-            values obtained from the user program executions with are
-            registered with the storage. The state label in the storage is
-            "finished".
-        num_of_generated_parameter (int): The number of generated paramters.
+        options (dict[str, str | int | bool]): A dictionary containing
+            command line options.
+        num_ready (int): A ready number of hyperparameters.
+        num_running (int): A running number of hyperprameters.
+        num_finished (int): A finished number of hyperparameters.
+        num_of_generated_parameter (int): A number of generated hyperparamters.
         all_parameters_generated (bool): Whether all parameters are generated.
             True if all parameters are generated.
         params (HyperParameterConfiguration): A loaded parameter configuration
@@ -49,39 +48,15 @@ class AbstractOptimizer(AbstractModule):
         )
 
         self.trial_number = self.config.optimize.trial_number
-        self.hp_ready = 0
-        self.hp_running = 0
-        self.hp_finished = 0
         self.num_of_generated_parameter = 0
         self.params = HyperParameterConfiguration(self.config.optimize.parameters)
-        self.trial_id = TrialId(self.config)
-        self.all_parameters_generated = False
+        self._initial_process()
 
-    def all_parameters_processed(self) -> bool:
-        """Checks whether any unprocessed parameters are left.
-
-        This method is beneficial for the case that the maximum number of
-        parameter generation is limited by algorithm (e.g. grid search).
-        To make this method effective, the algorithm with the parameter
-        generation limit should turn `all_parameters_generated` True when all
-        of available parameters are generated.
-
-        Returns:
-            bool: True if all parameters are generated and are processed.
-        """
-        return self.hp_ready == 0 and self.hp_running == 0 and self.all_parameters_generated
-
-    def all_parameters_registered(self) -> bool:
-        """Checks whether all parameters that can be generated with the given
-        number of trials are registered.
-
-        This method does not check whether the registered parameters have been
-        processed.
-
-        Returns:
-            bool: True if all parameters are registerd.
-        """
-        return self.trial_number - self.hp_finished - self.hp_ready - self.hp_running == 0
+    def _initial_process(self):
+        storage = Storage(self.workspace.storage_file_path)
+        self.set_storage(storage)
+        self.write_random_seed_to_debug_log()
+        self.resume()
 
     def register_new_parameters(self, params: list[dict[str, float | int | str]]) -> None:
         """Create hyper parameter files.
@@ -104,9 +79,7 @@ class AbstractOptimizer(AbstractModule):
 
         """
         self.storage.hp.set_any_trial_params(trial_id=self.trial_id.get(), params=params)
-
         self.storage.trial.set_any_trial_state(trial_id=self.trial_id.get(), state="ready")
-
         self.num_of_generated_parameter += 1
 
     def generate_initial_parameter(self) -> Any:
@@ -138,18 +111,6 @@ class AbstractOptimizer(AbstractModule):
         """
         raise NotImplementedError
 
-    def get_pool_size(self) -> int:
-        """Returns pool size.
-
-        Returns:
-            int: Pool size.
-        """
-        max_pool_size = self.config.resource.num_workers
-        hp_running = self.storage.get_num_running()
-        hp_ready = self.storage.get_num_ready()
-        available_pool_size = max_pool_size - hp_running - hp_ready
-        return available_pool_size
-
     def generate_new_parameter(self) -> list[dict[str, float | int | str]] | None:
         """Generate a list of parameters.
 
@@ -164,62 +125,14 @@ class AbstractOptimizer(AbstractModule):
 
         return new_params
 
-    def pre_process(self) -> None:
-        """Pre-procedure before executing processes.
-
-        Returns:
-            None
-        """
-        self.write_random_seed_to_debug_log()
-        self.resume()
-
-    def post_process(self) -> None:
-        """Post-procedure after executed processes.
-
-        Returns:
-            None
-        """
-        self.logger.info("Optimizer delete alive file.")
-        self.logger.info("Optimizer finished.")
-
-    def inner_loop_main_process(self) -> bool:
-        """A main loop process. This process is repeated every main loop.
-
-        Returns:
-            bool: The process succeeds or not. The main loop exits if failed.
-        """
-        self.update_each_state_count()
-
-        if self.check_finished():
-            return False
-
-        if self.all_parameters_processed():
-            return False
-
-        if self.all_parameters_registered():
-            return True
-
-        pool_size = self.get_pool_size()
-        if pool_size == 0:
-            return True
-
-        self.logger.info(
-            f"hp_ready: {self.hp_ready}, "
-            f"hp_running: {self.hp_running}, "
-            f"hp_finished: {self.hp_finished}, "
-            f"total: {self.config.optimize.trial_number}, "
-            f"pool_size: {pool_size}"
-        )
-
-        if new_params := self.generate_new_parameter():
-            self.register_new_parameters(new_params)
-            self.trial_id.increment()
-            self._serialize(self.trial_id.integer)
-            return True
-
-        self.print_dict_state()
-
-        return True
+    def run_optimizer_multiple_times(self, available_pool_size) -> None:
+        if available_pool_size <= 0:
+            return
+        for _ in range(available_pool_size):
+            if new_params := self.generate_new_parameter():
+                self.register_new_parameters(new_params)
+                self.trial_id.increment()
+                self._serialize(self.trial_id.integer)
 
     def resume(self) -> None:
         """When in resume mode, load the previous optimization data in advance.
@@ -280,28 +193,6 @@ class AbstractOptimizer(AbstractModule):
                 raise ValueError(e)
 
         return casted_params
-
-    def check_error(self) -> bool:
-        """Checks errors.
-
-        Returns:
-            bool: True if there is no error.
-        """
-        error_trial_ids = self.storage.error.get_error_trial_id()
-        failed_trial_ids = self.storage.error.get_failed_exitcode_trial_id()
-
-        if self.config.generic.is_ignore_warning:
-            if len(failed_trial_ids) == 0:
-                return True
-        else:
-            if len(failed_trial_ids) == 0 and len(error_trial_ids) == 0:
-                return True
-
-        for trial_id in error_trial_ids:
-            error_message = self.storage.error.get_any_trial_error(trial_id=trial_id)
-            self.logger.error(error_message)
-
-        return False
 
     def get_any_trial_objective(self, trial_id: int) -> Any:
         """Get any trial result.

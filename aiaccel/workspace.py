@@ -5,22 +5,15 @@ from pathlib import Path
 from typing import Any
 
 from aiaccel.common import (
-    dict_alive,
     dict_error,
-    dict_finished,
     dict_hp,
-    dict_jobstate,
     dict_lock,
     dict_log,
     dict_output,
-    dict_pid,
-    dict_ready,
     dict_result,
     dict_runner,
-    dict_running,
     dict_storage,
     dict_tensorboard,
-    dict_timestamp,
     extension_hp,
 )
 from aiaccel.util import Suffix, load_yaml, make_directories
@@ -58,40 +51,26 @@ class Workspace:
     def __init__(self, base_path: str):
         self.path = Path(base_path).resolve()
 
-        self.alive = self.path / dict_alive
         self.error = self.path / dict_error
         self.hp = self.path / dict_hp
-        self.hp_ready = self.path / dict_hp / dict_ready
-        self.hp_running = self.path / dict_hp / dict_running
-        self.hp_finished = self.path / dict_hp / dict_finished
-        self.jobstate = self.path / dict_jobstate
         self.lock = self.path / dict_lock
         self.log = self.path / dict_log
         self.output = self.path / dict_output
-        self.pid = self.path / dict_pid
         self.result = self.path / dict_result
         self.runner = self.path / dict_runner
         self.storage = self.path / dict_storage
         self.tensorboard = self.path / dict_tensorboard
-        self.timestamp = self.path / dict_timestamp
 
         self.consists = [
-            self.alive,
             self.error,
             self.hp,
-            self.hp_ready,
-            self.hp_running,
-            self.hp_finished,
-            self.jobstate,
             self.lock,
             self.log,
             self.output,
-            self.pid,
             self.result,
             self.runner,
             self.storage,
-            self.tensorboard,
-            self.timestamp,
+            self.tensorboard
         ]
         self.results = Path("./results")
         self.retults_csv_file = self.path / "results.csv"
