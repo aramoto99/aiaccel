@@ -27,7 +27,7 @@ class AbciModel(AbstractModel):
             runner_file_path=runner_file_path,
             job_script_preamble=obj.config.ABCI.job_script_preamble,
             command=obj.config.generic.job_command,
-            enable_name_in_optional_argument=obj.config.generic.enable_name_in_optional_argument,
+            enabled_variable_name_argumentation=obj.config.generic.enabled_variable_name_argumentation,
             dict_lock=obj.workspace.lock,
         )
 
@@ -61,7 +61,7 @@ class AbciModel(AbstractModel):
         runner_file_path: Path,
         job_script_preamble: Path | str | None,
         command: str,
-        enable_name_in_optional_argument: bool,
+        enabled_variable_name_argumentation: bool,
         dict_lock: Path,
     ) -> None:
         """Create a ABCI batch file.
@@ -86,7 +86,7 @@ class AbciModel(AbstractModel):
         """
 
         commands = re.split(" +", command)
-        if enable_name_in_optional_argument:
+        if enabled_variable_name_argumentation:
             for param in param_content["parameters"]:
                 if "name" in param.keys() and "value" in param.keys():
                     commands.append(f'--{param["name"]}=${param["name"]}')

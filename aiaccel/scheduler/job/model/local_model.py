@@ -23,7 +23,7 @@ class LocalModel(AbstractModel):
             obj.trial_id,
             str(obj.config.config_path),
             str(obj.workspace.get_error_output_file(obj.trial_id)),
-            obj.config.generic.enable_name_in_optional_argument
+            obj.config.generic.enabled_variable_name_argumentation
         )
         obj.logger.info(f'runner command: {" ".join(runner_command)}')
         obj.proc = Popen(runner_command, stdout=PIPE, stderr=PIPE)
@@ -52,7 +52,7 @@ class LocalModel(AbstractModel):
         trial_id: int,
         config_path: str,
         command_error_output: str,
-        enable_name_in_optional_argument: bool
+        enabled_variable_name_argumentation: bool
     ) -> list[str]:
         """Create a list of command strings to run a hyper parameter.
 
@@ -66,7 +66,7 @@ class LocalModel(AbstractModel):
         """
         commands = re.split(" +", command)
         params = param_content["parameters"]
-        if enable_name_in_optional_argument:
+        if enabled_variable_name_argumentation:
             """
             --name=value
             """

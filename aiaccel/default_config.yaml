@@ -3,7 +3,7 @@ generic:
     job_command: ''
     python_file: ''
     function: ''
-    enable_name_in_optional_argument: True
+    enabled_variable_name_argumentation: True
     main_loop_sleep_seconds: 0.01
     logging_level: ERROR
 
