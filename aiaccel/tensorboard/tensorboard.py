@@ -5,11 +5,11 @@ from tensorboardX import SummaryWriter
 
 from aiaccel import TrialId
 from aiaccel.common import goal_maximize
-from aiaccel.module import AiaccelCore
 from aiaccel.util.buffer import Buffer
+from aiaccel.util.trialid import TrialId
 
 
-class TensorBoard(AiaccelCore):
+class TensorBoard:
     """A class for TensorBoard.
     Args:
         options (dict[str, str | int | bool]): A dictionary containing
@@ -45,24 +45,21 @@ class TensorBoard(AiaccelCore):
             )
             if objective_ys is None or best_values is None:
                 continue
-
-            objectives = {}
-            for goal_id, (goal, objective_y, best_value) in enumerate(zip(self.goals, objective_ys, best_values)):
+            for i in range(len(self.goals)):
+                goal = self.goals[i]
+                objective_y = objective_ys[i]
+                best_value = best_values[i]
                 if len(self.goals) == 1:
                     tag_objective = "objective"
                     tag_min_or_max = "maximum" if goal == goal_maximize else "minimum"
                 else:
-                    tag_objective = f"objective_{goal_id}_"
-                    tag_min_or_max = f"maximum_{goal_id}_" if goal == goal_maximize else f"minimum_{goal_id}_"
+                    tag_objective = f"objective_{i}_"
+                    tag_min_or_max = f"maximum_{i}_" if goal == goal_maximize else f"minimum_{i}_"
                 self.writer.add_scalar(tag=tag_objective, scalar_value=objective_y, global_step=trial_id)
                 self.writer.add_scalar(tag=tag_min_or_max, scalar_value=best_value, global_step=trial_id)
-
-                objectives[tag_objective] = objective_y
-
-            # hyperparameters
-            params = self.storage.hp.get_any_trial_params_dict(trial_id)
-            _trial_id = TrialId(self.config).zero_padding_any_trial_id(trial_id)
-            self.writer.add_hparams(params, objectives, name=_trial_id)
-
+                # hyperparameters
+                params = self.storage.hp.get_any_trial_params_dict(trial_id)
+                _trial_id = TrialId(self.config).zero_padding_any_trial_id(trial_id)
+                self.writer.add_hparams(params, {tag_objective: objective_y}, name=_trial_id)
             self.writer.flush()
         self.writer.close()

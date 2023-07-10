@@ -23,7 +23,7 @@ class AbstractScheduler(AbstractModule):
             command line options.
             to select hyper parameters from a parameter pool.
         jobs (list[dict]): A list to store job dictionaries.
-        max_resource (int): A max resource number.
+        num_workers (int): A max resource number.
         stats (list[dict]): A list of current status which is updated using ps
             command or qstat command.
     """
