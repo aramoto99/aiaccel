@@ -1,16 +1,101 @@
 from __future__ import annotations
 
-import copy
+import logging
+import string
 from typing import Any
 
 import numpy as np
+from numpy.random import RandomState
+from omegaconf.listconfig import ListConfig
 
 coef: dict = {"r": 1.0, "ic": - 0.5, "oc": 0.5, "e": 2.0, "s": 0.5}
 
 
-class NelderMeadCore():
-    def __init__(self, n_dim: int, initial_parameters: Any = None):
-        self.n_dim = n_dim
+def generate_random_name(rng: RandomState, length: int = 10) -> str:
+    """Generate random name using alphanumeric.
+
+    Args:
+        rng (RandomState): A reference to a random generator.
+        length (int, optional): A length of the name. This value should be
+            greater than 0. Defaults to 10.
+
+    Raises:
+        ValueError: Occurs if the specified length is less than 1.
+
+    Returns:
+        str: A generated name.
+    """
+
+    if length < 1:
+        raise ValueError("Name length should be greater than 0.")
+    rands = [rng.choice(list(string.ascii_letters + string.digits))[0] for _ in range(length)]
+    return "".join(rands)
+
+
+class NelderMead(object):
+    """A class implementing Nelder-Mead method.
+
+    Args:
+        params (list[Parameter]): A list of hyper parameter objects.
+        iteration (float | None, optional): A max iteration counts.
+            Defaults to float('inf').
+        coef (dict | None, optional): A coefficient values. Defaults to None.
+        maximize (bool | None, optional): Evaluate maximize or not. Defaults
+            to False.
+        initial_parameters (list[dict[str, str  |  float  |  list[float]]] | None, optional):
+            A initial parameters. Defaults to None.
+        rng (np.random.RandomState | None, optional): A reference to a random
+            generator. Defaults to None.
+
+    Attributes:
+        bdrys (np.ndarray): A list of boundaries.
+        coef (dict[str, float]): A dictionary of coefficients.
+        f (np.ndarray): A list of evaluated parameter results.
+        logger (logging.Logger): A logger object.
+        params (list[Parameter]): A list of hyper parameters.
+        storage (dict[str, float | None]): A dictionary to store temporal
+            calculation results.
+        y (np.ndarray): A list of current evaluated parameters.
+        yc (float): A current centroid value of y.
+        _evaluated_itr (int): A count of evaluation each loop.
+        _executing (list[dict]): A list to store candidates to be executed.
+        _executing_index (int): A number to be added to executing list.
+        _fe (float): A temporal result of Expand.
+        _fic (float): A temporal result of Inside Contraction.
+        _foc (float): A temporal result of Outside Contraction.
+        _fr (float): A temporal result of Reflection
+        _history (dict[str, list[float | str]]): A storage of execution
+            history of each value and operator.
+        _maximize (bool): Evaluate the result as maximize or minimize.
+        _max_itr (int): A number of max iterations. This is compared with
+            _evaluated_itr.
+        _num_shrink (int): A number of Shrink.
+        _out_of_boundary (bool): Is a current iteration out of boundaries or
+            not.
+        _result (list[float]): A list of results for _executing.
+        _state (str): A current state.
+        _total_itr (int): A number of iterations. Currently same with
+            _evaluated_itr. It's different if counts out of boundaries.
+
+    Todo:
+        Fix float comparison errors.
+    """
+
+    def __init__(
+        self,
+        params: list[Parameter],
+        iteration: float = float("inf"),
+        coef: dict[str, Any] | None = None,
+        maximize: bool | None = False,
+        initial_parameters: Any = None,
+        rng: np.random.RandomState | None = None,
+    ) -> None:
+        if coef is None:
+            coef = {"r": 1.0, "ic": -0.5, "oc": 0.5, "e": 2.0, "s": 0.5}
+
+        self.logger = logging.getLogger("root.optimizer.nelder_mead")
+        self.params = params
+        self.bdrys = np.array([[p.lower, p.upper] for p in self.params])
         self.coef = coef
         self.y = None
         self.ys: Any = []

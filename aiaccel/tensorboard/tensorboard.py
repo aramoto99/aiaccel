@@ -5,11 +5,12 @@ from tensorboardX import SummaryWriter
 
 from aiaccel import TrialId
 from aiaccel.common import goal_maximize
+from aiaccel.module import AiaccelCore
 from aiaccel.util.buffer import Buffer
 from aiaccel.util.trialid import TrialId
 
 
-class TensorBoard:
+class TensorBoard(AiaccelCore):
     """A class for TensorBoard.
     Args:
         options (dict[str, str | int | bool]): A dictionary containing
@@ -59,7 +60,7 @@ class TensorBoard:
                 self.writer.add_scalar(tag=tag_min_or_max, scalar_value=best_value, global_step=trial_id)
                 # hyperparameters
                 params = self.storage.hp.get_any_trial_params_dict(trial_id)
-                _trial_id = TrialId(self.config).zero_padding_any_trial_id(trial_id)
+                _trial_id = self.trial_id.zero_padding_any_trial_id(trial_id)
                 self.writer.add_hparams(params, {tag_objective: objective_y}, name=_trial_id)
             self.writer.flush()
         self.writer.close()

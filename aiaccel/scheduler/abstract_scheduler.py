@@ -37,28 +37,30 @@ class AbstractScheduler(AbstractModule):
             str_to_logging_level(self.config.generic.logging_level),
             "Scheduler",
         )
+
         self.optimizer = optimizer
-        self.max_resource = self.config.resource.num_workers
+        self.num_workers = self.config.resource.num_workers
         self.trial_number = self.config.optimize.trial_number
         self.num_ready = 0
         self.num_running = 0
         self.num_finished = 0
         self.available_pool_size = 0
+        self.available_resource = self.num_workers
         self.stats: list[Any] = []
         self.jobs: list[Any] = []
         self.job_status: dict[Any, Any] = {}
+        self.algorithm: Any = None
         self.start_trial_id = self.config.resume if self.config.resume is not None else 0
         self.buff = Buffer([trial_id for trial_id in range(self.start_trial_id, self.trial_number)])
         for trial_id in range(self.start_trial_id, self.config.optimize.trial_number):
             self.buff.d[trial_id].set_max_len(2)
         self.all_parameters_generated = False
-        self.job_completed_count = 0
 
     def updata_num_ready_running_finished(self) -> None:
         self.num_ready = len(self.storage.trial.get_ready())
         self.num_running = len(self.storage.trial.get_running())
         self.num_finished = len(self.storage.trial.get_finished())
-        self.available_pool_size = self.max_resource - self.num_running
+        self.available_pool_size = self.num_workers - self.num_running
 
     def get_num_ready(self) -> int:
         return self.num_ready

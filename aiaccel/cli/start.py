@@ -92,13 +92,6 @@ def main() -> None:  # pragma: no cover
     for module in modules:
         module.pre_process()
 
-    max_trial_number = config.optimize.trial_number
-    loop_start_time = get_time_now_object()
-    end_estimated_time = "Unknown"
-    buff = Buffer(['num_finished', 'available_pool_size'])
-    buff.d['num_finished'].set_max_len(2)
-    buff.d['available_pool_size'].set_max_len(2)
-
     while True:
         try:
             for module in modules:
