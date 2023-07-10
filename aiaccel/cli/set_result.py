@@ -5,6 +5,7 @@ from argparse import ArgumentParser
 from pathlib import Path
 
 from aiaccel.storage.storage import Storage
+from aiaccel.util.data_type import str_or_float_or_int
 
 
 def write_results_to_database(
