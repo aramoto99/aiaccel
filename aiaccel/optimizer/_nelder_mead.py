@@ -8,12 +8,7 @@ import numpy as np
 from numpy.random import RandomState
 from omegaconf.listconfig import ListConfig
 
-<<<<<<< HEAD
-from aiaccel.parameter import OrdinalParameter, Parameter
-from aiaccel.util import generate_random_name
-=======
 from aiaccel.parameter import HyperParameter
->>>>>>> 8876d0f (Refactoring #2)
 
 STATES = [
     "WaitInitialize",

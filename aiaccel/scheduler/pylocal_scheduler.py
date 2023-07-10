@@ -14,7 +14,6 @@ from aiaccel.config import load_config
 from aiaccel.optimizer import AbstractOptimizer
 from aiaccel.scheduler.abstract_scheduler import AbstractScheduler
 from aiaccel.util.aiaccel import Run, set_logging_file_for_trial_id
-from aiaccel.util.cast import cast_y
 
 # These are for avoiding mypy-errors from initializer().
 # `global` does not work well.
@@ -31,13 +30,8 @@ class PylocalScheduler(AbstractScheduler):
         self.run = Run(self.config.config_path)
         self.processes: list[Any] = []
 
-<<<<<<< HEAD
-        Pool_ = Pool if self.num_workers > 1 else ThreadPool
-        self.pool = Pool_(self.num_workers, initializer=initializer, initargs=(self.config.config_path,))
-=======
         Pool_ = Pool if self.max_resource > 1 else ThreadPool
         self.pool = Pool_(self.max_resource, initializer=initializer, initargs=(self.config.config_path,))
->>>>>>> 8876d0f (Refactoring #2)
 
     def inner_loop_main_process(self) -> bool:
         """A main loop process. This process is repeated every main loop.
@@ -214,18 +208,17 @@ def execute(args: Any) -> tuple[int, dict[str, Any], list[Any], str, str, str]:
     set_logging_file_for_trial_id(workspace, trial_id)
 
     try:
-        # y = cast_y(user_func(xs), y_data_type=None)
         y = user_func(xs)
         if isinstance(y, list):
-            y = [cast_y(yi, y_data_type=None) for yi in y]
+            ys = [yi for yi in y]
         else:
-            y = [cast_y(y, y_data_type=None)]
+            ys = [y]
     except BaseException as e:
         err = str(e)
-        y = [None]
+        ys = [None]
     else:
         err = ""
 
     end_time = datetime.now().strftime(datetime_format)
 
-    return trial_id, xs, y, err, start_time, end_time
+    return trial_id, xs, ys, err, start_time, end_time

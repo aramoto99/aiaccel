@@ -114,9 +114,9 @@ class AbstractOptimizer(AiaccelCore):
             parameters.
         """
         if self.num_of_generated_parameter == 0:
-            new_params = self.cast(self.generate_initial_parameter())
+            new_params = self.generate_initial_parameter()
         else:
-            new_params = self.cast(self.generate_parameter())
+            new_params = self.generate_parameter()
 
         return new_params
 
@@ -142,50 +142,6 @@ class AbstractOptimizer(AiaccelCore):
         self.trial_id.initial(num=self.config.resume)
         super()._deserialize(self.config.resume)
         self.trial_number = self.config.optimize.trial_number
-
-    def cast(self, params: list[dict[str, Any]]) -> list[Any] | None:
-        """Casts types of parameter values to appropriate tepes.
-
-        Args:
-            params (list | None): list of parameters.
-
-        Raises:
-            ValueError: Occurs if any of parameter value could not be casted.
-
-        Returns:
-            list | None: A list of parameters with casted values. None if given
-            `params` is None.
-        """
-        if params is None or len(params) == 0:
-            return params
-
-        casted_params = []
-
-        for param in params:
-            _param = copy.deepcopy(param)
-            param_type = _param["type"]
-            param_value = _param["value"]
-
-            # None: str to NoneType
-            if type(_param["value"]) in [str, str_]:
-                if _param["value"].lower() == "none":
-                    _param["value"] = None
-                    _param["type"] = str(type(None))
-
-            try:
-                if is_categorical(param_type) or is_ordinal(param_type):
-                    casted_params.append(_param)
-                    continue
-                if is_uniform_float(param_type):
-                    _param["value"] = float(param_value)
-                if is_uniform_int(param_type):
-                    _param["value"] = int(param_value)
-                casted_params.append(_param)
-
-            except ValueError as e:
-                raise ValueError(e)
-
-        return casted_params
 
     def get_any_trial_objective(self, trial_id: int) -> Any:
         """Get any trial result.
