@@ -51,14 +51,12 @@ class CommandLineArgs:
         self.trial_id = None
         self.config_path = None
         self.config = None
-
         if self.args.trial_id is not None:
             self.trial_id = self.args.trial_id
         if self.args.config is not None:
             self.config_path = Path(self.args.config).resolve()
             self.config = load_config(self.config_path)
             self.parameters_config = HyperParameterConfiguration(self.config.optimize.parameters)
-
             for p in self.parameters_config.get_parameter_list():
                 if isinstance(p, FloatParameter):
                     self.parser.add_argument(f"--{p.name}", type=float)
@@ -85,7 +83,6 @@ class CommandLineArgs:
         for key in delete_keys:
             if key in xs.keys():
                 del xs[key]
-
         return xs
 
 

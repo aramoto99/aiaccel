@@ -87,7 +87,7 @@ class AbstractScheduler(AbstractModule):
         if trial_id not in trial_ids:
             job = Job(self.config, self, self.create_model(), trial_id)
             self.jobs.append(job)
-            self.logger.debug(f"Submit a job: {str(trial_id)}")
+            self.logger.debug(f"submit a job: {str(trial_id)}")
             job.main()
             return job
         else:
@@ -109,7 +109,7 @@ class AbstractScheduler(AbstractModule):
         Returns:
             None
         """
-        self.logger.info("Scheduler finished.")
+        self.logger.info("scheduler finished.")
 
     def search_hyperparameters(self, num_ready, num_running, num_finished) -> None:
         """Start hyper parameter optimization.
@@ -135,6 +135,7 @@ class AbstractScheduler(AbstractModule):
             not self.all_parameters_processed(num_ready, num_running) and
             not self.all_parameters_registered(num_ready, num_running, num_finished)
         ):
+            # self.logger.debug(f"optimizer run {self.available_pool_size} times")
             self.optimizer.run_optimizer_multiple_times(self.available_pool_size)
 
     def run_in_main_loop(self) -> bool:

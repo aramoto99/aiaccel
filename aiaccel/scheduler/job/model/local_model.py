@@ -130,5 +130,7 @@ class LocalModel(AbstractModel):
             if 'name' in param.keys() and 'value' in param.keys():
                 commands.append('--' + param['name'])
                 commands.append(str(param['value']))
+
+        obj.logger.debug(f'{" ".join(commands)}')
         Popen(commands)
         return None
