@@ -16,7 +16,6 @@ from aiaccel.util.filesystem import (
     make_directory,
 )
 from aiaccel.util.logger import str_to_logging_level
-from aiaccel.util.name import generate_random_name
 from aiaccel.util.process import OutputHandler, exec_runner, is_process_running, kill_process, ps2joblist, subprocess_ps
 from aiaccel.util.retry import retry
 from aiaccel.util.suffix import Suffix
@@ -38,7 +37,11 @@ __all__ = [
     "file_create",
     "file_delete",
     "file_read",
+<<<<<<< HEAD
     "generate_random_name",
+=======
+    "get_datetime_from_string",
+>>>>>>> 8876d0f (Refactoring #2)
     "get_dict_files",
     "get_file_result",
     "get_file_result_hp",

@@ -11,7 +11,6 @@ from aiaccel.parameter import HyperParameterConfiguration, is_categorical, is_or
 from aiaccel.util import str_to_logging_level
 from aiaccel.module import AiaccelCore
 from aiaccel.parameter import HyperParameterConfiguration
-from aiaccel.storage import Storage
 from aiaccel.util import str_to_logging_level
 
 
@@ -139,12 +138,10 @@ class AbstractOptimizer(AiaccelCore):
         Returns:
             None
         """
-        if self.config.resume is not None and self.config.resume > 0:
-            self.storage.rollback_to_ready(self.config.resume)
-            self.storage.delete_trial_data_after_this(self.config.resume)
-            self.trial_id.initial(num=self.config.resume)
-            self._deserialize(self.config.resume)
-            self.trial_number = self.config.optimize.trial_number
+        self.logger.info(f"Resume mode: {self.config.resume}")
+        self.trial_id.initial(num=self.config.resume)
+        super()._deserialize(self.config.resume)
+        self.trial_number = self.config.optimize.trial_number
 
     def cast(self, params: list[dict[str, Any]]) -> list[Any] | None:
         """Casts types of parameter values to appropriate tepes.

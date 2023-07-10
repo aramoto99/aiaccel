@@ -53,6 +53,7 @@ class ResumptionTest(IntegrationTest):
             config = self.load_config_for_test(
                 self.configs['config_{}.json'.format(self.search_algorithm)]
             )
+            print(config.optimize.trial_number)
             workspace = Workspace(config.generic.workspace)
             storage = Storage(workspace.storage_file_path)
             subprocess.Popen(['aiaccel-start', '--config', str(config.config_path), '--resume', '3']).wait()

@@ -4,13 +4,12 @@ from omegaconf.dictconfig import DictConfig
 from tensorboardX import SummaryWriter
 
 from aiaccel.common import goal_maximize
-from aiaccel.storage import Storage
+from aiaccel.module import AiaccelCore
 from aiaccel.util.buffer import Buffer
 from aiaccel.util.trialid import TrialId
-from aiaccel.workspace import Workspace
 
 
-class TensorBoard:
+class TensorBoard(AiaccelCore):
     """A class for TensorBoard.
     Args:
         options (dict[str, str | int | bool]): A dictionary containing
@@ -23,10 +22,7 @@ class TensorBoard:
     """
 
     def __init__(self, config: DictConfig) -> None:
-        self.config = config
-        self.goals = [item.value for item in self.config.optimize.goal]
-        self.workspace = Workspace(self.config.generic.workspace)
-        self.storage = Storage(self.workspace.storage_file_path)
+        super().__init__(config, "tensorboard")
         self.buff = Buffer(["finished"])
         self.buff.d["finished"].set_max_len(2)
 

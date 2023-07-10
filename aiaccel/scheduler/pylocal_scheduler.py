@@ -31,8 +31,13 @@ class PylocalScheduler(AbstractScheduler):
         self.run = Run(self.config.config_path)
         self.processes: list[Any] = []
 
+<<<<<<< HEAD
         Pool_ = Pool if self.num_workers > 1 else ThreadPool
         self.pool = Pool_(self.num_workers, initializer=initializer, initargs=(self.config.config_path,))
+=======
+        Pool_ = Pool if self.max_resource > 1 else ThreadPool
+        self.pool = Pool_(self.max_resource, initializer=initializer, initargs=(self.config.config_path,))
+>>>>>>> 8876d0f (Refactoring #2)
 
     def inner_loop_main_process(self) -> bool:
         """A main loop process. This process is repeated every main loop.

@@ -4,7 +4,7 @@ from typing import Any
 
 from omegaconf.dictconfig import DictConfig
 
-from aiaccel.module import AiaccelCore
+from aiaccel.module import AbstractModule
 from aiaccel.optimizer import AbstractOptimizer
 from aiaccel.scheduler.algorithm import RandomSampling
 from aiaccel.scheduler.job.job import Job
@@ -12,7 +12,7 @@ from aiaccel.scheduler.job.model.local_model import LocalModel
 from aiaccel.util import Buffer, create_yaml, str_to_logging_level
 
 
-class AbstractScheduler(AiaccelCore):
+class AbstractScheduler(AbstractModule):
     """An abstract class for AbciScheduler and LocalScheduler.
 
     Args:
@@ -42,29 +42,27 @@ class AbstractScheduler(AiaccelCore):
         )
         self.optimizer = optimizer
         self.max_resource = self.config.resource.num_node
-        self.available_resource = self.max_resource
-        self.stats: list[Any] = []
-        self.jobs: list[Any] = []
-        self.job_status: dict[Any, Any] = {}
-        self.algorithm: Any = None
-        self.num_node = self.config.resource.num_node
-        self.buff = Buffer([trial_id for trial_id in range(self.config.optimize.trial_number)])
-        for trial_id in range(self.config.optimize.trial_number):
-            self.buff.d[trial_id].set_max_len(2)
-        self.all_parameters_generated = False
-
-        self.max_pool_size = self.config.resource.num_node
         self.trial_number = self.config.optimize.trial_number
         self.num_ready = 0
         self.num_running = 0
         self.num_finished = 0
         self.available_pool_size = 0
+        self.available_resource = self.max_resource
+        self.stats: list[Any] = []
+        self.jobs: list[Any] = []
+        self.job_status: dict[Any, Any] = {}
+        self.algorithm: Any = None
+        self.start_trial_id = self.config.resume if self.config.resume is not None else 0
+        self.buff = Buffer([trial_id for trial_id in range(self.start_trial_id, self.trial_number)])
+        for trial_id in range(self.start_trial_id, self.config.optimize.trial_number):
+            self.buff.d[trial_id].set_max_len(2)
+        self.all_parameters_generated = False
 
     def updata_num_ready_running_finished(self) -> None:
         self.num_ready = len(self.storage.trial.get_ready())
         self.num_running = len(self.storage.trial.get_running())
         self.num_finished = len(self.storage.trial.get_finished())
-        self.available_pool_size = self.max_pool_size - self.num_running
+        self.available_pool_size = self.max_resource - self.num_running
 
     def get_num_ready(self) -> int:
         return self.num_ready
@@ -158,14 +156,6 @@ class AbstractScheduler(AiaccelCore):
                 job.maie()
             job.schedule()
 
-    def is_job_all_finished(self) -> bool:
-        """Check if all jobs are finished.
-
-        Returns:
-            bool: All jobs are finished or not.
-        """
-        return all([job.get_state_name() in {"Success", "Failure"} for job in self.jobs])
-
     def post_process(self) -> None:
         """Post-procedure after executed processes.
 
@@ -186,10 +176,10 @@ class AbstractScheduler(AiaccelCore):
             self.available_pool_size = 0
             self.logger.info(f"trial_number: {self.trial_number}, ready: {num_ready}, running: {num_running}, finished: {num_finished}")
             self.logger.info("All parameters are generated.")
-        elif (self.trial_number - sum_status) < self.max_pool_size:
+        elif (self.trial_number - sum_status) < self.max_resource:
             self.available_pool_size = self.trial_number - sum_status
         else:
-            self.available_pool_size = self.max_pool_size - num_running - num_ready
+            self.available_pool_size = self.max_resource - num_running - num_ready
 
         if self.available_pool_size == 0:
             return
@@ -240,8 +230,6 @@ class AbstractScheduler(AiaccelCore):
                 self.buff.d[job.trial_id].Add(job.get_state_name())
                 if self.buff.d[job.trial_id].has_difference():
                     self.logger.info(f"name: {job.trial_id}, state: {job.get_state_name()}")
-            else:
-                self.logger.warning(f"trial id: {job.trial_id} is not in the buffer.")
 
         self.update_resource()
 
@@ -327,9 +315,7 @@ class AbstractScheduler(AiaccelCore):
         """
         if self.config.resume is not None and self.config.resume > 0:
             self._deserialize(self.config.resume)
-        # self.optimizer.set_config(self.config)
-        # self.optimizer.set_storage(self.storage)
-        # self.optimizer.resume()
+            self.trial_number = self.config.optimize.trial_number
 
     def __getstate__(self) -> dict[str, Any]:
         obj = super().__getstate__()
