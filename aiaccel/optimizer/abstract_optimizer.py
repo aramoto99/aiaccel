@@ -8,7 +8,7 @@ from omegaconf.dictconfig import DictConfig
 from aiaccel.config import is_multi_objective
 from aiaccel.converted_parameter import ConvertedIntParameter
 from aiaccel.module import AiaccelCore
-from aiaccel.parameter import HyperParameterConfiguration, IntParameter
+from aiaccel.parameter import HyperParameterConfiguration, IntParameter, Parameter
 
 
 class AbstractOptimizer(AiaccelCore):
@@ -127,14 +127,17 @@ class AbstractOptimizer(AiaccelCore):
             list[dict[str, float | int | str]]: A list of converted parameters.
         """
         new_params = copy.deepcopy(temp_new_params)
-        config_params = self.params.get_parameter_dict()
+        config_params: dict[str, Parameter] = self.params.get_parameter_dict()
         for new_param in new_params:
-            name = new_param["name"]
-            if isinstance(config_params[name], IntParameter) or isinstance(config_params[name], ConvertedIntParameter):
+            name = str(new_param["name"])
+            if (
+                isinstance(config_params[name], IntParameter) or
+                isinstance(config_params[name], ConvertedIntParameter)
+            ):
                 new_param["value"] = int(new_param["value"])
         return new_params
 
-    def run_optimizer_multiple_times(self, available_pool_size) -> None:
+    def run_optimizer_multiple_times(self, available_pool_size: int) -> None:
         if available_pool_size <= 0:
             return
         for _ in range(available_pool_size):
@@ -178,16 +181,16 @@ class AbstractOptimizer(AiaccelCore):
         else:
             return objective[0]
 
-    def get_any_trial_params(self, trial_id: int) -> list[dict[str, float | int | str]]:
-        """Get any trial parameters.
+    # def get_any_trial_params(self, trial_id: int) -> list[dict[str, dict[str, int | float | str]]] | None:
+    #     """Get any trial parameters.
 
-        Args:
-            trial_id (int): Trial ID.
+    #     Args:
+    #         trial_id (int): Trial ID.
 
-        Returns:
-            list[dict[str, float | int | str]]: Any trial parameters.
-        """
-        return self.storage.hp.get_any_trial_params_dict(trial_id)
+    #     Returns:
+    #         list[dict[str, float | int | str]]: Any trial parameters.
+    #     """
+    #     return self.storage.hp.get_any_trial_params_dict(trial_id)
 
     def is_error_free(self) -> bool:
         """Check if all trials are error free.

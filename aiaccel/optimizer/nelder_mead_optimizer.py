@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import copy
-from typing import Any
+from typing import Any, Dict, List
 
 import numpy as np
 from omegaconf.dictconfig import DictConfig
@@ -39,9 +39,9 @@ class NelderMeadOptimizer(AbstractOptimizer):
         self.nelder_mead: Any = None
         if is_multi_objective(self.config):
             raise NotImplementedError("Nelder-Mead optimizer does not support multi-objective optimization.")
-        self.single_or_multiple_trial_params = []
-        self.map_trial_id_and_vertex_id = {}
-        self.completed_trial_ids = []
+        self.single_or_multiple_trial_params: list[Vertex] = []
+        self.map_trial_id_and_vertex_id: dict[int, str] = {}
+        self.completed_trial_ids: list[int] = []
 
     def create_initial_values(self, initial_parameters: list[dict[str, Any]]) -> np.ndarray[Any, Any]:
         initial_values = [
@@ -50,7 +50,7 @@ class NelderMeadOptimizer(AbstractOptimizer):
         ]
         return np.array(initial_values)
 
-    def convert_ndarray_to_parameter(self, ndarray: np.ndarray) -> list[dict[str, float | int | str]]:
+    def convert_ndarray_to_parameter(self, ndarray: np.ndarray[Any, Any]) -> list[dict[str, float | int | str]]:
         """Convert a list of numpy.ndarray to a list of parameters."""
         new_params = copy.deepcopy(self.base_params)
         for name, value, b in zip(self.param_names, ndarray, self.bdrys):
@@ -119,11 +119,11 @@ class NelderMeadOptimizer(AbstractOptimizer):
             return None
         new_params: Vertex = self.single_or_multiple_trial_params.pop(0)
         self.map_trial_id_and_vertex_id[self.trial_id.integer] = new_params.id
-        new_param: list[dict] = self.convert_ndarray_to_parameter(new_params.coordinates)
+        new_param = self.convert_ndarray_to_parameter(new_params.coordinates)
         self.logger.debug(f"new_params: {new_param}")
         return new_param
 
-    def run_optimizer_multiple_times(self, available_pool_size) -> None:
+    def run_optimizer_multiple_times(self, available_pool_size: int) -> None:
         if available_pool_size <= 0:
             return
         for _ in range(available_pool_size):
@@ -148,7 +148,7 @@ class NelderMeadOptimizer(AbstractOptimizer):
                 return True
         return False
 
-    def nelder_mead_main(self) -> list[np.ndarray] | None:
+    def nelder_mead_main(self) -> list[Vertex]:
         """Nelder Mead's main module.
 
         Args:

@@ -9,8 +9,9 @@ if TYPE_CHECKING:
 
 class AbstractModel(object):
     state: str
-    expire: Callable[[Any], Any]
-    next: Callable[[Any], Any]
+    expire: Any
+    next: Any
+    timeout: Any
 
     # ready
     def before_ready(self, obj: Job) -> None:

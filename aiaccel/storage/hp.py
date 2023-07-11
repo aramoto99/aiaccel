@@ -68,7 +68,7 @@ class Hp(Abstract):
         return hp
 
     @retry(_MAX_NUM=60, _DELAY=1.0)
-    def get_any_trials_params(self, trial_ids: list) -> list[HpTable] | None:
+    def get_any_trials_params(self, trial_ids: list[int]) -> list[dict[str, dict[str, int | float | str]]] | None:
         """Obtain the set parameter information for any given trial.
 
         Args:
@@ -78,7 +78,7 @@ class Hp(Abstract):
             list[HpTable] | None:
         """
 
-        def _to_dict(data):
+        def _to_dict(data: HpTable) -> dict[str, int | float | str]:
             return {d.param_name: d.param_value for d in data}
 
         with self.create_session() as session:

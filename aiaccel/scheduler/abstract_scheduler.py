@@ -110,7 +110,7 @@ class AbstractScheduler(AbstractModule):
         """
         self.logger.info("scheduler finished.")
 
-    def search_hyperparameters(self, num_ready, num_running, num_finished) -> None:
+    def search_hyperparameters(self, num_ready: int, num_running: int, num_finished: int) -> None:
         """Start hyper parameter optimization.
 
         Returns:
@@ -231,7 +231,7 @@ class AbstractScheduler(AbstractModule):
         self.logger.info("Best hyperparameter is followings:")
         self.logger.info(hp_results)
 
-    def all_parameters_processed(self, num_ready, num_running) -> bool:
+    def all_parameters_processed(self, num_ready: int, num_running: int) -> bool:
         """Checks whether any unprocessed parameters are left.
 
         This method is beneficial for the case that the maximum number of
@@ -245,7 +245,7 @@ class AbstractScheduler(AbstractModule):
         """
         return num_ready == 0 and num_running == 0 and self.all_parameters_generated
 
-    def all_parameters_registered(self, num_ready, num_running, num_finished) -> bool:
+    def all_parameters_registered(self, num_ready: int, num_running: int, num_finished: int) -> bool:
         """Checks whether all parameters that can be generated with the given
         number of trials are registered.
 

@@ -200,14 +200,6 @@ class HyperParameterConfiguration:
         """
         return self.param
 
-    def get_empty_parameter_dict(self) -> dict[str, Any]:
-        """Get a dictionary of hyper parameters.
-
-        Returns:
-            dict: A hyper parameter dictionary.
-        """
-        return {hp.name: None for hp in self.hps.values()}
-
     def sample(self, rng: RandomState, initial: bool = False) -> list[dict[str, Any]]:
         """Sample a hyper parameters set.
 

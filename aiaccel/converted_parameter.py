@@ -323,7 +323,7 @@ class ConvertedParameterConfiguration(HyperParameterConfiguration):
     def get_parameter_names(self) -> list[str]:
         return list(self.get_parameter_dict().keys())
 
-    def get_empty_parameter_dict(self) -> dict[str, Any]:
+    def get_empty_parameter_dict(self) -> list[dict[str, Any]]:
         base_params = []
         for param in self.get_parameter_list():
             base_params.append({"name": param.name, "type": param.type, "value": None})

@@ -1,4 +1,6 @@
-from typing import Any, Dict
+from __future__ import annotations
+
+from typing import Any, Dict, List
 
 from storage import Storage
 
@@ -8,7 +10,7 @@ from storage import Storage
 
 
 class Objective:
-    def __init__(self, storage: Storage, trial_id: int):
+    def __init__(self, storage: Storage, trial_id: int) -> None:
         self.storage = storage
         self.trial_id = trial_id
 
@@ -21,7 +23,7 @@ class Objective:
 
 
 class Parameter:
-    def __init__(self, name: str, value: Any):
+    def __init__(self, name: str, value: Any) -> None:
         self.name = name
         self.value = value
 
@@ -33,16 +35,16 @@ class Parameter:
 
 
 class ParameterList:
-    def __init__(self):
-        self.params = []
+    def __init__(self) -> None:
+        self.params: List[Any] = []
 
     def add(self, param: Parameter) -> None:
         self.params.append(param)
 
-    def get(self) -> list[Parameter]:
+    def get(self) -> List[Parameter]:
         return self.params
 
-    def get_by_name(self, name: str) -> Parameter:
+    def get_by_name(self, name: str) -> Parameter | None:
         for param in self.params:
             if param.get_name() == name:
                 return param
@@ -83,7 +85,7 @@ class Trial:
         self.objective = objective
 
     def change_state(self, state: str) -> None:
-        self.state = state
+        self.state.set_state(state)
 
     def get_state(self) -> str:
-        return self.state
+        return self.state.get_state()

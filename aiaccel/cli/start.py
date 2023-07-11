@@ -15,7 +15,7 @@ import yaml
 from aiaccel.cli import CsvWriter
 from aiaccel.common import datetime_format, dict_result, extension_hp
 from aiaccel.config import Config, load_config
-from aiaccel.module import AiaccelCore
+from aiaccel.module import AbstractModule, AiaccelCore
 from aiaccel.optimizer import create_optimizer
 from aiaccel.scheduler import create_scheduler
 from aiaccel.storage import Storage
@@ -57,7 +57,7 @@ def main() -> None:  # pragma: no cover
         logger.error("Creating workspace is Failed.")
         return
 
-    logger.info(f"config: {str(pathlib.Path(config.config_path).resolve())}")
+    logger.info(f"config: {config.config_path}")
 
     # storage
     storage = Storage(workspace.storage_file_path)
@@ -78,7 +78,7 @@ def main() -> None:  # pragma: no cover
     # tensorboard
     tensorboard = TensorBoard(config)
 
-    modules: list[AiaccelCore] = [scheduler]
+    modules: list[AbstractModule] = [scheduler]
 
     time_s = time.time()
     max_trial_number = config.optimize.trial_number
@@ -100,10 +100,10 @@ def main() -> None:  # pragma: no cover
                 if not module.is_error_free():
                     break
             else:
-                nun_ready = modules[0].get_num_ready()
-                num_running = modules[0].get_num_running()
-                num_finished = modules[0].get_num_finished()
-                available_pool_size = modules[0].get_available_pool_size()
+                nun_ready = scheduler.get_num_ready()
+                num_running = scheduler.get_num_running()
+                num_finished = scheduler.get_num_finished()
+                available_pool_size = scheduler.get_available_pool_size()
                 now = datetime.now()
                 looping_time = now - loop_start_time
 

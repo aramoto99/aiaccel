@@ -25,13 +25,13 @@ class TensorBoard(AiaccelCore):
         self.buff = Buffer(["finished"])
         self.buff.d["finished"].set_max_len(2)
 
-    def update(self):
+    def update(self) -> None:
         self.buff.d["finished"].Add(self.storage.get_finished())
 
         if self.buff.d["finished"].Len == 0:
-            return True
+            return
         if self.buff.d["finished"].Len >= 2 and self.buff.d["finished"].has_difference() is False:
-            return True
+            return
         if self.buff.d["finished"].Len == 1:
             trial_ids = self.buff.d["finished"].Now
         else:

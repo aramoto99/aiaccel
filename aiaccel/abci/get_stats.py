@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from subprocess import PIPE, Popen, TimeoutExpired
-from typing import Any, dict, list
+from typing import Any
 
 from aiaccel.abci import parse_qstat
 from aiaccel.util import retry

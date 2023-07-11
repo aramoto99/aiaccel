@@ -67,7 +67,7 @@ class Result(Abstract):
         return data.objective
 
     @retry(_MAX_NUM=60, _DELAY=1.0)
-    def get_any_trials_objective(self, trial_ids: list[int]) -> list[int | float | str]:
+    def get_any_trials_objective(self, trial_ids: list[int]) -> list[dict[str, int | float | str]]:
         """Obtain the results of an arbitrary trial.
 
         Args:
@@ -109,13 +109,13 @@ class Result(Abstract):
             list: result values
         """
         objectives = np.array(self.get_objectives())
-        bests = np.zeros((len(goals), len(objectives[0])))
+        bests: np.ndarray[Any, Any] = np.zeros((len(goals), len(objectives[0])))
 
         for i in range(len(goals)):
             if goals[i].lower() == "maximize":
-                bests[i, :] = np.max(objectives[:, i], axis=0)
+                bests[i, :] = np.max(objectives[:, i], axis=0)  # type: ignore
             elif goals[i].lower() == "minimize":
-                bests[i, :] = np.min(objectives[:, i], axis=0)
+                bests[i, :] = np.min(objectives[:, i], axis=0)  # type: ignore
             else:
                 raise ValueError("Invalid goal value.")
 

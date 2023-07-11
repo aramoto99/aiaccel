@@ -91,7 +91,7 @@ class Storage:
         """
         return len(self.trial.get_finished())
 
-    def get_num_running_ready_finished(self) -> int:
+    def get_num_running_ready_finished(self) -> tuple[int, int, int]:
         """Get the number of trials in the all state.
 
         Returns:
