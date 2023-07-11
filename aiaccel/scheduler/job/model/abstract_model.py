@@ -34,9 +34,8 @@ class AbstractModel(object):
         ...
 
     def conditions_job_finished(self, obj: Job) -> bool:
-        objective = obj.storage.result.get_any_trial_objective(
-            trial_id=obj.trial_id)
-        return (objective is not None)
+        objective = obj.storage.result.get_any_trial_objective(trial_id=obj.trial_id)
+        return objective is not None
 
     # finished
     def before_finished(self, obj: Job) -> None:

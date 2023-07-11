@@ -4,9 +4,10 @@ from storage import Storage
 
 #
 # (WIP) This is a snippet of aiaccel/trial.py
-# 
+#
 
-class Objective():
+
+class Objective:
     def __init__(self, storage: Storage, trial_id: int):
         self.storage = storage
         self.trial_id = trial_id
@@ -19,7 +20,7 @@ class Objective():
         return value
 
 
-class Parameter():
+class Parameter:
     def __init__(self, name: str, value: Any):
         self.name = name
         self.value = value
@@ -31,7 +32,7 @@ class Parameter():
         return self.value
 
 
-class ParameterList():
+class ParameterList:
     def __init__(self):
         self.params = []
 
@@ -48,30 +49,27 @@ class ParameterList():
         return None
 
 
-class State():
+class State:
     def __init__(self, storage: Storage, trial_id: int):
         self.storage = storage
         self.trial_id = trial_id
 
     def set_state(self, state: str) -> None:
-        self.storage.trial.set_any_trial_state(
-            trial_id=self.trial_id,
-            state=state
-        )
+        self.storage.trial.set_any_trial_state(trial_id=self.trial_id, state=state)
 
     def get_state(self) -> str:
         state = self.storage.trial.get_any_trial_state(trial_id=self.trial_id)
         return state
 
 
-class Trial():
+class Trial:
     def __init__(
         self,
         storage: Storage,
         trial_id: int,
         params: Dict[str, Any],
         out_of_boundary: bool = True,
-        objective: Any = None
+        objective: Any = None,
     ):
         self.storage = storage
         self.trial_id = trial_id

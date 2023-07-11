@@ -154,22 +154,13 @@ class Trial(Abstract):
         """
         with self.create_session() as session:
             num_of_ready = (
-                session.query(TrialTable)
-                .filter(TrialTable.state == "ready")
-                .with_for_update(read=True)
-                .count()
+                session.query(TrialTable).filter(TrialTable.state == "ready").with_for_update(read=True).count()
             )
             num_of_running = (
-                session.query(TrialTable)
-                .filter(TrialTable.state == "running")
-                .with_for_update(read=True)
-                .count()
+                session.query(TrialTable).filter(TrialTable.state == "running").with_for_update(read=True).count()
             )
             num_of_finished = (
-                session.query(TrialTable)
-                .filter(TrialTable.state == "finished")
-                .with_for_update(read=True)
-                .count()
+                session.query(TrialTable).filter(TrialTable.state == "finished").with_for_update(read=True).count()
             )
         return (num_of_ready, num_of_running, num_of_finished)
 

@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-import re
-
 from aiaccel.scheduler.abstract_scheduler import AbstractScheduler
 from aiaccel.scheduler.job.model.abci_model import AbciModel
 

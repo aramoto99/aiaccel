@@ -148,6 +148,7 @@ class ConvertedParameterConfiguration(HyperParameterConfiguration):
             ordinal parameter as a float value corresponding to the index of
             sequence. Defaults to True.
     """
+
     def __init__(
         self,
         params: HyperParameterConfiguration,

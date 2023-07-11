@@ -77,12 +77,8 @@ class Result(Abstract):
             int | float | None:
         """
         with self.create_session() as session:
-            datas = (
-                session.query(ResultTable)
-                .filter(ResultTable.trial_id.in_(trial_ids))
-                .with_for_update(read=True)
-            )
-        return [{'trial_id': data.trial_id, 'objective:': data.objective} for data in datas]
+            datas = session.query(ResultTable).filter(ResultTable.trial_id.in_(trial_ids)).with_for_update(read=True)
+        return [{"trial_id": data.trial_id, "objective:": data.objective} for data in datas]
 
     @retry(_MAX_NUM=60, _DELAY=1.0)
     def get_all_result(self) -> dict[int, list[Any]]:

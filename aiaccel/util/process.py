@@ -90,9 +90,7 @@ class OutputHandler(threading.Thread):
         """
         if self._proc.returncode != 0:
             raise RuntimeError(
-                f'An error occurred in the subprocess.\n'
-                f'stdout: {self._stdouts}\n'
-                f'stderr: {self._stderrs}'
+                f"An error occurred in the subprocess.\n" f"stdout: {self._stdouts}\n" f"stderr: {self._stderrs}"
             )
 
     def enforce_kill(self) -> None:
@@ -103,7 +101,5 @@ class OutputHandler(threading.Thread):
         """
         self._proc.kill()
         raise RuntimeError(
-            f'An error occurred in the subprocess.\n'
-            f'stdout: {self._stdouts}\n'
-            f'stderr: {self._stderrs}'
+            f"An error occurred in the subprocess.\n" f"stdout: {self._stdouts}\n" f"stderr: {self._stderrs}"
         )

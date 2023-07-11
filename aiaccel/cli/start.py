@@ -84,9 +84,9 @@ def main() -> None:  # pragma: no cover
     max_trial_number = config.optimize.trial_number
     loop_start_time = datetime.now()
     end_estimated_time = "Unknown"
-    buff = Buffer(['num_finished', 'available_pool_size'])
-    buff.d['num_finished'].set_max_len(2)
-    buff.d['available_pool_size'].set_max_len(2)
+    buff = Buffer(["num_finished", "available_pool_size"])
+    buff.d["num_finished"].set_max_len(2)
+    buff.d["available_pool_size"].set_max_len(2)
 
     # main process
     for module in modules:
@@ -112,15 +112,9 @@ def main() -> None:  # pragma: no cover
                     finishing_time = now + (max_trial_number - num_finished) * one_loop_time
                     end_estimated_time = finishing_time.strftime(datetime_format)
 
-                if (
-                    int((time.time() - time_s)) % 10 == 0 or
-                    num_finished >= max_trial_number
-                ):
-                    buff.d['num_finished'].Add(num_finished)
-                    if (
-                        buff.d['num_finished'].Len == 1 or
-                        buff.d['num_finished'].has_difference()
-                    ):
+                if int((time.time() - time_s)) % 10 == 0 or num_finished >= max_trial_number:
+                    buff.d["num_finished"].Add(num_finished)
+                    if buff.d["num_finished"].Len == 1 or buff.d["num_finished"].has_difference():
                         modules[0].logger.info(
                             f"{num_finished}/{max_trial_number} finished, "
                             f"max trial number: {max_trial_number}, "
@@ -131,16 +125,13 @@ def main() -> None:  # pragma: no cover
                         # TensorBoard
                         tensorboard.update()
 
-                    buff.d['available_pool_size'].Add(available_pool_size)
-                    if (
-                        buff.d['available_pool_size'].Len == 1 or
-                        buff.d['available_pool_size'].has_difference()
-                    ):
+                    buff.d["available_pool_size"].Add(available_pool_size)
+                    if buff.d["available_pool_size"].Len == 1 or buff.d["available_pool_size"].has_difference():
                         modules[0].logger.info(f"pool_size: {available_pool_size}")
 
                 else:
-                    buff.d['num_finished'].Clear()
-                    buff.d['available_pool_size'].Clear()
+                    buff.d["num_finished"].Clear()
+                    buff.d["available_pool_size"].Clear()
 
                 time.sleep(config.generic.main_loop_sleep_seconds)
                 continue

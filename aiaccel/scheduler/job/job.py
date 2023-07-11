@@ -68,7 +68,7 @@ JOB_TRANSITIONS: list[dict[str, str | list[str]]] = [
         "dest": "timeout",
         "before": "before_timeout",
         "after": "after_timeout",
-    }
+    },
 ]
 
 
@@ -78,8 +78,7 @@ class CustomMachine(Machine):
 
 
 class Job:
-    """A job thread to manage running jobs on local computer or ABCI.
-    """
+    """A job thread to manage running jobs on local computer or ABCI."""
 
     def __init__(self, config: DictConfig, scheduler: AbstractScheduler, model: AbstractModel, trial_id: int) -> None:
         super(Job, self).__init__()
@@ -127,44 +126,28 @@ class Job:
         return state.name
 
     def write_start_time_to_storage(self) -> None:
-        """Set a start time.
-        """
+        """Set a start time."""
         self.start_time = datetime.now()
         _start_time = self.start_time.strftime(datetime_format)
-        self.storage.timestamp.set_any_trial_start_time(
-            trial_id=self.trial_id,
-            start_time=_start_time
-        )
+        self.storage.timestamp.set_any_trial_start_time(trial_id=self.trial_id, start_time=_start_time)
 
     def write_end_time_to_storage(self) -> None:
-        """Set an end time.
-        """
+        """Set an end time."""
         self.end_time = datetime.now()
         _end_time = self.end_time.strftime(datetime_format)
-        self.storage.timestamp.set_any_trial_end_time(
-            trial_id=self.trial_id,
-            end_time=_end_time
-        )
+        self.storage.timestamp.set_any_trial_end_time(trial_id=self.trial_id, end_time=_end_time)
 
     def write_state_to_storage(self, state: str) -> None:
-        """Write a current state to the database.
-        """
-        self.storage.trial.set_any_trial_state(
-            trial_id=self.trial_id,
-            state=state
-        )
+        """Write a current state to the database."""
+        self.storage.trial.set_any_trial_state(trial_id=self.trial_id, state=state)
 
     def write_job_success_or_failed_to_storage(self) -> None:
-        """Write a job success or failed to the database.
-        """
-        return_code = self.storage.returncode.get_any_trial_returncode(
-            trial_id=self.trial_id)
+        """Write a job success or failed to the database."""
+        return_code = self.storage.returncode.get_any_trial_returncode(trial_id=self.trial_id)
         end_state = "success"
         if return_code != 0:
             end_state = "failed"
-        self.storage.jobstate.set_any_trial_jobstate(
-            trial_id=self.trial_id,
-            state=end_state)
+        self.storage.jobstate.set_any_trial_jobstate(trial_id=self.trial_id, state=end_state)
 
     def get_job_elapsed_time_in_seconds(self) -> float:
         """Get a job elapsed time in seconds.
@@ -211,8 +194,7 @@ class Job:
             elif state.name.lower() == "finished":
                 self.model.next(self)
         except BaseException as e:
-            self.logger.error(
-                f"An error occurred in the job thread. {e}")
+            self.logger.error(f"An error occurred in the job thread. {e}")
             self.model.expire(self)
             return
         if self.is_timeout():

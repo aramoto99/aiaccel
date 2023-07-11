@@ -12,7 +12,6 @@ if TYPE_CHECKING:
 
 
 class LocalModel(AbstractModel):
-
     def runner_create(self, obj: Job) -> None:
         pass
 
@@ -23,7 +22,7 @@ class LocalModel(AbstractModel):
             obj.trial_id,
             str(obj.config.config_path),
             str(obj.workspace.get_error_output_file(obj.trial_id)),
-            obj.config.generic.enabled_variable_name_argumentation
+            obj.config.generic.enabled_variable_name_argumentation,
         )
         obj.logger.info(f'runner command: {" ".join(runner_command)}')
         obj.proc = Popen(runner_command, stdout=PIPE, stderr=PIPE)
@@ -52,7 +51,7 @@ class LocalModel(AbstractModel):
         trial_id: int,
         config_path: str,
         command_error_output: str,
-        enabled_variable_name_argumentation: bool
+        enabled_variable_name_argumentation: bool,
     ) -> list[str]:
         """Create a list of command strings to run a hyper parameter.
 
@@ -88,7 +87,7 @@ class LocalModel(AbstractModel):
         commands.append(command_error_output)
         return commands
 
-    def write_result_to_storage(self, obj: 'Job') -> None:
+    def write_result_to_storage(self, obj: "Job") -> None:
         """Create result file.
 
         Args:
@@ -103,8 +102,8 @@ class LocalModel(AbstractModel):
         # start_time: str = str(obj.th_oh.get_start_time())
         # end_time: str = str(obj.th_oh.get_end_time())
         returncode: int = obj.th_oh.get_returncode()
-        params: list[dict[str, Any]] = obj.content['parameters']
-        objective: str = 'nan'
+        params: list[dict[str, Any]] = obj.content["parameters"]
+        objective: str = "nan"
         objectives: list[str] = []
 
         if len(stdouts) > 0:
@@ -113,31 +112,31 @@ class LocalModel(AbstractModel):
             objective = objective.replace(" ", "")
             objectives = objective.split(",")
 
-        error = '\n'.join(stderrs)
+        error = "\n".join(stderrs)
 
         args = {
-            'storage_file_path': str(obj.workspace.storage_file_path),
-            'trial_id': str(trial_id),
+            "storage_file_path": str(obj.workspace.storage_file_path),
+            "trial_id": str(trial_id),
             # 'start_time': start_time,
             # 'end_time': end_time,
-            'error': error,
-            'returncode': returncode
+            "error": error,
+            "returncode": returncode,
         }
 
         if len(error) == 0:
-            del args['error']
+            del args["error"]
 
-        commands = ['aiaccel-set-result']
+        commands = ["aiaccel-set-result"]
         for key in args.keys():
-            commands.append('--' + key)
+            commands.append("--" + key)
             commands.append(str(args[key]))
 
-        commands.append('--objective')
+        commands.append("--objective")
         for objective in objectives:
             commands.append(str(objective))
 
         for param in params:
-            if 'name' in param.keys() and 'value' in param.keys():
+            if "name" in param.keys() and "value" in param.keys():
                 commands.append(f'--{param["name"]}={param["value"]}')
 
         obj.logger.debug(f'{" ".join(commands)}')

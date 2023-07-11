@@ -5,12 +5,12 @@ from typing import Any
 
 import numpy as np
 
-coef: dict = {"r": 1.0, "ic": - 0.5, "oc": 0.5, "e": 2.0, "s": 0.5}
-name_rng = np.random.RandomState()  
+coef: dict = {"r": 1.0, "ic": -0.5, "oc": 0.5, "e": 2.0, "s": 0.5}
+name_rng = np.random.RandomState()
 
 
-class Vertex():
-    def __init__(self, xs: np.ndarray, value = None):
+class Vertex:
+    def __init__(self, xs: np.ndarray, value=None):
         self.xs = xs
         self.value = value
         self.id = self.generate_random_name()
@@ -115,7 +115,7 @@ class Vertex():
             raise TypeError("Unsupported operand type for >=")
 
 
-class Simplex():
+class Simplex:
     def __init__(self, simplex_coordinates: np.ndarray):
         self.n_dim = simplex_coordinates.shape[1]
         self.vertices: list[Vertex] = []
@@ -156,7 +156,7 @@ class Simplex():
         return xic
 
     def outside_contract(self) -> Vertex:
-        xoc = self.centroid + ((self.centroid - self.vertices[-1]) *  self.coef["oc"])
+        xoc = self.centroid + ((self.centroid - self.vertices[-1]) * self.coef["oc"])
         return xoc
 
     def shrink(self) -> list[Vertex]:
@@ -165,33 +165,33 @@ class Simplex():
         return self.vertices
 
 
-class Value():
+class Value:
     def __init__(self, id: str | None = None, value: Any = None):
         self.id: str = id
         self.value: Any = value
 
 
-class Store():
+class Store:
     def __init__(self):
-        self.r: Vertex | None = None   # reflect
-        self.e: Vertex | None = None   # expand
+        self.r: Vertex | None = None  # reflect
+        self.e: Vertex | None = None  # expand
         self.ic: Vertex | None = None  # inside_contract
         self.oc: Vertex | None = None  # outside_contract
         self.s: list[Vertex] | None = None  # shrink
 
 
-class NelderMead():
+class NelderMead:
     def __init__(self, initial_parameters: Any = None):
         self.simplex: Simplex = Simplex(initial_parameters)
         self.state = "initialize"
         self.store = Store()
         self.waits = {
-            'initialize': self.simplex.n_dim + 1,
-            'shrink': self.simplex.n_dim + 1,
-            'expand': 1,
-            'inside_contract': 1,
-            'outside_contract': 1,
-            'reflect': 1,
+            "initialize": self.simplex.n_dim + 1,
+            "shrink": self.simplex.n_dim + 1,
+            "expand": 1,
+            "inside_contract": 1,
+            "outside_contract": 1,
+            "reflect": 1,
         }
         self.n_waits = self.waits[self.state]
 

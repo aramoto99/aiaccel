@@ -8,7 +8,7 @@ from aiaccel.module import AbstractModule
 from aiaccel.optimizer import AbstractOptimizer
 from aiaccel.scheduler.job.job import Job
 from aiaccel.scheduler.job.model.local_model import LocalModel
-from aiaccel.util import Buffer, create_yaml, str_to_logging_level
+from aiaccel.util import Buffer, create_yaml
 
 
 class AbstractScheduler(AbstractModule):
@@ -120,7 +120,10 @@ class AbstractScheduler(AbstractModule):
         if sum_status >= self.trial_number and not self.all_parameters_generated:
             self.all_parameters_generated = True
             self.available_pool_size = 0
-            self.logger.info(f"trial_number: {self.trial_number}, ready: {num_ready}, running: {num_running}, finished: {num_finished}")
+            self.logger.info(
+                f"trial_number: {self.trial_number}, \
+                    ready: {num_ready}, running: {num_running}, finished: {num_finished}"
+            )
             self.logger.info("All parameters are generated.")
         elif (self.trial_number - sum_status) < self.num_workers:
             self.available_pool_size = self.trial_number - sum_status
@@ -130,9 +133,8 @@ class AbstractScheduler(AbstractModule):
         if self.available_pool_size == 0:
             return
 
-        if (
-            not self.all_parameters_processed(num_ready, num_running) and
-            not self.all_parameters_registered(num_ready, num_running, num_finished)
+        if not self.all_parameters_processed(num_ready, num_running) and not self.all_parameters_registered(
+            num_ready, num_running, num_finished
         ):
             # self.logger.debug(f"optimizer run {self.available_pool_size} times")
             self.optimizer.run_optimizer_multiple_times(self.available_pool_size)

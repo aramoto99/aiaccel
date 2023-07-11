@@ -30,8 +30,7 @@ class AiaccelCore(object):
         self.module_name = module_name
 
         self.storage.variable.register(
-            process_name=self.module_name,
-            labels=["native_random_state", "numpy_random_state", "state"]
+            process_name=self.module_name, labels=["native_random_state", "numpy_random_state", "state"]
         )
 
     def set_config(self, config: DictConfig) -> None:
@@ -40,18 +39,10 @@ class AiaccelCore(object):
     def set_storage(self, storage: Storage) -> None:
         self.storage = storage
         self.storage.variable.register(
-            process_name=self.module_name,
-            labels=["native_random_state", "numpy_random_state", "state"]
+            process_name=self.module_name, labels=["native_random_state", "numpy_random_state", "state"]
         )
 
-    def set_logger(
-        self, 
-        logger_name: str,
-        logfile: Path,
-        file_level: str,
-        stream_level: str,
-        module_type: str
-    ) -> None:
+    def set_logger(self, logger_name: str, logfile: Path, file_level: str, stream_level: str, module_type: str) -> None:
         """Set a default logger options.
 
         Args:
@@ -72,7 +63,7 @@ class AiaccelCore(object):
         fh.setFormatter(fh_formatter)
         fh.setLevel(str_to_logging_level(file_level))
 
-        ch = ColoredHandler(sys.stdout) 
+        ch = ColoredHandler(sys.stdout)
         ch_formatter = logging.Formatter(f"[{module_type}]: %(levelname)-8s %(message)s")
         ch.setFormatter(ch_formatter)
         ch.setLevel(str_to_logging_level(stream_level))
@@ -90,7 +81,7 @@ class AiaccelCore(object):
         self.storage.variable.d["state"].set(trial_id, self)
 
         # random state
-        self.logger.debug(f"serialize random state")
+        self.logger.debug("serialize random state")
         self.storage.variable.d["numpy_random_state"].set(trial_id, self.get_numpy_random_state())
 
     def deserialize(self, trial_id: int) -> None:
@@ -107,7 +98,7 @@ class AiaccelCore(object):
         # random state
         _random_state = self.storage.variable.d["numpy_random_state"].get(trial_id)
         self.set_numpy_random_state(_random_state)
-        self.logger.debug(f"deserialize random state")
+        self.logger.debug("deserialize random state")
         self.logger.debug(f"{_random_state}")
 
     def write_random_seed_to_debug_log(self) -> None:
@@ -143,7 +134,6 @@ class AiaccelCore(object):
 
 
 class AbstractModule(AiaccelCore):
-
     def pre_process(self) -> None:
         """Perform setup or initialization tasks before the main loop starts.
 
@@ -180,7 +170,7 @@ class AbstractModule(AiaccelCore):
     def is_error_free(self) -> bool:
         """Check if there has been an error.
 
-        This method should be implemented by subclasses to define how to check for errors. 
+        This method should be implemented by subclasses to define how to check for errors.
 
         Returns:
             bool: True if there has been no error, False otherwise.

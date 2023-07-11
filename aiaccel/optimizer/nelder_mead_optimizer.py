@@ -9,9 +9,8 @@ from omegaconf.listconfig import ListConfig
 
 from aiaccel.config import is_multi_objective
 from aiaccel.converted_parameter import ConvertedParameterConfiguration
-from aiaccel.optimizer import AbstractOptimizer, NelderMead
+from aiaccel.optimizer import AbstractOptimizer
 from aiaccel.optimizer._nelder_mead import NelderMead, Value, Vertex
-from aiaccel.optimizer.abstract_optimizer import AbstractOptimizer
 
 
 class NelderMeadOptimizer(AbstractOptimizer):
@@ -52,8 +51,7 @@ class NelderMeadOptimizer(AbstractOptimizer):
         return np.array(initial_values)
 
     def convert_ndarray_to_parameter(self, ndarray: np.ndarray) -> list[dict[str, float | int | str]]:
-        """Convert a list of numpy.ndarray to a list of parameters.
-        """
+        """Convert a list of numpy.ndarray to a list of parameters."""
         new_params = copy.deepcopy(self.base_params)
         for name, value, b in zip(self.param_names, ndarray, self.bdrys):
             for new_param in new_params:
@@ -132,17 +130,11 @@ class NelderMeadOptimizer(AbstractOptimizer):
             if new_params := self.generate_new_parameter():
                 if self.out_of_boundary(new_params):
                     self.logger.debug(f"out of boundary: {new_params}")
-                    self.register_new_parameters(
-                        self.convert_type_by_config(new_params),
-                        state="finished"
-                    )
+                    self.register_new_parameters(self.convert_type_by_config(new_params), state="finished")
                     objective = np.inf
                     if self.goals[0] == "maximize":
                         objective = -np.inf
-                    self.storage.result.set_any_trial_objective(
-                        trial_id=self.trial_id.integer,
-                        objective=[objective]
-                    )
+                    self.storage.result.set_any_trial_objective(trial_id=self.trial_id.integer, objective=[objective])
                     self.trial_id.increment()
                     self.serialize(self.trial_id.integer)
                     continue
@@ -173,7 +165,7 @@ class NelderMeadOptimizer(AbstractOptimizer):
             "expand_pending",
             "inside_contract_pending",
             "outside_contract_pending",
-            "shrink_pending"
+            "shrink_pending",
         }:
             new_finished = self.new_finished()
             if len(new_finished) == self.nelder_mead.get_n_waits():

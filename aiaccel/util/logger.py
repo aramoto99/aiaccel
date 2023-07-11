@@ -41,7 +41,6 @@ class ColoredHandler(logging.StreamHandler):
         self.stream.write(f"{color_start}{self.format(record)}{color_end}\n")
 
 
-
 def str_to_logging_level(s: str) -> int:
     """Convert from a input string to a logging level.
 

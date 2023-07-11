@@ -51,7 +51,6 @@ class SobolOptimizer(AbstractOptimizer):
 
         return new_params
 
-
     def generate_initial_parameter(self) -> list[dict[str, float | int | str]]:
         """Generate initial parameters.
 

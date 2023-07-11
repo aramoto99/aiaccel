@@ -164,7 +164,6 @@ class AbciModel(AbstractModel):
 
         self.file_create(runner_file_path, script, dict_lock)
 
-
     def file_create(self, path: Path, content: str, dict_lock: Path | None = None) -> None:
         """Create a text file.
         Args:

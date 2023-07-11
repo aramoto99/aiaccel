@@ -109,7 +109,7 @@ class Workspace:
             self.output,
             self.runner,
             self.storage,
-            self.tensorboard
+            self.tensorboard,
         ]
         self.results = Path("./results")
         self.retults_csv_file = self.path / "results.csv"

@@ -6,14 +6,9 @@ from typing import Any
 from omegaconf.dictconfig import DictConfig
 
 from aiaccel.config import is_multi_objective
-from aiaccel.converted_parameter import (  # ConvertedCategoricalParameter,; ConvertedFloatParameter,; ConvertedNumericalParameter,; ConvertedOrdinalParameter,; ConvertedParameter,; ConvertedParameterConfiguration,
-    ConvertedIntParameter,
-)
+from aiaccel.converted_parameter import ConvertedIntParameter
 from aiaccel.module import AiaccelCore
-from aiaccel.parameter import (  # CategoricalParameter,; FloatParameter,; OrdinalParameter,
-    HyperParameterConfiguration,
-    IntParameter,
-)
+from aiaccel.parameter import HyperParameterConfiguration, IntParameter
 
 
 class AbstractOptimizer(AiaccelCore):
@@ -121,7 +116,9 @@ class AbstractOptimizer(AiaccelCore):
 
         return new_params
 
-    def convert_type_by_config(self, temp_new_params: list[dict[str, float | int | str]]) -> list[dict[str, float | int | str]]:
+    def convert_type_by_config(
+        self, temp_new_params: list[dict[str, float | int | str]]
+    ) -> list[dict[str, float | int | str]]:
         """Convert the type of parameters by the configuration file.
 
         Args:
@@ -135,10 +132,7 @@ class AbstractOptimizer(AiaccelCore):
         config_params = self.params.get_parameter_dict()
         for new_param in new_params:
             name = new_param["name"]
-            if (
-                isinstance(config_params[name], IntParameter) or
-                isinstance(config_params[name], ConvertedIntParameter)
-            ):
+            if isinstance(config_params[name], IntParameter) or isinstance(config_params[name], ConvertedIntParameter):
                 new_param["value"] = int(new_param["value"])
         return new_params
 
