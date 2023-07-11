@@ -47,12 +47,8 @@ class BudgetSpecifiedGridOptimizer(AbstractOptimizer):
         Returns:
             list[dict[str, float | int | str]] | None: A list of new parameters.
         """
-        if self.all_parameters_generated:
-            return None
-
         if self._grid_point_generator.all_grid_points_generated():
             self.logger.info("Generated all of parameters.")
-            self.all_parameters_generated = True
             return None
 
         new_params: list[dict[str, float | int | str]] = []

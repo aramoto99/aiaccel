@@ -160,7 +160,6 @@ class GridOptimizer(AbstractOptimizer):
 
         if parameter_index is None:
             self.logger.info("Generated all of parameters.")
-            self.all_parameters_generated = True
             return None
 
         new_params: list[Any] = []

@@ -26,8 +26,6 @@ class AbstractOptimizer(AiaccelCore):
         num_running (int): A running number of hyperprameters.
         num_finished (int): A finished number of hyperparameters.
         num_of_generated_parameter (int): A number of generated hyperparamters.
-        all_parameters_generated (bool): Whether all parameters are generated.
-            True if all parameters are generated.
         params (HyperParameterConfiguration): A loaded parameter configuration
             object.
         trial_id (TrialId): A TrialId object.

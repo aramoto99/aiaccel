@@ -91,14 +91,9 @@ class IntegrationTest(BaseTest):
     def evaluate(self, config, is_multi_objective=False):
         workspace = Workspace(config.generic.workspace)
         storage = Storage(workspace.storage_file_path)
-        work_dir = Path(config.generic.workspace)
         running = storage.get_num_running()
         ready = storage.get_num_ready()
         finished = storage.get_num_finished()
         assert finished == config.optimize.trial_number
         assert ready == 0
         assert running == 0
-
-        if not is_multi_objective:
-            final_result = work_dir.joinpath(dict_result, file_final_result)
-            assert final_result.exists()

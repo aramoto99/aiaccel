@@ -1,15 +1,18 @@
+from __future__ import annotations
+
 import json
 import os
 import shutil
 import tempfile
 from pathlib import Path
+from typing import Any
 
-import fasteners
 import pytest
+import yaml
 
 from aiaccel.config import load_config
 from aiaccel.storage import Storage
-from aiaccel.util import create_yaml, interprocess_lock_file
+from aiaccel.util import create_yaml
 from aiaccel.workspace import Workspace
 
 WORK_SUB_DIRECTORIES = [
@@ -59,11 +62,10 @@ def clean_directory(path: Path, exclude_dir: list = None,
                                 exclude_dir + exclude_file]:
                     p.unlink()
     else:
-        with fasteners.InterProcessLock(interprocess_lock_file(path, dict_lock)):
-            for p in path.glob('**/*'):
-                if p.is_file():
-                    if True not in [p in d.parts for d in exclude_dir + exclude_file]:
-                        p.unlink()
+        for p in path.glob('**/*'):
+            if p.is_file():
+                if True not in [p in d.parts for d in exclude_dir + exclude_file]:
+                    p.unlink()
 
 
 def to_path(path):
@@ -79,6 +81,21 @@ def to_path(path):
         return path.resolve()
 
     return Path(path).resolve()
+
+
+def load_yaml(path: Path) -> dict[str, Any]:
+    """Load a content of a yaml file.
+    Args:
+        path (Path): A path of a yaml file.
+        dict_lock (Path | None, optional): A directory to store lock files.
+            Defaults to None.
+
+    Returns:
+        dict: A loaded content.
+    """
+    with open(path, "r") as f:
+        yml = yaml.load(f, Loader=yaml.UnsafeLoader)
+    return yml
 
 
 @pytest.fixture
