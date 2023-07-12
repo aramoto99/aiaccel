@@ -186,7 +186,7 @@ class TestAbstractScheduler(BaseTest):
         database_remove()
         scheduler = AbstractScheduler(self.load_config_for_test(self.configs['config.json']))
         scheduler._rng = np.random.RandomState(0)
-        scheduler.storage.trial.set_any_trial_state(trial_id=0, state="finished")
+        scheduler.storage.state.set_any_trial_state(trial_id=0, state="finished")
         assert scheduler.serialize(trial_id=0) is None
 
     def testdeserialize(
@@ -197,7 +197,7 @@ class TestAbstractScheduler(BaseTest):
     ):
         database_remove()
         scheduler = AbstractScheduler(self.load_config_for_test(self.configs['config.json']))
-        scheduler.storage.trial.set_any_trial_state(trial_id=0, state="finished")
+        scheduler.storage.state.set_any_trial_state(trial_id=0, state="finished")
         scheduler._rng = np.random.RandomState(0)
         scheduler.serialize(trial_id=0)
         assert scheduler.deserialize(trial_id=0) is None

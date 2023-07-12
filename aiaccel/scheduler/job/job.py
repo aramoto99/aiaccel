@@ -139,7 +139,7 @@ class Job:
 
     def write_state_to_storage(self, state: str) -> None:
         """Write a current state to the database."""
-        self.storage.trial.set_any_trial_state(trial_id=self.trial_id, state=state)
+        self.storage.state.set_any_trial_state(trial_id=self.trial_id, state=state)
 
     def write_job_success_or_failed_to_storage(self) -> None:
         """Write a job success or failed to the database."""

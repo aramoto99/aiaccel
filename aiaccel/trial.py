@@ -57,10 +57,10 @@ class State:
         self.trial_id = trial_id
 
     def set_state(self, state: str) -> None:
-        self.storage.trial.set_any_trial_state(trial_id=self.trial_id, state=state)
+        self.storage.state.set_any_trial_state(trial_id=self.trial_id, state=state)
 
     def get_state(self) -> str:
-        state = self.storage.trial.get_any_trial_state(trial_id=self.trial_id)
+        state = self.storage.state.get_any_trial_state(trial_id=self.trial_id)
         return state
 
 

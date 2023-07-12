@@ -55,9 +55,9 @@ class AbstractScheduler(AbstractModule):
         self.job_completed_count = 0
 
     def updata_num_ready_running_finished(self) -> None:
-        self.num_ready = len(self.storage.trial.get_ready())
-        self.num_running = len(self.storage.trial.get_running())
-        self.num_finished = len(self.storage.trial.get_finished())
+        self.num_ready = len(self.storage.state.get_ready())
+        self.num_running = len(self.storage.state.get_running())
+        self.num_finished = len(self.storage.state.get_finished())
         self.available_pool_size = self.num_workers - self.num_running
 
     def get_num_ready(self) -> int:
@@ -151,7 +151,7 @@ class AbstractScheduler(AbstractModule):
         if self.num_finished >= self.config.optimize.trial_number:
             return False
 
-        readies = self.storage.trial.get_ready()
+        readies = self.storage.state.get_ready()
         # find a new hp
         for ready in readies:
             if ready not in [job.trial_id for job in self.jobs]:

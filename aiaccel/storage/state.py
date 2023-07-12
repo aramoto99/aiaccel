@@ -5,11 +5,11 @@ from typing import Any, Literal
 
 from sqlalchemy.exc import SQLAlchemyError
 
-from aiaccel.storage import Abstract, TrialTable
+from aiaccel.storage import Abstract, StateTable
 from aiaccel.util import retry
 
 
-class Trial(Abstract):
+class State(Abstract):
     def __init__(self, file_name: Path) -> None:
         super().__init__(file_name)
 
@@ -25,8 +25,8 @@ class Trial(Abstract):
         """
         with self.create_session() as session:
             trials = (
-                session.query(TrialTable)
-                .filter(TrialTable.trial_id == trial_id)
+                session.query(StateTable)
+                .filter(StateTable.trial_id == trial_id)
                 .with_for_update(read=True)
                 .one_or_none()
             )
@@ -48,7 +48,7 @@ class Trial(Abstract):
             specified state.
         """
         with self.create_session() as session:
-            trials = session.query(TrialTable).filter(TrialTable.state == state).with_for_update(read=True).all()
+            trials = session.query(StateTable).filter(StateTable.state == state).with_for_update(read=True).all()
 
         if trials is None or len(trials) == 0:
             return None
@@ -69,13 +69,13 @@ class Trial(Abstract):
         with self.create_session() as session:
             try:
                 trials = (
-                    session.query(TrialTable)
-                    .filter(TrialTable.trial_id == trial_id)
+                    session.query(StateTable)
+                    .filter(StateTable.trial_id == trial_id)
                     .with_for_update(read=True)
                     .one_or_none()
                 )
                 if trials is None:
-                    new_row = TrialTable(trial_id=trial_id, state=state)
+                    new_row = StateTable(trial_id=trial_id, state=state)
                     session.add(new_row)
                 else:
                     trials.state = state
@@ -93,7 +93,7 @@ class Trial(Abstract):
         """
         with self.create_session() as session:
             try:
-                session.query(TrialTable).with_for_update(read=True).delete()
+                session.query(StateTable).with_for_update(read=True).delete()
                 session.commit()
             except SQLAlchemyError as e:
                 session.rollback()
@@ -103,7 +103,7 @@ class Trial(Abstract):
     def delete_any_trial_state(self, trial_id: int) -> None:
         with self.create_session() as session:
             try:
-                session.query(TrialTable).filter(TrialTable.trial_id == trial_id).delete()
+                session.query(StateTable).filter(StateTable.trial_id == trial_id).delete()
                 session.commit()
             except SQLAlchemyError as e:
                 session.rollback()
@@ -117,7 +117,7 @@ class Trial(Abstract):
             trial ids(list[int])
         """
         with self.create_session() as session:
-            trials = session.query(TrialTable).filter(TrialTable.state == "ready").with_for_update(read=True).all()
+            trials = session.query(StateTable).filter(StateTable.state == "ready").with_for_update(read=True).all()
 
         return [trial.trial_id for trial in trials]
 
@@ -129,7 +129,7 @@ class Trial(Abstract):
             trial ids(list[int])
         """
         with self.create_session() as session:
-            trials = session.query(TrialTable).filter(TrialTable.state == "running").with_for_update(read=True).all()
+            trials = session.query(StateTable).filter(StateTable.state == "running").with_for_update(read=True).all()
 
         return [trial.trial_id for trial in trials]
 
@@ -141,7 +141,7 @@ class Trial(Abstract):
             trial ids(list[int])
         """
         with self.create_session() as session:
-            trials = session.query(TrialTable).filter(TrialTable.state == "finished").with_for_update(read=True).all()
+            trials = session.query(StateTable).filter(StateTable.state == "finished").with_for_update(read=True).all()
 
         return [trial.trial_id for trial in trials]
 
@@ -154,13 +154,13 @@ class Trial(Abstract):
         """
         with self.create_session() as session:
             num_of_ready = (
-                session.query(TrialTable).filter(TrialTable.state == "ready").with_for_update(read=True).count()
+                session.query(StateTable).filter(StateTable.state == "ready").with_for_update(read=True).count()
             )
             num_of_running = (
-                session.query(TrialTable).filter(TrialTable.state == "running").with_for_update(read=True).count()
+                session.query(StateTable).filter(StateTable.state == "running").with_for_update(read=True).count()
             )
             num_of_finished = (
-                session.query(TrialTable).filter(TrialTable.state == "finished").with_for_update(read=True).count()
+                session.query(StateTable).filter(StateTable.state == "finished").with_for_update(read=True).count()
             )
         return (num_of_ready, num_of_running, num_of_finished)
 
@@ -171,7 +171,7 @@ class Trial(Abstract):
             list[int] | None: A list of trial ids.
         """
         with self.create_session() as session:
-            trials = session.query(TrialTable).with_for_update(read=True).all()
+            trials = session.query(StateTable).with_for_update(read=True).all()
 
         if trials is None or len(trials) == 0:
             return None

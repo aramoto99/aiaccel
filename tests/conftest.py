@@ -223,7 +223,7 @@ def setup_hp_files(work_dir):
         workspace = Workspace(str(work_dir))
         storage = Storage(workspace.storage_file_path)
         for i in range(n):
-            storage.trial.set_any_trial_state(trial_id=i, state=hp_type)
+            storage.state.set_any_trial_state(trial_id=i, state=hp_type)
     return _setup_hp_files
 
 

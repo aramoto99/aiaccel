@@ -53,7 +53,7 @@ class CsvWriter:
         data = []
         header = []
 
-        trial_ids = self.storage.trial.get_all_trial_id()
+        trial_ids = self.storage.state.get_all_trial_id()
 
         if trial_ids is None or len(trial_ids) == 0:
             return

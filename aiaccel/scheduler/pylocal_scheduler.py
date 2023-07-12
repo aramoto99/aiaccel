@@ -45,19 +45,19 @@ class PylocalScheduler(AbstractScheduler):
         if self.check_finished():
             return False
 
-        trial_ids = self.storage.trial.get_ready()
+        trial_ids = self.storage.state.get_ready()
         if trial_ids is None or len(trial_ids) == 0:
             return True
 
         args = []
         for trial_id in trial_ids:
-            self.storage.trial.set_any_trial_state(trial_id=trial_id, state="running")
+            self.storage.state.set_any_trial_state(trial_id=trial_id, state="running")
             args.append([trial_id, self.get_any_trial_xs(trial_id)])
             self.serialize(trial_id)
 
         for trial_id, xs, ys, err, start_time, end_time in self.pool.imap_unordered(execute, args):
             self.report(trial_id, ys, err, start_time, end_time)
-            self.storage.trial.set_any_trial_state(trial_id=trial_id, state="finished")
+            self.storage.state.set_any_trial_state(trial_id=trial_id, state="finished")
 
             self.write_result_to_storage(trial_id, xs, ys, err, start_time, end_time)
 

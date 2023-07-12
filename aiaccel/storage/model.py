@@ -7,7 +7,7 @@ Base: DeclarativeMeta = declarative_base()
 
 
 # models
-class TrialTable(Base):
+class StateTable(Base):
     __tablename__ = "Trial"
     trial_id = Column(Integer, primary_key=True, nullable=False)
     state = Column(Text, nullable=True)

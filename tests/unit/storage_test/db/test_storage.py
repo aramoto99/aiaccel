@@ -16,7 +16,7 @@ def test_current_max_trial_number():
     states = ["test1", "test2", "test3"]
 
     for i in range(len(states)):
-        storage.trial.set_any_trial_state(
+        storage.state.set_any_trial_state(
             trial_id=i,
             state=states[i]
         )
@@ -38,7 +38,7 @@ def test_get_ready():
     ]
 
     for i in range(len(states)):
-        storage.trial.set_any_trial_state(
+        storage.state.set_any_trial_state(
             trial_id=i,
             state=states[i]
         )
@@ -61,7 +61,7 @@ def test_get_running():
     ]
 
     for i in range(len(states)):
-        storage.trial.set_any_trial_state(
+        storage.state.set_any_trial_state(
             trial_id=i,
             state=states[i]
         )
@@ -84,7 +84,7 @@ def test_get_finished():
     ]
 
     for i in range(len(states)):
-        storage.trial.set_any_trial_state(
+        storage.state.set_any_trial_state(
             trial_id=i,
             state=states[i]
         )
@@ -110,7 +110,7 @@ def test_get_num_ready():
     ]
 
     for i in range(len(states)):
-        storage.trial.set_any_trial_state(
+        storage.state.set_any_trial_state(
             trial_id=i,
             state=states[i]
         )
@@ -136,7 +136,7 @@ def test_get_num_running():
     ]
 
     for i in range(len(states)):
-        storage.trial.set_any_trial_state(
+        storage.state.set_any_trial_state(
             trial_id=i,
             state=states[i]
         )
@@ -162,7 +162,7 @@ def test_get_num_finished():
     ]
 
     for i in range(len(states)):
-        storage.trial.set_any_trial_state(
+        storage.state.set_any_trial_state(
             trial_id=i,
             state=states[i]
         )
@@ -188,7 +188,7 @@ def test_is_ready():
     ]
 
     for i in range(len(states)):
-        storage.trial.set_any_trial_state(
+        storage.state.set_any_trial_state(
             trial_id=i,
             state=states[i]
         )
@@ -218,7 +218,7 @@ def test_is_running():
     ]
 
     for i in range(len(states)):
-        storage.trial.set_any_trial_state(
+        storage.state.set_any_trial_state(
             trial_id=i,
             state=states[i]
         )
@@ -248,7 +248,7 @@ def test_is_finished():
     ]
 
     for i in range(len(states)):
-        storage.trial.set_any_trial_state(
+        storage.state.set_any_trial_state(
             trial_id=i,
             state=states[i]
         )

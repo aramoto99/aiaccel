@@ -42,7 +42,7 @@ msgstr ""
 
 #: aiaccel.storage.error.Error:1 aiaccel.storage.hp.Hp:1
 #: aiaccel.storage.jobstate.JobState:1 aiaccel.storage.result.Result:1
-#: aiaccel.storage.timestamp.TimeStamp:1 aiaccel.storage.trial.Trial:1
+#: aiaccel.storage.timestamp.TimeStamp:1 aiaccel.storage.state.Trial:1
 #: aiaccel.storage.variable.Variable:1 of
 msgid "ベースクラス: :py:class:`~aiaccel.storage.abstract.Abstract`"
 msgstr ""
@@ -50,7 +50,7 @@ msgstr ""
 #: aiaccel.storage.error.Error.all_delete:1 aiaccel.storage.hp.Hp.all_delete:1
 #: aiaccel.storage.result.Result.all_delete:1
 #: aiaccel.storage.timestamp.TimeStamp.all_delete:1
-#: aiaccel.storage.trial.Trial.all_delete:1
+#: aiaccel.storage.state.Trial.all_delete:1
 #: aiaccel.storage.variable.Variable.all_delete:1 of
 msgid "Clear table"
 msgstr ""
@@ -92,14 +92,14 @@ msgstr ""
 #: aiaccel.storage.timestamp.TimeStamp.get_any_trial_start_time
 #: aiaccel.storage.timestamp.TimeStamp.set_any_trial_end_time
 #: aiaccel.storage.timestamp.TimeStamp.set_any_trial_start_time
-#: aiaccel.storage.trial.Trial.all_delete
-#: aiaccel.storage.trial.Trial.get_all_trial_id
-#: aiaccel.storage.trial.Trial.get_any_state_list
-#: aiaccel.storage.trial.Trial.get_any_trial_state
-#: aiaccel.storage.trial.Trial.get_finished
-#: aiaccel.storage.trial.Trial.get_ready
-#: aiaccel.storage.trial.Trial.get_running
-#: aiaccel.storage.trial.Trial.set_any_trial_state
+#: aiaccel.storage.state.Trial.all_delete
+#: aiaccel.storage.state.Trial.get_all_trial_id
+#: aiaccel.storage.state.Trial.get_any_state_list
+#: aiaccel.storage.state.Trial.get_any_trial_state
+#: aiaccel.storage.state.Trial.get_finished
+#: aiaccel.storage.state.Trial.get_ready
+#: aiaccel.storage.state.Trial.get_running
+#: aiaccel.storage.state.Trial.set_any_trial_state
 #: aiaccel.storage.variable.Variable.all_delete of
 msgid "戻り値"
 msgstr ""
@@ -117,8 +117,8 @@ msgstr ""
 #: aiaccel.storage.timestamp.TimeStamp.all_delete:3
 #: aiaccel.storage.timestamp.TimeStamp.set_any_trial_end_time:8
 #: aiaccel.storage.timestamp.TimeStamp.set_any_trial_start_time:8
-#: aiaccel.storage.trial.Trial.all_delete:3
-#: aiaccel.storage.trial.Trial.set_any_trial_state:8
+#: aiaccel.storage.state.Trial.all_delete:3
+#: aiaccel.storage.state.Trial.set_any_trial_state:8
 #: aiaccel.storage.variable.Variable.all_delete:3 of
 msgid "None"
 msgstr ""
@@ -149,9 +149,9 @@ msgstr ""
 #: aiaccel.storage.timestamp.TimeStamp.get_any_trial_start_time
 #: aiaccel.storage.timestamp.TimeStamp.set_any_trial_end_time
 #: aiaccel.storage.timestamp.TimeStamp.set_any_trial_start_time
-#: aiaccel.storage.trial.Trial.get_any_state_list
-#: aiaccel.storage.trial.Trial.get_any_trial_state
-#: aiaccel.storage.trial.Trial.set_any_trial_state of
+#: aiaccel.storage.state.Trial.get_any_state_list
+#: aiaccel.storage.state.Trial.get_any_trial_state
+#: aiaccel.storage.state.Trial.set_any_trial_state of
 msgid "パラメータ"
 msgstr ""
 
@@ -173,8 +173,8 @@ msgstr ""
 #: aiaccel.storage.timestamp.TimeStamp.get_any_trial_start_time:3
 #: aiaccel.storage.timestamp.TimeStamp.set_any_trial_end_time:3
 #: aiaccel.storage.timestamp.TimeStamp.set_any_trial_start_time:3
-#: aiaccel.storage.trial.Trial.get_any_trial_state:3
-#: aiaccel.storage.trial.Trial.set_any_trial_state:3 of
+#: aiaccel.storage.state.Trial.get_any_trial_state:3
+#: aiaccel.storage.state.Trial.set_any_trial_state:3 of
 msgid "Any trial id"
 msgstr ""
 
@@ -199,9 +199,9 @@ msgstr ""
 #: aiaccel.storage.storage.Storage.get_running
 #: aiaccel.storage.timestamp.TimeStamp.get_any_trial_end_time
 #: aiaccel.storage.timestamp.TimeStamp.get_any_trial_start_time
-#: aiaccel.storage.trial.Trial.get_all_trial_id
-#: aiaccel.storage.trial.Trial.get_any_state_list
-#: aiaccel.storage.trial.Trial.get_any_trial_state of
+#: aiaccel.storage.state.Trial.get_all_trial_id
+#: aiaccel.storage.state.Trial.get_any_state_list
+#: aiaccel.storage.state.Trial.get_any_trial_state of
 msgid "戻り値の型"
 msgstr ""
 
@@ -250,7 +250,7 @@ msgid "Hyperparameter data type"
 msgstr ""
 
 #: aiaccel.storage.hp.Hp.set_any_trial_param:12 of
-msgid "TrialTable | None"
+msgid "StateTable | None"
 msgstr ""
 
 #: ../../source/api_reference/aiaccel.storage.rst:32
@@ -292,7 +292,7 @@ msgstr ""
 
 #: aiaccel.storage.model.ErrorTable:1 aiaccel.storage.model.HpTable:1
 #: aiaccel.storage.model.JobStateTable:1 aiaccel.storage.model.ResultTable:1
-#: aiaccel.storage.model.TimestampTable:1 aiaccel.storage.model.TrialTable:1
+#: aiaccel.storage.model.TimestampTable:1 aiaccel.storage.model.StateTable:1
 #: aiaccel.storage.model.VariableTable:1 of
 msgid "ベースクラス: :py:class:`~sqlalchemy.orm.decl_api.Base`"
 msgstr ""
@@ -498,47 +498,47 @@ msgstr ""
 msgid "aiaccel.storage.trial module"
 msgstr ""
 
-#: aiaccel.storage.trial.Trial.get_all_trial_id:1 of
+#: aiaccel.storage.state.Trial.get_all_trial_id:1 of
 msgid "A list of trial ids."
 msgstr ""
 
-#: aiaccel.storage.trial.Trial.get_any_state_list:1 of
+#: aiaccel.storage.state.Trial.get_any_state_list:1 of
 msgid "Get any trials numbers."
 msgstr ""
 
-#: aiaccel.storage.trial.Trial.get_any_state_list:3
-#: aiaccel.storage.trial.Trial.get_any_trial_state:6
-#: aiaccel.storage.trial.Trial.set_any_trial_state:5 of
+#: aiaccel.storage.state.Trial.get_any_state_list:3
+#: aiaccel.storage.state.Trial.get_any_trial_state:6
+#: aiaccel.storage.state.Trial.set_any_trial_state:5 of
 msgid "Trial state."
 msgstr ""
 
-#: aiaccel.storage.trial.Trial.get_any_state_list:6 of
+#: aiaccel.storage.state.Trial.get_any_state_list:6 of
 msgid "A list of trial ids. None if no trials match the specified state."
 msgstr ""
 
-#: aiaccel.storage.trial.Trial.get_any_trial_state:1 of
+#: aiaccel.storage.state.Trial.get_any_trial_state:1 of
 msgid "Get any trials state."
 msgstr ""
 
-#: aiaccel.storage.trial.Trial.get_finished:1 of
+#: aiaccel.storage.state.Trial.get_finished:1 of
 msgid "Get the trial id whose status is finished."
 msgstr ""
 
-#: aiaccel.storage.trial.Trial.get_finished:3
-#: aiaccel.storage.trial.Trial.get_ready:3
-#: aiaccel.storage.trial.Trial.get_running:3 of
+#: aiaccel.storage.state.Trial.get_finished:3
+#: aiaccel.storage.state.Trial.get_ready:3
+#: aiaccel.storage.state.Trial.get_running:3 of
 msgid "trial ids(list[int])"
 msgstr ""
 
-#: aiaccel.storage.trial.Trial.get_ready:1 of
+#: aiaccel.storage.state.Trial.get_ready:1 of
 msgid "Get the trial id whose status is ready."
 msgstr ""
 
-#: aiaccel.storage.trial.Trial.get_running:1 of
+#: aiaccel.storage.state.Trial.get_running:1 of
 msgid "Get the trial id whose status is running."
 msgstr ""
 
-#: aiaccel.storage.trial.Trial.set_any_trial_state:1 of
+#: aiaccel.storage.state.Trial.set_any_trial_state:1 of
 msgid "Set any trials numbers."
 msgstr ""
 

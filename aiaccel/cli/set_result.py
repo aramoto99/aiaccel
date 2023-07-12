@@ -12,8 +12,8 @@ def write_results_to_database(
     storage_file_path: str | Path,
     trial_id: int,
     objective: float | None,
-    start_time: str | None,
-    end_time: str | None,
+    start_time: str,
+    end_time: str,
     error: str,
     returncode: int | None,
 ) -> None:
@@ -24,10 +24,11 @@ def write_results_to_database(
         raise Exception("Could not get objective")
     storage.result.set_any_trial_objective(trial_id, objective)
 
-    if start_time is not None:
-        storage.timestamp.set_any_trial_start_time(trial_id, start_time)
-    if end_time is not None:
-        storage.timestamp.set_any_trial_end_time(trial_id, end_time)
+    storage.timestamp.set_any_trial_start_time_and_end_time(trial_id, start_time, end_time)
+    # if start_time is not None:
+    #     storage.timestamp.set_any_trial_start_time(trial_id, start_time)
+    # if end_time is not None:
+    #     storage.timestamp.set_any_trial_end_time(trial_id, end_time)
     if returncode is not None:
         storage.returncode.set_any_trial_returncode(trial_id, returncode)
     if error != "":

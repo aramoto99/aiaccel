@@ -9,14 +9,14 @@ from aiaccel.storage.model import (
     JobStateTable,
     ResultTable,
     ReturnCodeTable,
+    StateTable,
     TimestampTable,
-    TrialTable,
     VariableTable,
 )
 from aiaccel.storage.result import Result
+from aiaccel.storage.state import State
 from aiaccel.storage.storage import Storage
 from aiaccel.storage.timestamp import TimeStamp
-from aiaccel.storage.trial import Trial
 from aiaccel.storage.variable import Serializer, Value, Variable
 
 __all__ = [
@@ -35,8 +35,8 @@ __all__ = [
     "Storage",
     "TimeStamp",
     "TimestampTable",
-    "Trial",
-    "TrialTable",
+    "State",
+    "StateTable",
     "Variable",
     "VariableTable",
     "Value",

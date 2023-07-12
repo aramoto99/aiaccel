@@ -8,8 +8,8 @@ from aiaccel.storage.hp import Hp
 from aiaccel.storage.jobstate import JobState
 from aiaccel.storage.result import Result
 from aiaccel.storage.returncode import ReturnCode
+from aiaccel.storage.state import State
 from aiaccel.storage.timestamp import TimeStamp
-from aiaccel.storage.trial import Trial
 from aiaccel.storage.variable import Serializer
 
 
@@ -18,7 +18,7 @@ class Storage:
 
     def __init__(self, _db_path: Path | str) -> None:
         self.db_path = Path(_db_path)
-        self.trial = Trial(self.db_path)
+        self.state = State(self.db_path)
         self.hp = Hp(self.db_path)
         self.result = Result(self.db_path)
         self.returncode = ReturnCode(self.db_path)
@@ -37,7 +37,7 @@ class Storage:
             Refuctoring
         """
 
-        trial_ids = self.trial.get_all_trial_id()
+        trial_ids = self.state.get_all_trial_id()
         if trial_ids is None or len(trial_ids) == 0:
             return None
 
@@ -49,7 +49,7 @@ class Storage:
         Returns:
             trial_ids (list): trial ids in ready states
         """
-        return self.trial.get_ready()
+        return self.state.get_ready()
 
     def get_running(self) -> list[Any]:
         """Get a trial number for the running state.
@@ -57,7 +57,7 @@ class Storage:
         Returns:
             trial_ids (list): trial ids in running states
         """
-        return self.trial.get_running()
+        return self.state.get_running()
 
     def get_finished(self) -> list[Any]:
         """Get a trial number for the finished state.
@@ -65,7 +65,7 @@ class Storage:
         Returns:
             trial_ids (list): trial ids in finished states
         """
-        return self.trial.get_finished()
+        return self.state.get_finished()
 
     def get_num_ready(self) -> int:
         """Get the number of trials in the ready state.
@@ -73,7 +73,7 @@ class Storage:
         Returns:
             int: number of ready state in trials
         """
-        return len(self.trial.get_ready())
+        return len(self.state.get_ready())
 
     def get_num_running(self) -> int:
         """Get the number of trials in the running state.
@@ -81,7 +81,7 @@ class Storage:
         Returns:
             int: number of running state in trials
         """
-        return len(self.trial.get_running())
+        return len(self.state.get_running())
 
     def get_num_finished(self) -> int:
         """Get the number of trials in the finished state.
@@ -89,7 +89,7 @@ class Storage:
         Returns:
             int: number of finished state in trials
         """
-        return len(self.trial.get_finished())
+        return len(self.state.get_finished())
 
     def get_num_running_ready_finished(self) -> tuple[int, int, int]:
         """Get the number of trials in the all state.
@@ -97,7 +97,7 @@ class Storage:
         Returns:
             int: number of all state in trials
         """
-        return self.trial.get_num_running_ready_finished()
+        return self.state.get_num_running_ready_finished()
 
     def is_ready(self, trial_id: int) -> bool:
         """Whether the specified trial ID is ready or not.
@@ -108,7 +108,7 @@ class Storage:
         Returns:
             bool
         """
-        return trial_id in self.trial.get_ready()
+        return trial_id in self.state.get_ready()
 
     def is_running(self, trial_id: int) -> bool:
         """Whether the specified trial ID is running or not.
@@ -119,7 +119,7 @@ class Storage:
         Returns:
             bool
         """
-        return trial_id in self.trial.get_running()
+        return trial_id in self.state.get_running()
 
     def is_finished(self, trial_id: int) -> bool:
         """Whether the specified trial ID is finished or not.
@@ -130,7 +130,7 @@ class Storage:
         Returns:
             bool
         """
-        return trial_id in self.trial.get_finished()
+        return trial_id in self.state.get_finished()
 
     def get_hp_dict(self, trial_id: Any) -> Any:
         """Obtain information on a specified trial in dict.
@@ -280,7 +280,7 @@ class Storage:
         self.result.delete_any_trial_objective(trial_id)
         self.variable.delete_any_trial_variable(trial_id)
         self.timestamp.delete_any_trial_timestamp(trial_id)
-        self.trial.delete_any_trial_state(trial_id)
+        self.state.delete_any_trial_state(trial_id)
         self.hp.delete_any_trial_params(trial_id)
 
     def rollback_to_ready(self, trial_id: int) -> None:
@@ -291,4 +291,4 @@ class Storage:
         self.jobstate.delete_any_trial_jobstate(trial_id)
         self.result.delete_any_trial_objective(trial_id)
         self.hp.delete_any_trial_params(trial_id)
-        self.trial.delete_any_trial_state(trial_id)
+        self.state.delete_any_trial_state(trial_id)

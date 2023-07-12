@@ -25,7 +25,7 @@ class Hp(Abstract):
             param_type (str)  : Hyperparameter data type
 
         Returns:
-            TrialTable | None
+            StateTable | None
         """
         with self.create_session() as session:
             try:

@@ -98,7 +98,7 @@ class TestNelderMead(BaseTest):
                     param_value=0.0,
                     param_type='uniform_float'
                 )
-        storage.trial.set_any_trial_state(trial_id=1, state='finished')
+        storage.state.set_any_trial_state(trial_id=1, state='finished')
         #
         # c = load_yaml(work_dir.joinpath(dict_hp_finished, '001.hp'))
         #

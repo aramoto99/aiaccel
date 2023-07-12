@@ -171,7 +171,7 @@ class TestModel(BaseTest):
         #     {'name': '2 python user.py --trial_id 0 --config config.yaml --x1=1.0 --x2=1.0', }
         # )
         self.job.trial_id = 99
-        self.job.scheduler.storage.trial.set_any_trial_state(self.job.trial_id, 'running')
+        self.job.scheduler.storage.state.set_any_trial_state(self.job.trial_id, 'running')
         assert self.model.conditions_job_confirmed(self.job)
 
     def test_after_result(self, database_remove):
@@ -210,14 +210,14 @@ class TestModel(BaseTest):
             )
         assert self.model.before_finished(self.job) is None
 
-        # self.job.storage.trial.all_delete()
+        # self.job.storage.state.all_delete()
         # self.job.storage.hp.all_delete()
 
         # setup_hp_running(1)
         # setup_result(1)
 
         for i in range(10):
-            self.job.storage.trial.set_any_trial_state(trial_id=i, state='finished')
+            self.job.storage.state.set_any_trial_state(trial_id=i, state='finished')
             self.job.storage.hp.set_any_trial_params(
                 trial_id=i,
                 params=[

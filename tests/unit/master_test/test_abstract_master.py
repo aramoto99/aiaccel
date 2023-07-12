@@ -75,7 +75,7 @@ class TestAbstractMaster(BaseTest):
         master = AbstractMaster(self.load_config_for_test(self.configs["config.json"]))
 
         for i in range(10):
-            master.storage.trial.set_any_trial_state(trial_id=i, state='finished')
+            master.storage.state.set_any_trial_state(trial_id=i, state='finished')
             master.storage.result.set_any_trial_objective(trial_id=i, objective=([i * 10.0]))
             for j in range(2):
                 master.storage.hp.set_any_trial_param(
@@ -121,7 +121,7 @@ class TestAbstractMaster(BaseTest):
 
         master.trial_number = 10
         for i in range(10):
-            master.storage.trial.set_any_trial_state(trial_id=i, state='finished')
+            master.storage.state.set_any_trial_state(trial_id=i, state='finished')
         # setup_hp_finished(10)
         master.update_each_state_count()
         assert not master.run_in_main_loop()
