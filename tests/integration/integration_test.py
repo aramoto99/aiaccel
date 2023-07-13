@@ -4,7 +4,6 @@ from pathlib import Path
 
 import yaml
 
-from aiaccel.common import dict_result, file_final_result
 from aiaccel.config import is_multi_objective, load_config
 from aiaccel.scheduler import LocalScheduler, PylocalScheduler, create_scheduler
 from aiaccel.storage import Storage
