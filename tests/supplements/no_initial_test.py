@@ -14,18 +14,19 @@ class NoInitialTest(BaseTest):
     search_algorithm = None
 
     def test_run(self, work_dir, create_tmp_config):
-        test_data_dir = Path(__file__).resolve().parent.joinpath('no_initial_test_benchmark', 'test_data')
-        config_file = test_data_dir.joinpath('config_{}.yaml'.format(self.search_algorithm))
+        test_data_dir = Path(__file__).resolve().parent.joinpath("no_initial_test_benchmark", "test_data")
+        config_file = test_data_dir.joinpath("config_{}.yaml".format(self.search_algorithm))
         config_file = create_tmp_config(config_file)
         config = load_config(config_file)
-        python_file = test_data_dir.joinpath('user.py')
+        python_file = test_data_dir.joinpath("user.py")
 
         workspace = Workspace(config.generic.workspace)
         storage = Storage(workspace.storage_file_path)
 
         with self.create_main(python_file):
-            subprocess.Popen(['aiaccel-start', '--config', str(config_file), '--clean']
-                             ).wait(timeout=config.job_setting.job_timeout_seconds)
+            subprocess.Popen(["aiaccel-start", "--config", str(config_file), "--clean"]).wait(
+                timeout=config.job_setting.job_timeout_seconds
+            )
         self.evaluate(work_dir, config, storage)
 
     def evaluate(self, work_dir, config, storage):

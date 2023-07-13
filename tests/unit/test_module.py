@@ -23,26 +23,29 @@ async def delay_make_directory(sleep_time, d):
 
 def dummy_break():
     import sys
+
     sys.exit()
 
 
 class TestAbstractModule(BaseTest):
-
     @pytest.fixture(autouse=True)
     def setup_module(self, clean_work_dir):
-        self.module = AbstractModule(self.load_config_for_test(self.configs["config.json"]), 'abstract')
+        self.module = AbstractModule(self.load_config_for_test(self.configs["config.json"]), "abstract")
         self.module.logger = logging.getLogger(__name__)
         yield
         self.module = None
 
     def test_set_logger(self, work_dir):
-        assert self.module.set_logger(
-            'root.optimizer',
-            work_dir.joinpath(self.module.workspace.log, self.module.config.logger.file.optimizer),
-            self.module.config.logger.log_level.optimizer,
-             self.module.config.logger.stream_level.optimizer,
-            'Optimizer'
-        ) is None
+        assert (
+            self.module.set_logger(
+                "root.optimizer",
+                work_dir.joinpath(self.module.workspace.log, self.module.config.logger.file.optimizer),
+                self.module.config.logger.log_level.optimizer,
+                self.module.config.logger.stream_level.optimizer,
+                "Optimizer",
+            )
+            is None
+        )
 
     def test_pre_process(self):
         try:

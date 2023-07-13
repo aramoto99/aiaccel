@@ -10,7 +10,7 @@ name_rng = np.random.RandomState()
 
 
 class Vertex:
-    def __init__(self, xs: np.ndarray[Any, Any], value: Any=None) -> None:
+    def __init__(self, xs: np.ndarray[Any, Any], value: Any = None) -> None:
         self.xs: np.ndarray[Any, Any] = xs
         self.value: Any = value
         self.id: str = self.generate_random_name()

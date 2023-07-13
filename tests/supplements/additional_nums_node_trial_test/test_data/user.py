@@ -11,6 +11,6 @@ def main(p: dict[str, float | int]) -> float:
     return y
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     run = Run()
     run.execute_and_report(main)

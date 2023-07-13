@@ -15,7 +15,7 @@ def test_plot(clean_work_dir, work_dir, create_tmp_config):
         workspace.clean()
     workspace.create()
 
-    config_path = Path('tests/test_data/config.json')
+    config_path = Path("tests/test_data/config.json")
     config_path = create_tmp_config(config_path)
     config = load_config(config_path)
     config.optimize.goal = ["minimize"]
@@ -29,26 +29,23 @@ def test_plot(clean_work_dir, work_dir, create_tmp_config):
     objective = [0.01]
 
     storage = Storage(workspace.storage_file_path)
-    storage.result.set_any_trial_objective(
-        trial_id=trial_id,
-        objective=objective
-    )
+    storage.result.set_any_trial_objective(trial_id=trial_id, objective=objective)
 
     plotter = Plotter(config)
     assert plotter.plot() is None
 
     # len(objectives) == 0
-    with patch.object(plotter.storage.result, 'get_objectives', return_value=[]):
+    with patch.object(plotter.storage.result, "get_objectives", return_value=[]):
         assert plotter.plot() is None
 
     # len(objectives) != len(bests)
-    with patch.object(plotter.storage.result, 'get_objectives', return_value=[[1], [2], [3]]):
-        with patch.object(plotter.storage.result, 'get_bests', return_value=[1, 2, 3, 4]):
+    with patch.object(plotter.storage.result, "get_objectives", return_value=[[1], [2], [3]]):
+        with patch.object(plotter.storage.result, "get_bests", return_value=[1, 2, 3, 4]):
             assert plotter.plot() is None
 
     # self.cplt.set_colors
     # self.cplt.caption
     # self.cplt.line_plot
-    with patch.object(plotter.storage.result, 'get_objectives', return_value=[[1], [2], [3]]):
-        with patch.object(plotter.storage.result, 'get_bests', return_value=[1, 2, 3]):
+    with patch.object(plotter.storage.result, "get_objectives", return_value=[[1], [2], [3]]):
+        with patch.object(plotter.storage.result, "get_bests", return_value=[1, 2, 3]):
             assert plotter.plot() is None

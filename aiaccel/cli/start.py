@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import os
-import pathlib
 import shutil
 import time
 from argparse import ArgumentParser
@@ -15,7 +14,6 @@ import yaml
 from aiaccel.cli import CsvWriter
 from aiaccel.common import datetime_format, dict_result, extension_hp
 from aiaccel.config import Config, load_config
-from aiaccel.module import AbstractModule, AiaccelCore
 from aiaccel.optimizer import create_optimizer
 from aiaccel.scheduler import create_scheduler
 from aiaccel.storage import Storage
@@ -78,7 +76,7 @@ def main() -> None:  # pragma: no cover
     # tensorboard
     tensorboard = TensorBoard(config)
 
-    modules: list[AbstractModule] = [scheduler]
+    modules = [scheduler]
 
     time_s = time.time()
     max_trial_number = config.optimize.trial_number

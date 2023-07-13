@@ -20,15 +20,12 @@ class TestTpeOptimizer(BaseTest):
     @pytest.fixture(autouse=True)
     def setup_optimizer(self, data_dir, create_tmp_config):
         self.data_dir = data_dir
-        self.optimizer = TpeOptimizer(self.load_config_for_test(self.configs['config_tpe.json']))
+        self.optimizer = TpeOptimizer(self.load_config_for_test(self.configs["config_tpe.json"]))
         yield
         self.optimizer = None
 
-
     def test_check_result(self):
-        with patch.object(
-            self.optimizer.storage.result, "get_any_trial_objective", return_value=[1]
-        ):
+        with patch.object(self.optimizer.storage.result, "get_any_trial_objective", return_value=[1]):
             assert self.optimizer.check_result() is None
 
     def test_is_startup_trials(self):
@@ -75,17 +72,17 @@ class TestTpeOptimizer(BaseTest):
 
 
 def test_create_distributions(data_dir):
-    config = load_config(data_dir / 'config_tpe_2.json')
+    config = load_config(data_dir / "config_tpe_2.json")
     params = HyperParameterConfiguration(config.optimize.parameters)
     dist = create_distributions(params)
     assert type(dist) is dict
 
-    config = load_config(data_dir / 'config_tpe_categorical.json')
+    config = load_config(data_dir / "config_tpe_categorical.json")
     params = HyperParameterConfiguration(config.optimize.parameters)
     dist = create_distributions(params)
     assert type(dist) is dict
 
-    config = load_config(data_dir / 'config_tpe_invalid_type.json')
+    config = load_config(data_dir / "config_tpe_invalid_type.json")
 
     with pytest.raises(TypeError):
         params = HyperParameterConfiguration(config.optimize.parameters)

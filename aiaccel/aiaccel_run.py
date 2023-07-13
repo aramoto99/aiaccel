@@ -9,13 +9,8 @@ from pathlib import Path
 from typing import Any
 
 from aiaccel.config import load_config
-from aiaccel.parameter import (
-    CategoricalParameter,
-    FloatParameter,
-    HyperParameterConfiguration,
-    IntParameter,
-    OrdinalParameter,
-)
+from aiaccel.parameter import (CategoricalParameter, FloatParameter, HyperParameterConfiguration, IntParameter,
+                               OrdinalParameter)
 from aiaccel.util.data_type import str_or_float_or_int
 
 

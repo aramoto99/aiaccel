@@ -130,10 +130,7 @@ class AbstractOptimizer(AiaccelCore):
         config_params: dict[str, Parameter] = self.params.get_parameter_dict()
         for new_param in new_params:
             name = str(new_param["name"])
-            if (
-                isinstance(config_params[name], IntParameter) or
-                isinstance(config_params[name], ConvertedIntParameter)
-            ):
+            if isinstance(config_params[name], IntParameter) or isinstance(config_params[name], ConvertedIntParameter):
                 new_param["value"] = int(new_param["value"])
         return new_params
 

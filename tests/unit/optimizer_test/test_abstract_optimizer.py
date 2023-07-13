@@ -22,7 +22,6 @@ async def make_directory(sleep_time, d):
 
 
 class TestAbstractOptimizer(BaseTest):
-
     @pytest.fixture(autouse=True)
     def setup_optimizer(self, clean_work_dir):
         self.optimizer = AbstractOptimizer(self.load_config_for_test(self.configs["config.json"]))
@@ -31,25 +30,25 @@ class TestAbstractOptimizer(BaseTest):
 
     def test_register_new_parameters(self):
         params = [
-            {'name': 'x1', 'type': 'uniform_float', 'value': 0.1},
-            {'name': 'x2', 'type': 'uniform_float', 'value': 0.1}
+            {"name": "x1", "type": "uniform_float", "value": 0.1},
+            {"name": "x2", "type": "uniform_float", "value": 0.1},
         ]
 
         assert self.optimizer.register_new_parameters(params) is None
 
     def test_generate_initial_parameter(self):
-        with patch.object(self.optimizer.params, 'sample', return_value=[]):
+        with patch.object(self.optimizer.params, "sample", return_value=[]):
             assert self.optimizer.generate_initial_parameter() == []
 
         p = [
-            {'name': "x1", 'type': 'uniform_float', 'value': 1.0},
-            {'name': "x2", 'type': 'uniform_float', 'value': 2.0},
+            {"name": "x1", "type": "uniform_float", "value": 1.0},
+            {"name": "x2", "type": "uniform_float", "value": 2.0},
         ]
 
-        with patch.object(self.optimizer.params, 'sample', return_value=p):
+        with patch.object(self.optimizer.params, "sample", return_value=p):
             assert self.optimizer.generate_initial_parameter() == [
-                {'name': 'x1', 'type': 'uniform_float', 'value': 1.0},
-                {'name': 'x2', 'type': 'uniform_float', 'value': 2.0}
+                {"name": "x1", "type": "uniform_float", "value": 1.0},
+                {"name": "x2", "type": "uniform_float", "value": 2.0},
             ]
 
     def test_generate_parameter(self) -> None:
@@ -58,12 +57,12 @@ class TestAbstractOptimizer(BaseTest):
 
     def test_generate_new_parameter(self, monkeypatch: pytest.MonkeyPatch) -> None:
         with monkeypatch.context() as m:
-            m.setattr(self.optimizer, 'num_of_generated_parameter', 0)
-            m.setattr(self.optimizer, 'generate_initial_parameter', lambda: None)
+            m.setattr(self.optimizer, "num_of_generated_parameter", 0)
+            m.setattr(self.optimizer, "generate_initial_parameter", lambda: None)
             assert self.optimizer.generate_new_parameter() is None
 
-            m.setattr(self.optimizer, 'num_of_generated_parameter', 1)
-            m.setattr(self.optimizer, 'generate_parameter', lambda: None)
+            m.setattr(self.optimizer, "num_of_generated_parameter", 1)
+            m.setattr(self.optimizer, "generate_parameter", lambda: None)
             assert self.optimizer.generate_new_parameter() is None
 
     def test_is_error_free(self):

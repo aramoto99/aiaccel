@@ -4,6 +4,7 @@ from subprocess import PIPE
 
 from aiaccel.util import OutputHandler
 
+
 '''
 def test_ps2joblist(fake_process):
     """
@@ -72,7 +73,7 @@ def test_ps2joblist(fake_process):
 
 
 def test_OutputHandler():
-    _ouputhandler = OutputHandler(subprocess.Popen('ls', stdout=PIPE))
+    _ouputhandler = OutputHandler(subprocess.Popen("ls", stdout=PIPE))
 
     _ouputhandler._abort = False
 
@@ -82,5 +83,5 @@ def test_OutputHandler():
     _ouputhandler._abort = False
     assert _ouputhandler.run() is None
 
-    _ouputhandler = OutputHandler(subprocess.Popen('ls', stdout=None))
+    _ouputhandler = OutputHandler(subprocess.Popen("ls", stdout=None))
     assert _ouputhandler.run() is None

@@ -2,17 +2,8 @@ from aiaccel.storage.abstract import Abstract
 from aiaccel.storage.error import Error
 from aiaccel.storage.hp import Hp
 from aiaccel.storage.jobstate import JobState
-from aiaccel.storage.model import (
-    Base,
-    ErrorTable,
-    HpTable,
-    JobStateTable,
-    ResultTable,
-    ReturnCodeTable,
-    StateTable,
-    TimestampTable,
-    VariableTable,
-)
+from aiaccel.storage.model import (Base, ErrorTable, HpTable, JobStateTable, ResultTable, ReturnCodeTable, StateTable,
+                                   TimestampTable, VariableTable)
 from aiaccel.storage.result import Result
 from aiaccel.storage.state import State
 from aiaccel.storage.storage import Storage

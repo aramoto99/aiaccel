@@ -21,15 +21,14 @@ async def make_directory(sleep_time, d):
     os.mkdir(d)
 
 
-
-'''
+"""
 def test_create_stat():
     assert create_stat(1, 'name') == {
         'job-ID': 1, 'prior': None, 'name': 'name', 'user': None, 'state': 'r',
         'submit/start at': None, 'queue': None, 'jclass': '', 'slots': None,
         'ja-task-ID': None
     }
-'''
+"""
 
 
 class TestAbstractScheduler(BaseTest):

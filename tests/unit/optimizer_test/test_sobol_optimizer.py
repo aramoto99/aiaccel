@@ -7,7 +7,6 @@ from tests.base_test import BaseTest
 
 
 class TestSobolOptimizer(BaseTest):
-
     @pytest.fixture(autouse=True)
     def setup_optimizer(self, data_dir, create_tmp_config):
         self.data_dir = data_dir
