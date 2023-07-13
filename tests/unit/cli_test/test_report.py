@@ -42,7 +42,7 @@ def test_report(clean_work_dir, work_dir, create_tmp_config):
         ],
         'result': -0.2433042724186567
     }
-    with patch.object(csv_writer.storage.trial, 'get_finished', return_value=[0]):
+    with patch.object(csv_writer.storage.state, 'get_finished', return_value=[0]):
         with patch.object(csv_writer.storage, 'get_hp_dict', return_value=hp):
             assert csv_writer.create() is None
 

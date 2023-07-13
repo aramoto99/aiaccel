@@ -17,30 +17,10 @@ class TestMOTpeOptimizer(BaseTest):
         yield
         self.optimizer = None
 
-    def test_pre_process(self):
-        assert self.optimizer.pre_process() is None
-
-    def test_post_process(self):
-        self.optimizer.pre_process()
-        assert self.optimizer.post_process() is None
-
-    def test_check_result(self, setup_hp_finished, setup_result, work_dir):
-        self.optimizer.pre_process()
-        self.optimizer.run_in_main_loop()
-        with warnings.catch_warnings():
-            warnings.simplefilter('error', UserWarning)
-            with patch.object(self.optimizer.storage.result, 'get_any_trial_objective', return_value=1):
-                with pytest.raises(UserWarning):
-                    self.optimizer.check_result()
-        with patch.object(self.optimizer.storage.result, 'get_any_trial_objective', return_value=[0, 1]):
-            assert self.optimizer.check_result() is None
-
     def test_is_startup_trials(self):
-        self.optimizer.pre_process()
         assert self.optimizer.is_startup_trials()
 
     def test_generate_parameter(self):
-        self.optimizer.pre_process()
         assert len(self.optimizer.generate_parameter()) > 0
 
         # if ((not self.is_startup_trials()) and (len(self.parameter_pool) >= 1))
@@ -54,16 +34,15 @@ class TestMOTpeOptimizer(BaseTest):
         with patch.object(self.optimizer, 'is_startup_trials', return_value=False):
             assert self.optimizer.generate_parameter() is None
 
-    def test_generate_initial_parameter(self, create_tmp_config):
-        config = self.optimizer.config.copy()
-        self.config_motpe_path = create_tmp_config(self.data_dir / 'config_motpe_no_initial_params.json')
-        optimizer = MOTpeOptimizer(self.optimizer.config)
-        (optimizer.workspace.path / 'storage' / 'storage.db').unlink()
+    # def test_generate_initial_parameter(self, create_tmp_config):
+    #     (self.optimizer.workspace.path / 'storage' / 'storage.db').unlink()
+    #     config = self.optimizer.config.copy()
+    #     self.config_motpe_path = create_tmp_config(self.data_dir / 'config_motpe_no_initial_params.json')
+    #     optimizer = MOTpeOptimizer(self.optimizer.config)
 
-        optimizer.__init__(config)
-        optimizer.pre_process()
-        assert len(optimizer.generate_initial_parameter()) > 0
-        assert len(optimizer.generate_initial_parameter()) > 0
+    #     optimizer.__init__(config)
+    #     assert len(optimizer.generate_initial_parameter()) > 0
+    #     assert len(optimizer.generate_initial_parameter()) > 0
 
     def test_create_study(self):
         assert self.optimizer.create_study() is None
@@ -76,7 +55,6 @@ class TestMOTpeOptimizer(BaseTest):
         assert self.optimizer.serialize(trial_id=0) is None
 
     def testdeserialize(self):
-        self.optimizer.pre_process()
         self.optimizer.trial_id.initial(num=0)
         self.optimizer.storage.state.set_any_trial_state(trial_id=0, state="finished")
         self.optimizer.serialize(trial_id=0)

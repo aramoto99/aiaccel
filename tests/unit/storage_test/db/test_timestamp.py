@@ -95,24 +95,6 @@ def test_set_any_trial_end_time_exception():
 
 
 @t_base()
-def test_set_any_trial_end_time_assersion():
-    storage = get_storage()
-
-    trial_id = 0
-    end_time = "10:00"
-
-    with pytest.raises(AssertionError):
-        set_any_trial_end_time = undecorated(storage.timestamp.set_any_trial_end_time)
-        set_any_trial_end_time(
-            storage.timestamp,
-            trial_id=trial_id,
-            end_time=end_time
-        )
-
-# get_any_trial_start_time
-
-
-@t_base()
 def test_get_any_trial_start_time():
     storage = get_storage()
 

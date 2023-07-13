@@ -72,9 +72,6 @@ class Workspace:
         alive (Path): Path to "alive", i.e. `path`/alive.
         error (Path): Path to "error", i.e. 'path`/error.
         hp (Path): Path to "hp", i.e. `path`/hp.
-        hp_ready (Path): Path to "ready", i.e. `path`/hp/ready.
-        hp_running (Path): Path to "running", i.e. `path`/hp/running.
-        hp_finished (Path): Path to "finished", i.e. `path`/hp/finished.
         jobstate (Path): Path to "jobstate", i.e. `path`/jobstate.
         lock (Path): Path to "lock", i.e. `path`/lock.
         log (Path): Path to "log", i.e. `path`/log.

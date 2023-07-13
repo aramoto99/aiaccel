@@ -81,10 +81,6 @@ class TpeOptimizer(AbstractOptimizer):
 
     #     self.create_study()
 
-    def post_process(self) -> None:
-        """Post-procedure after executed processes."""
-        self.check_result()
-
     def check_result(self) -> None:
         """Check the result files and add it to sampler object.
 

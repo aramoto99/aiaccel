@@ -36,7 +36,7 @@ def test_set_any_trial_state_exception():
     with pytest.raises(SQLAlchemyError):
         set_any_trial_state = undecorated(storage.state.set_any_trial_state)
         set_any_trial_state(
-            storage.trial,
+            storage.state,
             trial_id=0,
             state="ready"
         )
@@ -161,7 +161,7 @@ def test_all_delete_exception():
     init()
     with pytest.raises(SQLAlchemyError):
         all_delete = undecorated(storage.state.all_delete)
-        all_delete(storage.trial)
+        all_delete(storage.state)
 
 
 # get_ready
@@ -333,4 +333,4 @@ def test_delete_any_trial_state_exception():
     init()
     with pytest.raises(SQLAlchemyError):
         delete_any_trial_state = undecorated(storage.state.delete_any_trial_state)
-        delete_any_trial_state(storage.trial, trial_id=0)
+        delete_any_trial_state(storage.state, trial_id=0)

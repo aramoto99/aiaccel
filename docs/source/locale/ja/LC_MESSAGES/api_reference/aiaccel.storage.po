@@ -495,7 +495,7 @@ msgid "Set the specified start time for the specified trial."
 msgstr ""
 
 #: ../../source/api_reference/aiaccel.storage.rst:72
-msgid "aiaccel.storage.trial module"
+msgid "aiaccel.storage.state module"
 msgstr ""
 
 #: aiaccel.storage.state.Trial.get_all_trial_id:1 of
