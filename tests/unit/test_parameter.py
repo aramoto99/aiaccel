@@ -7,12 +7,12 @@ from tests.base_test import BaseTest
 
 class TestParameter(BaseTest):
     def test_get_parameter_list(self):
-        hp = HyperParameterConfiguration(self.load_config_for_test(self.configs["config.json"]).optimize.parameters)
+        hp = HyperParameterConfiguration(self.load_config_for_test(self.configs["config.yaml"]).optimize.parameters)
         p = hp.get_parameter_list()
         assert len(p) == 10
 
     def test_get_hyperparameter(self):
-        hp = HyperParameterConfiguration(self.load_config_for_test(self.configs["config.json"]).optimize.parameters)
+        hp = HyperParameterConfiguration(self.load_config_for_test(self.configs["config.yaml"]).optimize.parameters)
         ps = hp.get_hyperparameter("x3")
         assert ps.name == "x3"
 

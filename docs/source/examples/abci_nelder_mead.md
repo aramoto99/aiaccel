@@ -63,7 +63,7 @@ resource:
 ```yaml
 ABCI:
   group: "[group]"
-  job_script_preamble: "./job_script_preamble.sh"
+  job_script_preamble: ./job_script_preamble.sh
   job_execution_options: ""
 
 ```
@@ -188,7 +188,7 @@ source ~/optenv/bin/activate
     ```yaml
     ABCI:
         group: "[group]"
-        job_script_preamble: "./job_script_preamble.sh"
+        job_script_preamble: ./job_script_preamble.sh
         job_execution_options: ""
     ```
 

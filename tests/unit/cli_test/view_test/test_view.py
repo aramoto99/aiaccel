@@ -13,7 +13,7 @@ def test_view(clean_work_dir, work_dir, create_tmp_config):
         workspace.clean()
     workspace.create()
 
-    config_path = Path("tests/test_data/config.json")
+    config_path = Path("tests/test_data/config.yaml")
     config_path = create_tmp_config(config_path)
     config = load_config(config_path)
 

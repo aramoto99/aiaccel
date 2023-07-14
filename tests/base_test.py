@@ -72,43 +72,42 @@ class BaseTest(object):
     @pytest.fixture(autouse=True)
     def _setup(self, tmpdir, work_dir, create_tmp_config, cd_work):
         self.test_data_dir = Path(__file__).resolve().parent.joinpath("test_data")
-        self.config_json_path = create_tmp_config(self.test_data_dir.joinpath("config.json"))
+        self.config_json_path = create_tmp_config(self.test_data_dir.joinpath("config.yaml"))
 
         self.configs = {
-            "config.json": create_tmp_config(self.test_data_dir.joinpath("config.json")),
-            "config_random.json": create_tmp_config(self.test_data_dir.joinpath("config_random.json")),
-            "config_grid.json": create_tmp_config(self.test_data_dir.joinpath("config_grid.json")),
-            "config_budget-specified-grid.json": create_tmp_config(
-                self.test_data_dir.joinpath("config_budget-specified-grid.json")
+            "config.yaml": create_tmp_config(self.test_data_dir.joinpath("config.yaml")),
+            "config_random.yaml": create_tmp_config(self.test_data_dir.joinpath("config_random.yaml")),
+            "config_grid.yaml": create_tmp_config(self.test_data_dir.joinpath("config_grid.yaml")),
+            "config_budget-specified-grid.yaml": create_tmp_config(
+                self.test_data_dir.joinpath("config_budget-specified-grid.yaml")
             ),
-            "config_sobol.json": create_tmp_config(self.test_data_dir.joinpath("config_sobol.json")),
-            "config_sobol_int.json": create_tmp_config(self.test_data_dir.joinpath("config_sobol_int.json")),
-            "config_sobol_no_initial.json": create_tmp_config(
-                self.test_data_dir.joinpath("config_sobol_no_initial.json")
+            "config_sobol.yaml": create_tmp_config(self.test_data_dir.joinpath("config_sobol.yaml")),
+            "config_sobol_int.yaml": create_tmp_config(self.test_data_dir.joinpath("config_sobol_int.yaml")),
+            "config_sobol_no_initial.yaml": create_tmp_config(
+                self.test_data_dir.joinpath("config_sobol_no_initial.yaml")
             ),
-            "config_tpe.json": create_tmp_config(self.test_data_dir.joinpath("config_tpe.json")),
-            "config_tpe_2.json": create_tmp_config(self.test_data_dir.joinpath("config_tpe_2.json")),
-            "config_motpe.json": create_tmp_config(self.test_data_dir.joinpath("config_motpe.json")),
-            "config_abci_json": create_tmp_config(self.test_data_dir.joinpath("config_abci.json")),
-            "config_nelder_mead.json": create_tmp_config(self.test_data_dir.joinpath("config_nelder_mead.json")),
-            "config_nelder_mead_resumption.json": create_tmp_config(
-                self.test_data_dir.joinpath("config_nelder_mead_resumption.json")
+            "config_tpe.yaml": create_tmp_config(self.test_data_dir.joinpath("config_tpe.yaml")),
+            "config_tpe_2.yaml": create_tmp_config(self.test_data_dir.joinpath("config_tpe_2.yaml")),
+            "config_motpe.yaml": create_tmp_config(self.test_data_dir.joinpath("config_motpe.yaml")),
+            "config_nelder_mead.yaml": create_tmp_config(self.test_data_dir.joinpath("config_nelder_mead.yaml")),
+            "config_nelder_mead_resumption.yaml": create_tmp_config(
+                self.test_data_dir.joinpath("config_nelder_mead_resumption.yaml")
             ),
-            "config_random_resumption.json": create_tmp_config(
-                self.test_data_dir.joinpath("config_random_resumption.json")
+            "config_random_resumption.yaml": create_tmp_config(
+                self.test_data_dir.joinpath("config_random_resumption.yaml")
             ),
-            "config_sobol_resumption.json": create_tmp_config(
-                self.test_data_dir.joinpath("config_sobol_resumption.json")
+            "config_sobol_resumption.yaml": create_tmp_config(
+                self.test_data_dir.joinpath("config_sobol_resumption.yaml")
             ),
-            "config_tpe_resumption.json": create_tmp_config(self.test_data_dir.joinpath("config_tpe_resumption.json")),
-            "config_grid_resumption.json": create_tmp_config(
-                self.test_data_dir.joinpath("config_grid_resumption.json")
+            "config_tpe_resumption.yaml": create_tmp_config(self.test_data_dir.joinpath("config_tpe_resumption.yaml")),
+            "config_grid_resumption.yaml": create_tmp_config(
+                self.test_data_dir.joinpath("config_grid_resumption.yaml")
             ),
-            "config_budget-specified-grid_resumption.json": create_tmp_config(
-                self.test_data_dir.joinpath("config_budget-specified-grid_resumption.json")
+            "config_budget-specified-grid_resumption.yaml": create_tmp_config(
+                self.test_data_dir.joinpath("config_budget-specified-grid_resumption.yaml")
             ),
-            "config_motpe_resumption.json": create_tmp_config(
-                self.test_data_dir.joinpath("config_motpe_resumption.json")
+            "config_motpe_resumption.yaml": create_tmp_config(
+                self.test_data_dir.joinpath("config_motpe_resumption.yaml")
             ),
         }
 

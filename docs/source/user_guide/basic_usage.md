@@ -131,7 +131,7 @@ resource:
 ```yaml
 ABCI:
     group: "[group]"
-    job_script_preamble: "./job_script_preamble.sh"
+    job_script_preamble: ./job_script_preamble.sh
     job_execution_options: ""
 ```
 
@@ -383,7 +383,7 @@ resource:
 
 ABCI:
     group: "[group]"
-    job_script_preamble: "./job_script_preamble.sh"
+    job_script_preamble: ./job_script_preamble.sh
     job_execution_options: ""
 
 optimize:
@@ -541,7 +541,7 @@ resource:
 ```yaml
 ABCI:
     group: "[group]"
-    job_script_preamble: "./job_script_preamble.sh"
+    job_script_preamble: ./job_script_preamble.sh
     job_execution_options: ""
 ```
 

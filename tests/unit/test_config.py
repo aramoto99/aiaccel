@@ -7,7 +7,7 @@ from tests.base_test import BaseTest
 class TestConfig(BaseTest):
     def test_load_config(self):
         # default
-        config_path = self.test_data_dir.joinpath("config.json")
+        config_path = self.test_data_dir.joinpath("config.yaml")
         config = load_config(str(config_path))
         assert type(config) is omegaconf.dictconfig.DictConfig
         assert type(config.generic.workspace) is str
@@ -16,7 +16,7 @@ class TestConfig(BaseTest):
         assert type(config.optimize.parameters[0].lower) is float
 
         # typo config (typo trial_number)
-        config_typo_path = self.test_data_dir.joinpath("config_typo.json")
+        config_typo_path = self.test_data_dir.joinpath("config_typo.yaml")
         try:
             load_config(str(config_typo_path))
             assert False
@@ -24,7 +24,7 @@ class TestConfig(BaseTest):
             assert True
 
         # customize config (user option)
-        config_user_option_path = self.test_data_dir.joinpath("config_user_option.json")
+        config_user_option_path = self.test_data_dir.joinpath("config_user_option.yaml")
         config = load_config(str(config_user_option_path))
         # completely new item
         assert type(config) is omegaconf.dictconfig.DictConfig

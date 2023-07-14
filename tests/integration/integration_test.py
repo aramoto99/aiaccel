@@ -26,7 +26,7 @@ class IntegrationTest(BaseTest):
         #
         # is_multi_objective = isinstance(config.goal.get(), list)
 
-        config = self.load_config_for_test(self.configs["config_{}.json".format(self.search_algorithm)])
+        config = self.load_config_for_test(self.configs["config_{}.yaml".format(self.search_algorithm)])
 
         if is_multi_objective(config):
             user_main_file = self.test_data_dir.joinpath("original_main_mo.py")
@@ -50,7 +50,7 @@ class IntegrationTest(BaseTest):
         # pylocal test
         #
         with self.create_main(user_main_file):
-            config = self.load_config_for_test(self.configs["config_{}.json".format(self.search_algorithm)])
+            config = self.load_config_for_test(self.configs["config_{}.yaml".format(self.search_algorithm)])
             base_dir = Path(config.config_path).parent
             new_config_file_path = base_dir / f"config_{self.search_algorithm}_pylocal.yaml"
 

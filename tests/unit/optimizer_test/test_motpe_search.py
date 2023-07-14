@@ -12,7 +12,7 @@ class TestMOTpeOptimizer(BaseTest):
     @pytest.fixture(autouse=True)
     def setup_optimizer(self, data_dir, create_tmp_config):
         self.data_dir = data_dir
-        self.optimizer = MOTpeOptimizer(self.load_config_for_test(self.configs["config_motpe.json"]))
+        self.optimizer = MOTpeOptimizer(self.load_config_for_test(self.configs["config_motpe.yaml"]))
         yield
         self.optimizer = None
 
@@ -36,7 +36,7 @@ class TestMOTpeOptimizer(BaseTest):
     # def test_generate_initial_parameter(self, create_tmp_config):
     #     (self.optimizer.workspace.path / 'storage' / 'storage.db').unlink()
     #     config = self.optimizer.config.copy()
-    #     self.config_motpe_path = create_tmp_config(self.data_dir / 'config_motpe_no_initial_params.json')
+    #     self.config_motpe_path = create_tmp_config(self.data_dir / 'config_motpe_no_initial_params.yaml')
     #     optimizer = MOTpeOptimizer(self.optimizer.config)
 
     #     optimizer.__init__(config)

@@ -1,6 +1,6 @@
 {
   "generic": {
-    "workspace": "/tmp/work",
+    "workspace": /tmp/work,
     "job_command": "python original_main.py",
     "python_file": "original_main.py",
     "function": "main"
@@ -21,7 +21,6 @@
       {
         "name": "x1",
         "type": "uniform_float",
-        "log": false,
         "lower": -5.0,
         "upper": 5.0,
         "initial": [
@@ -38,7 +37,6 @@
       {
         "name": "x2",
         "type": "uniform_float",
-        "log": false,
         "lower": -5.0,
         "upper": 5.0,
         "initial": [
@@ -58,7 +56,6 @@
       {
         "name": "x3",
         "type": "uniform_float",
-        "log": false,
         "lower": -5.0,
         "upper": 5.0,
         "initial": [
@@ -78,7 +75,6 @@
       {
         "name": "x4",
         "type": "uniform_float",
-        "log": false,
         "lower": -5.0,
         "upper": 5.0,
         "initial": [
@@ -98,7 +94,6 @@
       {
         "name": "x5",
         "type": "uniform_float",
-        "log": false,
         "lower": -5.0,
         "upper": 5.0,
         "initial": [
@@ -118,7 +113,6 @@
       {
         "name": "x6",
         "type": "uniform_float",
-        "log": false,
         "lower": -5.0,
         "upper": 5.0,
         "initial": [
@@ -138,7 +132,6 @@
       {
         "name": "x7",
         "type": "uniform_float",
-        "log": false,
         "lower": -5.0,
         "upper": 5.0,
         "initial": [
@@ -158,7 +151,6 @@
       {
         "name": "x8",
         "type": "uniform_float",
-        "log": false,
         "lower": -5.0,
         "upper": 5.0,
         "initial": [
@@ -178,7 +170,6 @@
       {
         "name": "x9",
         "type": "uniform_float",
-        "log": false,
         "lower": -5.0,
         "upper": 5.0,
         "initial": [
@@ -198,7 +189,6 @@
       {
         "name": "x10",
         "type": "uniform_float",
-        "log": false,
         "lower": -5.0,
         "upper": 5.0,
         "initial": [

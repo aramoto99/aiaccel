@@ -11,11 +11,12 @@ from omegaconf.base import Container
 from omegaconf.dictconfig import DictConfig
 from omegaconf.listconfig import ListConfig
 
+from aiaccel.common import resource_type_abci, resource_type_local, resource_type_memory, goal_maximize, goal_minimize
 
 class ResourceType(Enum):
-    abci: str = "abci"
-    local: str = "local"
-    python_local: str = "python_local"
+    abci: str = resource_type_abci
+    local: str = resource_type_local
+    python_local: str = resource_type_memory
 
     @classmethod
     def _missing_(cls, value: Any) -> Any | None:
@@ -27,8 +28,8 @@ class ResourceType(Enum):
 
 
 class OptimizerDirection(Enum):
-    minimize: str = "minimize"
-    maximize: str = "maximize"
+    minimize: str = goal_minimize
+    maximize: str = goal_maximize
 
     @classmethod
     def _missing_(cls, value: Any) -> Any | None:

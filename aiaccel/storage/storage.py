@@ -12,6 +12,7 @@ from aiaccel.storage.state import State
 from aiaccel.storage.timestamp import TimeStamp
 from aiaccel.storage.variable import Serializer
 
+from aiaccel.common import goal_maximize, goal_minimize
 
 class Storage:
     """Database"""
@@ -191,9 +192,9 @@ class Storage:
 
         best_values = []
         for i in range(len(goals)):
-            if goals[i].lower() == "maximize":
+            if goals[i].lower() == goal_maximize:
                 best_values.append(float("-inf"))
-            elif goals[i].lower() == "minimize":
+            elif goals[i].lower() == goal_minimize:
                 best_values.append(float("inf"))
             else:
                 return None, None
@@ -222,12 +223,12 @@ class Storage:
                 best_value = best_values[i]
                 best_trial_id = best_trial_ids[i]
 
-                if goals[i].lower() == "maximize":
+                if goals[i].lower() == goal_maximize:
                     if best_value < val:
                         best_value = val
                         best_trial_id = trial_id
 
-                elif goals[i].lower() == "minimize":
+                elif goals[i].lower() == goal_minimize:
                     if best_value > val:
                         best_value = val
                         best_trial_id = trial_id

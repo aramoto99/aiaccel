@@ -6,7 +6,7 @@ from aiaccel.workspace import Workspace
 
 # db_path = pathlib.Path("test.db")
 # ws = Workspace("test_work")
-config_path = pathlib.Path("tests/test_data/config.json")
+config_path = pathlib.Path("tests/test_data/config.yaml")
 config = load_config(config_path)
 ws = Workspace(config.generic.workspace)
 db_path = pathlib.Path("test.db")

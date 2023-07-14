@@ -20,7 +20,7 @@ class TestTpeOptimizer(BaseTest):
     @pytest.fixture(autouse=True)
     def setup_optimizer(self, data_dir, create_tmp_config):
         self.data_dir = data_dir
-        self.optimizer = TpeOptimizer(self.load_config_for_test(self.configs["config_tpe.json"]))
+        self.optimizer = TpeOptimizer(self.load_config_for_test(self.configs["config_tpe.yaml"]))
         yield
         self.optimizer = None
 
@@ -47,10 +47,10 @@ class TestTpeOptimizer(BaseTest):
         self.optimizer.config.resource.num_workers = _tmp_num_workers
 
     # def test_generate_initial_parameter(self):
-    #     optimizer = TpeOptimizer(self.load_config_for_test(self.configs['config_tpe_2.json']))
+    #     optimizer = TpeOptimizer(self.load_config_for_test(self.configs['config_tpe_2.yaml']))
     #     (optimizer.workspace.storage / 'storage.db').unlink()
 
-    #     optimizer.__init__(self.load_config_for_test(self.configs['config_tpe_2.json']))
+    #     optimizer.__init__(self.load_config_for_test(self.configs['config_tpe_2.yaml']))
     #     assert len(optimizer.generate_initial_parameter()) > 0
     #     assert len(optimizer.generate_initial_parameter()) > 0
 
@@ -72,17 +72,17 @@ class TestTpeOptimizer(BaseTest):
 
 
 def test_create_distributions(data_dir):
-    config = load_config(data_dir / "config_tpe_2.json")
+    config = load_config(data_dir / "config_tpe_2.yaml")
     params = HyperParameterConfiguration(config.optimize.parameters)
     dist = create_distributions(params)
     assert type(dist) is dict
 
-    config = load_config(data_dir / "config_tpe_categorical.json")
+    config = load_config(data_dir / "config_tpe_categorical.yaml")
     params = HyperParameterConfiguration(config.optimize.parameters)
     dist = create_distributions(params)
     assert type(dist) is dict
 
-    config = load_config(data_dir / "config_tpe_invalid_type.json")
+    config = load_config(data_dir / "config_tpe_invalid_type.yaml")
 
     with pytest.raises(TypeError):
         params = HyperParameterConfiguration(config.optimize.parameters)

@@ -14,7 +14,7 @@ class TestBudgetSpecifiedGridOptimizer(BaseTest):
     def setup_optimizer(self, data_dir: Path, create_tmp_config: Callable[[Path], Path]) -> Generator[None, None, None]:
 
         self.data_dir = data_dir
-        self.optimizer = BudgetSpecifiedGridOptimizer(self.load_config_for_test(self.configs["config_tpe.json"]))
+        self.optimizer = BudgetSpecifiedGridOptimizer(self.load_config_for_test(self.configs["config_tpe.yaml"]))
         yield
         self.optimizer = None
 

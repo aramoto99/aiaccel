@@ -29,5 +29,6 @@ goal_minimize = "minimize"
 
 resource_type_local = "local"
 resource_type_abci = "abci"
+resource_type_memory = "python_local"
 
 datetime_format = "%m/%d/%Y %H:%M:%S"

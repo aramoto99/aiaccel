@@ -10,22 +10,22 @@ class TestSobolOptimizer(BaseTest):
     @pytest.fixture(autouse=True)
     def setup_optimizer(self, data_dir, create_tmp_config):
         self.data_dir = data_dir
-        self.optimizer = SobolOptimizer(self.load_config_for_test(self.configs["config_sobol.json"]))
+        self.optimizer = SobolOptimizer(self.load_config_for_test(self.configs["config_sobol.yaml"]))
         yield
         self.optimizer = None
 
     def test_generate_parameter(self):
-        optimizer = SobolOptimizer(self.load_config_for_test(self.configs["config_sobol.json"]))
+        optimizer = SobolOptimizer(self.load_config_for_test(self.configs["config_sobol.yaml"]))
 
         assert len(optimizer.generate_parameter()) > 0
 
     def test_generate_initial_parameter(self):
-        optimizer = SobolOptimizer(self.load_config_for_test(self.configs["config_sobol.json"]))
+        optimizer = SobolOptimizer(self.load_config_for_test(self.configs["config_sobol.yaml"]))
 
         log_strings = []
         with patch.object(optimizer.logger, "warning", lambda s: log_strings.append(s)):
             optimizer.generate_initial_parameter()
             assert len(log_strings) > 0
 
-        optimizer = SobolOptimizer(self.load_config_for_test(self.configs["config_sobol_no_initial.json"]))
+        optimizer = SobolOptimizer(self.load_config_for_test(self.configs["config_sobol_no_initial.yaml"]))
         optimizer.generate_initial_parameter()

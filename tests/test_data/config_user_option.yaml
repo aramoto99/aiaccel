@@ -11,7 +11,7 @@
         ]
     },
     "generic": {
-        "workspace": "/tmp/work",
+        "workspace": /tmp/work,
         "job_command": "python original_main.py",
         "python_file": "original_main.py",
         "function": "main",

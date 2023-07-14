@@ -7,7 +7,7 @@ from aiaccel.workspace import Workspace
 
 ws = Workspace("test_work")
 db_path = ws.path / "storage/storage.db"
-config_path = pathlib.Path("tests/test_data/config.json")
+config_path = pathlib.Path("tests/test_data/config.yaml")
 
 
 def db_delete():

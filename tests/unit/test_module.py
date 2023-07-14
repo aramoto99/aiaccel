@@ -30,7 +30,7 @@ def dummy_break():
 class TestAbstractModule(BaseTest):
     @pytest.fixture(autouse=True)
     def setup_module(self, clean_work_dir):
-        self.module = AbstractModule(self.load_config_for_test(self.configs["config.json"]), "abstract")
+        self.module = AbstractModule(self.load_config_for_test(self.configs["config.yaml"]), "abstract")
         self.module.logger = logging.getLogger(__name__)
         yield
         self.module = None

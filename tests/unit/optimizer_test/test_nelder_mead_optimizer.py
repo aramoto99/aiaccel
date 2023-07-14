@@ -14,7 +14,7 @@
 
 #     @pytest.fixture(autouse=True)
 #     def setup_optimizer(self, clean_work_dir):
-#         self.optimizer = NelderMeadOptimizer(self.load_config_for_test(self.configs["config.json"]))
+#         self.optimizer = NelderMeadOptimizer(self.load_config_for_test(self.configs["config.yaml"]))
 #         yield
 #         self.optimizer = None
 
@@ -32,7 +32,7 @@
 #             {'name': 'x10', 'type': 'uniform_float', 'value': 4.03}
 #         ]
 
-#         _optimizer = NelderMeadOptimizer(self.load_config_for_test(self.configs["config.json"]))
+#         _optimizer = NelderMeadOptimizer(self.load_config_for_test(self.configs["config.yaml"]))
 #         _optimizer._rng = np.random.RandomState(0)
 #         _nelder_mead = _optimizer.generate_initial_parameter()
 #         self.optimizer._rng = np.random.RandomState(0)
@@ -49,7 +49,7 @@
 #         setup_result
 #     ):
 #         # config = load_test_config()
-#         config = self.load_config_for_test(self.configs["config_nelder_mead.json"])
+#         config = self.load_config_for_test(self.configs["config_nelder_mead.yaml"])
 #         self.optimizer.params = ConvertedParameterConfiguration(
 #             HyperParameterConfiguration(config.optimize.parameters), convert_log=True, convert_int=True,
 #             convert_choices=True, convert_sequence=True,
@@ -76,7 +76,7 @@
 #         load_test_config_org,
 #         setup_result
 #     ):
-#         config = self.load_config_for_test(self.configs["config.json"])
+#         config = self.load_config_for_test(self.configs["config.yaml"])
 #         self.optimizer.params = ConvertedParameterConfiguration(
 #             HyperParameterConfiguration(config.optimize.parameters), convert_log=True, convert_int=True,
 #             convert_choices=True, convert_sequence=True,
@@ -92,7 +92,7 @@
 #         self,
 #         load_test_config_org
 #     ):
-#         config = self.load_config_for_test(self.configs["config.json"])
+#         config = self.load_config_for_test(self.configs["config.yaml"])
 #         self.optimizer.params = ConvertedParameterConfiguration(
 #             HyperParameterConfiguration(config.optimize.parameters), convert_log=True, convert_int=True,
 #             convert_choices=True, convert_sequence=True,
@@ -111,7 +111,7 @@
 #         load_test_config_org
 #     ):
 #         config = load_test_config_org()
-#         config = self.load_config_for_test(self.configs["config.json"])
+#         config = self.load_config_for_test(self.configs["config.yaml"])
 #         self.optimizer.params = ConvertedParameterConfiguration(
 #             HyperParameterConfiguration(config.optimize.parameters), convert_log=True, convert_int=True,
 #             convert_choices=True, convert_sequence=True,

@@ -6,7 +6,7 @@ from aiaccel.util import TrialId
 
 
 def test_trial_id_init(create_tmp_config):
-    config_path = create_tmp_config(Path("tests/test_data/config.json"))
+    config_path = create_tmp_config(Path("tests/test_data/config.yaml"))
     config = load_config(config_path)
     trial_id = TrialId(config)
 
@@ -14,7 +14,7 @@ def test_trial_id_init(create_tmp_config):
 
 
 def test_zero_padding_any_trial_id(create_tmp_config):
-    config_path = create_tmp_config(Path("tests/test_data/config.json"))
+    config_path = create_tmp_config(Path("tests/test_data/config.yaml"))
     config = load_config(config_path)
     trial_id = TrialId(config)
 
@@ -24,7 +24,7 @@ def test_zero_padding_any_trial_id(create_tmp_config):
 
 
 def test_increment_1(create_tmp_config):
-    config_path = create_tmp_config(Path("tests/test_data/config.json"))
+    config_path = create_tmp_config(Path("tests/test_data/config.yaml"))
     config = load_config(config_path)
     workspace = Path(config.generic.workspace)
     trial_id = TrialId(config)
@@ -41,7 +41,7 @@ def test_increment_1(create_tmp_config):
 
 
 def test_get(create_tmp_config):
-    config_path = create_tmp_config(Path("tests/test_data/config.json"))
+    config_path = create_tmp_config(Path("tests/test_data/config.yaml"))
     config = load_config(config_path)
     trial_id = TrialId(config)
     trial_id.initial(42)
@@ -49,7 +49,7 @@ def test_get(create_tmp_config):
 
 
 def test_initial(create_tmp_config):
-    config_path = create_tmp_config(Path("tests/test_data/config.json"))
+    config_path = create_tmp_config(Path("tests/test_data/config.yaml"))
     config = load_config(config_path)
     trial_id = TrialId(config)
     assert trial_id.initial(num=5) is None
@@ -61,7 +61,7 @@ def test_initial(create_tmp_config):
 
 
 def test_integer(create_tmp_config):
-    config_path = create_tmp_config(Path("tests/test_data/config.json"))
+    config_path = create_tmp_config(Path("tests/test_data/config.yaml"))
     config = load_config(config_path)
     trial_id = TrialId(config)
     trial_id.initial(num=42)
@@ -69,7 +69,7 @@ def test_integer(create_tmp_config):
 
 
 def test_string(create_tmp_config):
-    config_path = create_tmp_config(Path("tests/test_data/config.json"))
+    config_path = create_tmp_config(Path("tests/test_data/config.yaml"))
     config = load_config(config_path)
     trial_id = TrialId(config)
 

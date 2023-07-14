@@ -7,7 +7,7 @@ from aiaccel.config import load_config
 from aiaccel.workspace import Workspace
 
 ws = Workspace("test_work")
-config_path = pathlib.Path("tests/test_data/config.json")
+config_path = pathlib.Path("tests/test_data/config.yaml")
 
 
 def test_report(clean_work_dir, work_dir, create_tmp_config):
@@ -17,7 +17,7 @@ def test_report(clean_work_dir, work_dir, create_tmp_config):
         workspace.clean()
     workspace.create()
 
-    config_path = pathlib.Path("tests/test_data/config.json")
+    config_path = pathlib.Path("tests/test_data/config.yaml")
     config_path = create_tmp_config(config_path)
     config = load_config(config_path)
 

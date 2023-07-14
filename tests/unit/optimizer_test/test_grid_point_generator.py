@@ -629,7 +629,7 @@ class TestGridPointGenerator(BaseTest):
     ) -> Generator[None, None, None]:
         self.data_dir = data_dir
 
-        config = self.load_config_for_test(self.configs["config_budget-specified-grid.json"])
+        config = self.load_config_for_test(self.configs["config_budget-specified-grid.yaml"])
         self.hyperparameters = load_parameter(config.optimize.parameters).get_parameter_list()
         self.trial_number = config.optimize.trial_number
         self.grid_point_generator = GridPointGenerator(self.trial_number, self.hyperparameters.copy())

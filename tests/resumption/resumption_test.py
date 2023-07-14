@@ -13,7 +13,7 @@ class ResumptionTest(IntegrationTest):
     search_algorithm = None
 
     def test_run(self, data_dir, create_tmp_config):
-        config = self.load_config_for_test(self.configs["config_{}.json".format(self.search_algorithm)])
+        config = self.load_config_for_test(self.configs["config_{}.yaml".format(self.search_algorithm)])
 
         if is_multi_objective(config):
             user_main_file = self.test_data_dir / "original_main_mo.py"
@@ -40,13 +40,13 @@ class ResumptionTest(IntegrationTest):
 
         # max trial 5
         with self.create_main(user_main_file):
-            config = self.load_config_for_test(self.configs["config_{}_resumption.json".format(self.search_algorithm)])
+            config = self.load_config_for_test(self.configs["config_{}_resumption.yaml".format(self.search_algorithm)])
             subprocess.Popen(["aiaccel-start", "--config", str(config.config_path), "--clean"]).wait()
             subprocess.Popen(["aiaccel-view", "--config", str(config.config_path)]).wait()
 
         # resume
         with self.create_main(user_main_file):
-            config = self.load_config_for_test(self.configs["config_{}.json".format(self.search_algorithm)])
+            config = self.load_config_for_test(self.configs["config_{}.yaml".format(self.search_algorithm)])
             print(config.optimize.trial_number)
             workspace = Workspace(config.generic.workspace)
             storage = Storage(workspace.storage_file_path)
