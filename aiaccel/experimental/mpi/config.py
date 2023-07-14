@@ -49,6 +49,9 @@ class GenericConfig:
     batch_job_timeout: int
     sleep_time: Union[float, int]
     is_ignore_warning: bool
+    enabled_variable_name_argumentation: bool
+    main_loop_sleep_seconds: Union[float, int]
+    logging_level: str
 
 
 @dataclass
