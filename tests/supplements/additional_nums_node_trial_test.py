@@ -10,7 +10,7 @@ import pytest
 import yaml
 from omegaconf.dictconfig import DictConfig
 
-from aiaccel.common import dict_result, file_final_result
+from aiaccel.common import dict_result
 from aiaccel.config import load_config
 from aiaccel.storage.storage import Storage
 from aiaccel.workspace import Workspace
@@ -65,5 +65,5 @@ class AdditionalNumsNodeTrialTest(BaseTest):
         assert finished <= config.optimize.trial_number
         assert ready == 0
         assert running == 0
-        final_result = work_dir.joinpath(dict_result, file_final_result)
+        final_result = work_dir.joinpath("final_result.result")
         assert final_result.exists()
