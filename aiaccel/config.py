@@ -60,6 +60,7 @@ class ResourceConifig:
 @dataclass
 class AbciConifig:
     group: str
+    job_script_preamble_inline: str
     job_script_preamble: str
     job_execution_options: Optional[str]
 

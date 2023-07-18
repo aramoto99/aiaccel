@@ -26,6 +26,7 @@ class AbciModel(AbstractModel):
             config_file_path=obj.config.config_path,
             runner_file_path=runner_file_path,
             job_script_preamble=obj.config.ABCI.job_script_preamble,
+            job_script_preamble_inline=obj.config.ABCI.job_script_preamble_inline,
             command=obj.config.generic.job_command,
             enabled_variable_name_argumentation=obj.config.generic.enabled_variable_name_argumentation,
             dict_lock=obj.workspace.lock,
@@ -51,6 +52,14 @@ class AbciModel(AbstractModel):
                 param_args += f'--{param["name"]}=${param["name"]} '
         return param_args
 
+    def create_job_script_preamble(self, job_script_preamble: Path | str | None, job_script_preamble_inline: str) -> str:
+        if job_script_preamble is None or job_script_preamble == "":
+            return job_script_preamble_inline
+        else:
+            with open(job_script_preamble, "r") as f:
+                job_script_preamble = f.read()
+            return job_script_preamble
+
     def create_abci_batch_file(
         self,
         trial_id: int,
@@ -60,6 +69,7 @@ class AbciModel(AbstractModel):
         config_file_path: Path | str,
         runner_file_path: Path,
         job_script_preamble: Path | str | None,
+        job_script_preamble_inline: str,
         command: str,
         enabled_variable_name_argumentation: bool,
         dict_lock: Path,
@@ -146,12 +156,13 @@ class AbciModel(AbstractModel):
 
         script = ""
         # preamble
-        if job_script_preamble is not None:
-            with open(job_script_preamble, "r") as f:
-                lines = f.read().splitlines()
-                if len(lines) > 0:
-                    for line in lines:
-                        script += line + "\n"
+        # if job_script_preamble is not None:
+        #     with open(job_script_preamble, "r") as f:
+        #         lines = f.read().splitlines()
+        #         if len(lines) > 0:
+        #             for line in lines:
+        #                 script += line + "\n"
+        script = self.create_job_script_preamble(job_script_preamble, job_script_preamble_inline)
         script += "\n"
         # parameters
         for param in param_content["parameters"]:
