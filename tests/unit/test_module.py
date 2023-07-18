@@ -38,11 +38,11 @@ class TestAbstractModule(BaseTest):
     def test_set_logger(self, work_dir):
         assert (
             self.module.set_logger(
-                "root.optimizer",
-                work_dir.joinpath(self.module.workspace.log, self.module.config.logger.file.optimizer),
-                self.module.config.logger.log_level.optimizer,
-                self.module.config.logger.stream_level.optimizer,
-                "Optimizer",
+                logger_name="root.optimizer",
+                logfile=work_dir.joinpath(self.module.workspace.log,  "optimizer.log"),
+                file_level=self.module.config.generic.logging_level,
+                stream_level=self.module.config.generic.logging_level,
+                module_type="Optimizer",
             )
             is None
         )

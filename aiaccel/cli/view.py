@@ -104,7 +104,7 @@ def main() -> None:  # pragma: no cover
     theterminal.
     """
     parser = ArgumentParser()
-    parser.add_argument("--config", "-c", type=str, default="config.yml")
+    parser.add_argument("--config", "-c", type=str, default="config.yaml")
     args = parser.parse_args()
 
     config: DictConfig = load_config(args.config)

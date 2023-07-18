@@ -30,13 +30,12 @@ WORK_SUB_DIRECTORIES = [
     "state",
 ]
 WORK_FILES = [
-    "config.json",
-    "config.yml",
+    "config.yaml",
     "hyperparameter.json",
     "original_main.py",
     "wrapper.py",
     "wrapper_abci.sh",
-    "config_grid.json",
+    "config_grid.yaml",
 ]
 
 
@@ -115,18 +114,13 @@ def cd_work(tmpdir):
 
 
 @pytest.fixture(scope="session")
-def config_json(data_dir):
-    return data_dir.joinpath("config.json")
+def config_yaml(data_dir):
+    return data_dir.joinpath("config.yaml")
 
 
 @pytest.fixture(scope="session")
-def grid_config_json(data_dir):
-    return data_dir.joinpath("config_grid.json")
-
-
-@pytest.fixture
-def config_yaml(data_dir):
-    return data_dir.joinpath("config.yml")
+def grid_config_yaml(data_dir):
+    return data_dir.joinpath("config_grid.yaml")
 
 
 @pytest.fixture(scope="session")
@@ -144,25 +138,25 @@ def get_one_parameter(work_dir):
 
 
 @pytest.fixture(scope="session")
-def load_test_config(config_json):
+def load_test_config(config_yaml):
     def _load_test_config():
-        return load_config(config_json)
+        return load_config(config_yaml)
 
     return _load_test_config
 
 
 @pytest.fixture(scope="session")
-def load_test_config_org(config_json):
+def load_test_config_org(config_yaml):
     def _load_test_config():
-        return load_config(config_json)
+        return load_config(config_yaml)
 
     return _load_test_config
 
 
 @pytest.fixture(scope="session")
-def grid_load_test_config(grid_config_json):
+def grid_load_test_config(grid_config_yaml):
     def _load_test_config():
-        return load_config(grid_config_json)
+        return load_config(grid_config_yaml)
 
     return _load_test_config
 

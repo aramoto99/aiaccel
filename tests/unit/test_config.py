@@ -13,7 +13,8 @@ class TestConfig(BaseTest):
         assert type(config.generic.workspace) is str
         assert type(config.resource.num_workers) is int
         assert type(config.optimize.parameters) is omegaconf.listconfig.ListConfig
-        assert type(config.optimize.parameters[0].lower) is float
+        assert type(config.optimize.parameters[0].upper) is int
+        assert type(config.optimize.parameters[0].lower) is int
 
         # typo config (typo trial_number)
         config_typo_path = self.test_data_dir.joinpath("config_typo.yaml")

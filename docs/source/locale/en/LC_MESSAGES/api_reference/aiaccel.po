@@ -59,7 +59,7 @@ msgstr ""
 msgid "An interface for all config classes."
 msgstr ""
 
-#: aiaccel.config.BaseConfig:3 aiaccel.config.JsonOrYamlObjectConfig:3 of
+#: aiaccel.config.BaseConfig:3 aiaccel.config.yamlOrYamlObjectConfig:3 of
 msgid "Fork by confile: https://github.com/777nancy/confile"
 msgstr ""
 
@@ -69,8 +69,8 @@ msgstr ""
 
 #: aiaccel.config.Config aiaccel.config.Config.define_items
 #: aiaccel.config.ConfigEntry aiaccel.config.ConfileWrapper
-#: aiaccel.config.ConfileWrapper.get aiaccel.config.JsonOrYamlObjectConfig
-#: aiaccel.config.JsonOrYamlObjectConfig.get_property
+#: aiaccel.config.ConfileWrapper.get aiaccel.config.yamlOrYamlObjectConfig
+#: aiaccel.config.yamlOrYamlObjectConfig.get_property
 #: aiaccel.config.is_multi_objective aiaccel.module.AbstractModule.is_error_free
 #: aiaccel.module.AbstractModule.create_numpy_random_generator
 #: aiaccel.module.AbstractModule.get_numpy_random_state
@@ -174,8 +174,8 @@ msgid "If the value is not set, it will force an error to occur."
 msgstr ""
 
 #: aiaccel.config.ConfigEntry.get aiaccel.config.ConfileWrapper.get
-#: aiaccel.config.JsonOrYamlObjectConfig.get_property
-#: aiaccel.config.JsonOrYamlObjectConfig.to_dict
+#: aiaccel.config.yamlOrYamlObjectConfig.get_property
+#: aiaccel.config.yamlOrYamlObjectConfig.to_dict
 #: aiaccel.config.is_multi_objective aiaccel.config.load_config
 #: aiaccel.module.AbstractModule.is_error_free
 #: aiaccel.module.AbstractModule.check_finished
@@ -263,8 +263,8 @@ msgid "A property for the specified keys."
 msgstr ""
 
 #: aiaccel.config.ConfileWrapper.get
-#: aiaccel.config.JsonOrYamlObjectConfig.get_property
-#: aiaccel.config.JsonOrYamlObjectConfig.to_dict
+#: aiaccel.config.yamlOrYamlObjectConfig.get_property
+#: aiaccel.config.yamlOrYamlObjectConfig.to_dict
 #: aiaccel.config.is_multi_objective aiaccel.config.load_config
 #: aiaccel.module.AbstractModule.is_error_free
 #: aiaccel.module.AbstractModule.check_finished
@@ -285,43 +285,43 @@ msgstr ""
 msgid "戻り値の型"
 msgstr ""
 
-#: aiaccel.config.JsonOrYamlObjectConfig:1 of
+#: aiaccel.config.yamlOrYamlObjectConfig:1 of
 msgid "ベースクラス: :py:class:`~aiaccel.config.BaseConfig`"
 msgstr ""
 
-#: aiaccel.config.JsonOrYamlObjectConfig:1 of
+#: aiaccel.config.yamlOrYamlObjectConfig:1 of
 msgid "A wrapper for confile to support json, yaml object."
 msgstr ""
 
-#: aiaccel.config.JsonOrYamlObjectConfig:5 of
+#: aiaccel.config.yamlOrYamlObjectConfig:5 of
 msgid "A json or yaml object"
 msgstr ""
 
-#: aiaccel.config.JsonOrYamlObjectConfig:7 of
+#: aiaccel.config.yamlOrYamlObjectConfig:7 of
 msgid "'json_object' or 'yaml_object'."
 msgstr ""
 
-#: aiaccel.config.JsonOrYamlObjectConfig.get_property:1 of
+#: aiaccel.config.yamlOrYamlObjectConfig.get_property:1 of
 msgid "Get a property for specified keys."
 msgstr ""
 
-#: aiaccel.config.JsonOrYamlObjectConfig.get_property:3 of
+#: aiaccel.config.yamlOrYamlObjectConfig.get_property:3 of
 msgid "A key to get a property."
 msgstr ""
 
-#: aiaccel.config.JsonOrYamlObjectConfig.get_property:5 of
+#: aiaccel.config.yamlOrYamlObjectConfig.get_property:5 of
 msgid "Keys to get a property."
 msgstr ""
 
-#: aiaccel.config.JsonOrYamlObjectConfig.get_property:8 of
+#: aiaccel.config.yamlOrYamlObjectConfig.get_property:8 of
 msgid "A property for the keys."
 msgstr ""
 
-#: aiaccel.config.JsonOrYamlObjectConfig.to_dict:1 of
+#: aiaccel.config.yamlOrYamlObjectConfig.to_dict:1 of
 msgid "Convert the configuration to a dictionary object."
 msgstr ""
 
-#: aiaccel.config.JsonOrYamlObjectConfig.to_dict:3 of
+#: aiaccel.config.yamlOrYamlObjectConfig.to_dict:3 of
 msgid "The dictionary object of the configuration."
 msgstr ""
 

@@ -1,6 +1,6 @@
 {
   "generic": {
-    "config_path": "config.json",
+    "config_path": "config.yaml",
     "init_fail_count": 10,
     "$trial_id_digits": 32,
     "trial_id_digits": 3,

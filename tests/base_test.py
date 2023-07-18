@@ -72,7 +72,7 @@ class BaseTest(object):
     @pytest.fixture(autouse=True)
     def _setup(self, tmpdir, work_dir, create_tmp_config, cd_work):
         self.test_data_dir = Path(__file__).resolve().parent.joinpath("test_data")
-        self.config_json_path = create_tmp_config(self.test_data_dir.joinpath("config.yaml"))
+        self.config_yaml_path = create_tmp_config(self.test_data_dir.joinpath("config.yaml"))
 
         self.configs = {
             "config.yaml": create_tmp_config(self.test_data_dir.joinpath("config.yaml")),

@@ -15,8 +15,8 @@ from tests.base_test import BaseTest
 
 def test_get_grid_options():
     test_data_dir = Path(__file__).resolve().parent.parent.parent.joinpath("test_data")
-    grid_config_json = test_data_dir.joinpath("config_grid.yaml")
-    config_grid = load_config(grid_config_json)
+    grid_config_yaml = test_data_dir.joinpath("config_grid.yaml")
+    config_grid = load_config(grid_config_yaml)
     config_grid.resume = None
 
     base, log, step = get_grid_options("x1", config_grid)
@@ -30,24 +30,24 @@ def test_get_grid_options():
         assert True
 
     # no step
-    grid_config_json = test_data_dir / "config_grid_no_step.yaml"
-    config_grid = load_config(grid_config_json)
+    grid_config_yaml = test_data_dir / "config_grid_no_step.yaml"
+    config_grid = load_config(grid_config_yaml)
     config_grid.resume = None
 
     with pytest.raises(MissingMandatoryValue):
         base, log, step = get_grid_options("x1", config_grid)
 
     # no log
-    grid_config_json = test_data_dir / "config_grid_no_log.yaml"
-    config_grid = load_config(grid_config_json)
+    grid_config_yaml = test_data_dir / "config_grid_no_log.yaml"
+    config_grid = load_config(grid_config_yaml)
     config_grid.resume = None
 
     with pytest.raises(MissingMandatoryValue):
         base, log, step = get_grid_options("x1", config_grid)
 
     # no base
-    grid_config_json = test_data_dir / "config_grid_no_base.yaml"
-    config_grid = load_config(grid_config_json)
+    grid_config_yaml = test_data_dir / "config_grid_no_base.yaml"
+    config_grid = load_config(grid_config_yaml)
     config_grid.resume = None
 
     with pytest.raises(MissingMandatoryValue):
@@ -101,8 +101,8 @@ def test_generate_grid_points(grid_load_test_config):
 class TestGridOptimizer(BaseTest):
     @pytest.fixture(autouse=True)
     def setup_optimizer(self, create_tmp_config: Callable[[Path], Path]) -> Generator[None, None, None]:
-        self.grid_config_json = self.load_config_for_test(self.configs["config_grid.yaml"])
-        self.optimizer = GridOptimizer(self.grid_config_json)
+        self.grid_config_yaml = self.load_config_for_test(self.configs["config_grid.yaml"])
+        self.optimizer = GridOptimizer(self.grid_config_yaml)
         yield
         self.optimzer = None
 
