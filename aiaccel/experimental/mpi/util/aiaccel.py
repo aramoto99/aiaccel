@@ -10,14 +10,8 @@ from typing import Any
 
 from aiaccel.common import datetime_format
 from aiaccel.experimental.mpi.config import load_config
-from aiaccel.parameter import (
-    CategoricalParameter,
-    FloatParameter,
-    HyperParameterConfiguration,
-    IntParameter,
-    OrdinalParameter,
-)
-from aiaccel.util import cast_y
+from aiaccel.parameter import (CategoricalParameter, FloatParameter, HyperParameterConfiguration, IntParameter,
+                               OrdinalParameter)
 from aiaccel.util.data_type import str_or_float_or_int
 
 
@@ -66,6 +60,34 @@ class CommandLineArgs:
                 del xs[key]
 
         return xs
+
+
+def cast_y(y_value: Any, y_data_type: str | None) -> float | int | str:
+    """Casts y to the appropriate data type.
+
+    Args:
+        y_value (Any): y value to be casted.
+        y_data_type (str | None): Name of data type of objective value.
+
+    Returns:
+        float | int | str: Casted y value.
+
+    Raises:
+        TypeError: Occurs when given `y_data_type` is other than `float`,
+                `int`, or `str`.
+    """
+    if y_data_type is None:
+        y = y_value
+    elif y_data_type.lower() == "float":
+        y = float(y_value)
+    elif y_data_type.lower() == "int":
+        y = int(float(y_value))
+    elif y_data_type.lower() == "str":
+        y = str(y_value)
+    else:
+        TypeError(f"{y_data_type} cannot be specified")
+
+    return y
 
 
 class Run:

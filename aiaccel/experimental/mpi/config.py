@@ -50,6 +50,9 @@ class GenericConfig:
     sleep_time: Union[float, int]
     enabled_variable_name_argumentation: bool
     is_ignore_warning: bool
+    enabled_variable_name_argumentation: bool
+    main_loop_sleep_seconds: Union[float, int]
+    logging_level: str
 
 
 @dataclass

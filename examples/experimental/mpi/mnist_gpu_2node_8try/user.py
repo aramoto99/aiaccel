@@ -4,28 +4,20 @@ from aiaccel.experimental.mpi.util import aiaccel
 
 
 def execute(commands):
-    output = subprocess.run(
-        commands,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE
-    )
+    output = subprocess.run(commands, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     if output.stderr is not None:
-        stderr = output.stderr.decode('UTF-8')
+        stderr = output.stderr.decode("UTF-8")
         # No error handling. for testing purposes.
     if output.stdout is not None:
-        stdout = output.stdout.decode('UTF-8')
-        return float(stdout.split('\n')[-1])
-    print('Error: user.py: execute()')
+        stdout = output.stdout.decode("UTF-8")
+        return float(stdout.split("\n")[-1])
+    print("Error: user.py: execute()")
     return None
 
 
 def execute_debug(commands):
-    proc = subprocess.Popen(
-        commands,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT
-    )
-    save_line = ''
+    proc = subprocess.Popen(commands, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    save_line = ""
     while True:
         if proc.stdout is None:
             break
@@ -36,24 +28,24 @@ def execute_debug(commands):
         else:
             if proc.poll() is not None:
                 o, e = proc.communicate()
-                s = ''
+                s = ""
                 if o:
                     s += o.decode().strip()
-                if s != '':
+                if s != "":
                     save_line = s
                 if e:
                     s += e.decode().strip()
-                print(f'before break: s=|{s}| save_line=|{save_line}|')
+                print(f"before break: s=|{s}| save_line=|{save_line}|")
                 break
-    ret_s = save_line.split('\n')[-1]
-    print(f'end: save_line=|{save_line}| ret_s=|{ret_s}|')
+    ret_s = save_line.split("\n")[-1]
+    print(f"end: save_line=|{save_line}| ret_s=|{ret_s}|")
     return float(ret_s)
 
 
 def main(p):
     x1 = p["x1"]
-    cmd = f'./mnist.sh {x1}'
-    y = execute_debug(cmd.split(' '))
+    cmd = f"./mnist.sh {x1}"
+    y = execute_debug(cmd.split(" "))
     return y
 
 

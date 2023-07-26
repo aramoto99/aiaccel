@@ -53,7 +53,7 @@ class CsvWriter:
         data = []
         header = []
 
-        trial_ids = self.storage.trial.get_all_trial_id()
+        trial_ids = self.storage.state.get_all_trial_id()
 
         if trial_ids is None or len(trial_ids) == 0:
             return
@@ -62,7 +62,7 @@ class CsvWriter:
         example = self.storage.get_hp_dict(trial_ids[0])
         header.append("trial_id")
         for param in example["parameters"]:
-            header.append(param["parameter_name"])
+            header.append(param["name"])
         header.append("objective")
 
         with InterProcessLock(self.lock_file["result_txt"]):

@@ -7,7 +7,7 @@ Base: DeclarativeMeta = declarative_base()
 
 
 # models
-class TrialTable(Base):
+class StateTable(Base):
     __tablename__ = "Trial"
     trial_id = Column(Integer, primary_key=True, nullable=False)
     state = Column(Text, nullable=True)
@@ -41,6 +41,12 @@ class ResultTable(Base):
     trial_id = Column(Integer, primary_key=True, nullable=False)
     data_type = Column(String(length=128), nullable=True)
     objective = Column(PickleType, nullable=True)
+
+
+class ReturnCodeTable(Base):
+    __tablename__ = "returncode"
+    trial_id = Column(Integer, primary_key=True, nullable=False)
+    returncode = Column(Integer, nullable=False)
 
 
 class JobStateTable(Base):

@@ -23,7 +23,7 @@
   },
   "optimizer": {
     "search_algorithm": "NelderMeadSearch",
-    "parameter_pool_size": 5,
+    "parameter_pool_size": 5
   },
   "scheduler": {
     "cancel_retry": 3,
@@ -50,7 +50,7 @@
   },
   "ABCI": {
     "abci_wrapper": "wrapper_abci.sh",
-    "group": "gaa50073",
+    "group": "",
     "runner_search_pattern": "run_*.sh"
   },
   "hyperparameter": {

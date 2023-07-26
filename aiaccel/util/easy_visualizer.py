@@ -4,26 +4,8 @@ import shutil
 from typing import Any
 
 import numpy as np
-from asciichartpy import (
-    black,
-    blue,
-    cyan,
-    darkgray,
-    green,
-    lightblue,
-    lightcyan,
-    lightgray,
-    lightgreen,
-    lightmagenta,
-    lightred,
-    lightyellow,
-    magenta,
-    plot,
-    red,
-    reset,
-    white,
-    yellow,
-)
+from asciichartpy import (black, blue, cyan, darkgray, green, lightblue, lightcyan, lightgray, lightgreen, lightmagenta,
+                          lightred, lightyellow, magenta, plot, red, reset, white, yellow)
 
 
 class EasyVisualizer:
