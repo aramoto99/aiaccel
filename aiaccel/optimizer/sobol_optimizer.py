@@ -39,15 +39,12 @@ class SobolOptimizer(AbstractOptimizer):
             list[dict[str, float | int | str]]: A list of new parameters.
         """
         vec = self.sampler.random()[0]
-
-        for i in range(0, n_params):
-            min_value = l_params[i].lower
-            max_value = l_params[i].upper
-            value = (max_value - min_value) * vec[i] + min_value
-            new_param = {"name": l_params[i].name, "type": l_params[i].type, "value": value}
-            new_params.append(new_param)
-
+        new_params = []
+        for vec_i, param in zip(vec, self.params.get_parameter_list()):
+            value = (param.upper - param.lower) * vec_i + param.lower
+            new_params.append({"name": param.name, "type": param.type, "value": value})
         return self.params.to_original_repr(new_params)
+
 
     def generate_initial_parameter(self) -> list[dict[str, float | int | str]]:
         """Generate initial parameters.
