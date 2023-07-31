@@ -9,23 +9,12 @@ import pytest
 from numpy.random import RandomState
 
 from aiaccel.config import Config, load_config
-from aiaccel.optimizer._grid_point_generator import (
-    CategoricalGridCondition,
-    FloatGridCondition,
-    GridCondition,
-    GridConditionCollection,
-    GridPointGenerator,
-    GridValueType,
-    IntGridCondition,
-    NumericGridCondition,
-    NumericType,
-    OrdinalGridCondition,
-    _cast_start_to_integer,
-    _cast_stop_to_integer,
-    _create_grid_condition,
-    _is_there_zero_between_lower_and_upper,
-    _validate_parameter_range,
-)
+from aiaccel.optimizer._grid_point_generator import (CategoricalGridCondition, FloatGridCondition, GridCondition,
+                                                     GridConditionCollection, GridPointGenerator, GridValueType,
+                                                     IntGridCondition, NumericGridCondition, NumericType,
+                                                     OrdinalGridCondition, _cast_start_to_integer,
+                                                     _cast_stop_to_integer, _create_grid_condition,
+                                                     _is_there_zero_between_lower_and_upper, _validate_parameter_range)
 from aiaccel.parameter import Parameter, load_parameter
 from tests.base_test import BaseTest
 
@@ -37,14 +26,14 @@ class TestGridCondition:
         self.num_choices = len(self.choices)
         self.hyperparameter = Parameter(
             {
-                'name': 'test',
-                'type': "uniform_float",
-                'lower': None,
-                'upper': None,
-                'log': None,
-                'num_numeric_choices': None,
-                'choices': None,
-                'sequence': None
+                "name": "test",
+                "type": "uniform_float",
+                "lower": None,
+                "upper": None,
+                "log": None,
+                "num_numeric_choices": None,
+                "choices": None,
+                "sequence": None,
             }
         )
         if "noautousefixture" in request.keywords:
@@ -129,7 +118,7 @@ argvalues_is_there_zero_between_lower_and_upper = [
     (-1, 0, True),
     (-1, 1, True),
     (0, 1, True),
-    (1, 2, False)
+    (1, 2, False),
 ]
 
 
@@ -141,13 +130,13 @@ def is_there_zero_between_lower_and_upper(lower, upper, expect) -> None:
     hyperparameter = Parameter(
         {
             "name": "test",
-            "type": 'uniform_float',
+            "type": "uniform_float",
             "lower": lower,
             "upper": upper,
             "log": None,
             "num_numeric_choices": None,
             "choices": None,
-            "sequence": None
+            "sequence": None,
         }
     )
     assert _is_there_zero_between_lower_and_upper(hyperparameter) == expect
@@ -157,13 +146,13 @@ def test_validate_parameter_range(monkeypatch: pytest.MonkeyPatch) -> None:
     hyperparameter = Parameter(
         {
             "name": "test",
-            "type": 'uniform_float',
+            "type": "uniform_float",
             "lower": 1.0,
             "upper": 10.0,
             "log": None,
             "num_numeric_choices": None,
             "choices": None,
-            "sequence": None
+            "sequence": None,
         }
     )
     with monkeypatch.context() as m:
@@ -185,13 +174,13 @@ class TestNumericGridCondition:
         hyperparameter = Parameter(
             {
                 "name": "test",
-                "type": 'uniform_float',
+                "type": "uniform_float",
                 "lower": 1.0,
                 "upper": 10.0,
                 "log": None,
                 "num_numeric_choices": None,
                 "choices": None,
-                "sequence": None
+                "sequence": None,
             }
         )
 
@@ -212,7 +201,7 @@ argvalues_float_grid_condition_create_choices = [
     (False, None, True, None, []),
     (False, None, True, 10, list(map(float, np.geomspace(1.0, 10.0, 10)))),
     (True, 100, False, None, list(map(float, np.linspace(1.0, 10.0, 100)))),
-    (True, 100, True, None, list(map(float, np.geomspace(1.0, 10.0, 100))))
+    (True, 100, True, None, list(map(float, np.geomspace(1.0, 10.0, 100)))),
 ]
 
 
@@ -222,13 +211,13 @@ class TestFloatGridCondition:
         self.hyperparameter = Parameter(
             {
                 "name": "test",
-                "type": 'uniform_float',
+                "type": "uniform_float",
                 "lower": 1.0,
                 "upper": 10.0,
                 "log": None,
                 "num_numeric_choices": None,
                 "choices": None,
-                "sequence": None
+                "sequence": None,
             }
         )
         yield
@@ -242,8 +231,7 @@ class TestFloatGridCondition:
             assert args == [self.hyperparameter]
 
     @pytest.mark.parametrize(
-        argnames=argnames_float_grid_condition_create_choices,
-        argvalues=argvalues_float_grid_condition_create_choices
+        argnames=argnames_float_grid_condition_create_choices, argvalues=argvalues_float_grid_condition_create_choices
     )
     def test_create_choices(
         self,
@@ -252,12 +240,12 @@ class TestFloatGridCondition:
         num_choices: int | None,
         log: bool,
         num_numeric_choices: int | None,
-        choices: list[float]
+        choices: list[float],
     ) -> None:
         hyperparameter = Parameter(
             {
                 "name": "test",
-                "type": 'uniform_float',
+                "type": "uniform_float",
                 "lower": 1.0,
                 "upper": 10.0,
                 "log": log,
@@ -275,7 +263,7 @@ class TestFloatGridCondition:
         hyperparameter = Parameter(
             {
                 "name": "test",
-                "type": 'uniform_float',
+                "type": "uniform_float",
                 "lower": 1.0,
                 "upper": 10.0,
                 "log": False,
@@ -324,7 +312,7 @@ argvalues_int_grid_condition_create_choices = [
     (False, None, False, None, 1, 10, True, 10, list(set(map(int, np.geomspace(1, 10, 10))))),
     (False, None, True, 100, 1, 10, False, None, list(set(map(int, np.linspace(1, 10, 100))))),
     (False, None, True, 100, 1, 10, False, None, list(set(map(int, np.linspace(1, 10, 100))))),
-    (True, ValueError, False, None, 1.0, 1.9, False, None, [])
+    (True, ValueError, False, None, 1.0, 1.9, False, None, []),
 ]
 
 
@@ -336,13 +324,13 @@ class TestIntGridCondition:
         self.hyperparameter = Parameter(
             {
                 "name": "test",
-                "type": 'uniform_int',
+                "type": "uniform_int",
                 "lower": 1.0,
                 "upper": 10.0,
                 "log": None,
                 "num_numeric_choices": None,
                 "choices": None,
-                "sequence": None
+                "sequence": None,
             }
         )
         yield
@@ -358,8 +346,7 @@ class TestIntGridCondition:
             assert args == [self.hyperparameter]
 
     @pytest.mark.parametrize(
-        argnames=argnames_int_grid_condition_create_choices,
-        argvalues=argvalues_int_grid_condition_create_choices
+        argnames=argnames_int_grid_condition_create_choices, argvalues=argvalues_int_grid_condition_create_choices
     )
     def test_create_choices(
         self,
@@ -372,12 +359,12 @@ class TestIntGridCondition:
         upper: NumericType,
         log: bool,
         num_numeric_choices: int | None,
-        choices: list[float]
+        choices: list[float],
     ) -> None:
         hyperparameter = Parameter(
             {
                 "name": "test",
-                "type": 'uniform_int',
+                "type": "uniform_int",
                 "lower": lower,
                 "upper": upper,
                 "log": log,
@@ -425,7 +412,7 @@ class TestCategoricalGridCondition:
         self.hyperparameter = Parameter(
             {
                 "name": "test",
-                "type": 'categorical',
+                "type": "categorical",
                 "choices": self.choices,
             }
         )
@@ -455,7 +442,7 @@ class TestOrdinalGridCondition:
         self.hyperparameter = Parameter(
             {
                 "name": "test",
-                "type": 'ordinal',
+                "type": "ordinal",
                 "sequence": self.choices,
             }
         )
@@ -478,11 +465,11 @@ class TestOrdinalGridCondition:
 
 
 def test_create_grid_condition(monkeypatch: pytest.MonkeyPatch) -> None:
-    parameter_info = {"name": "test", "type": 'uniform_float'}
+    parameter_info = {"name": "test", "type": "uniform_float"}
     hyperparameter = Parameter(parameter_info)
     with monkeypatch.context() as m:
         m.setattr(GridCondition, "__init__", lambda *_: None)
-        hyperparameter.type = 'uniform_float'
+        hyperparameter.type = "uniform_float"
         grid_condition = _create_grid_condition(hyperparameter)
         assert isinstance(grid_condition, FloatGridCondition)
         parameter_info["type"] = "uniform_int"
@@ -505,30 +492,30 @@ def test_create_grid_condition(monkeypatch: pytest.MonkeyPatch) -> None:
 
 
 argnames_grid_condition_collection_register = (
-    'num_trials, parameter_type, lower, upper, num_numeric_choices, log, choices, sequence, expect'
+    "num_trials, parameter_type, lower, upper, num_numeric_choices, log, choices, sequence, expect"
 )
 argvalues_grid_condition_collection_register = [
-    (10, 'uniform_float', 0.0, 1.0, 10, False, None, None, list(map(float, np.linspace(0.0, 1.0, 10)))),
-    (10, 'uniform_float', 0.0, 1.0, None, False, None, None, list(map(float, np.linspace(0.0, 1.0, 10)))),
-    (10, 'uniform_int', 0, 10, 10, False, None, None, list(set(np.linspace(0, 10, 10, dtype=int)))),
-    (10, 'uniform_int', 0, 10, None, False, None, None, list(set(np.linspace(0, 10, 10, dtype=int)))),
-    (10, 'categorical', None, None, None, None, ['a', 'b'], None, ['a', 'b']),
-    (10, 'ordinal', None, None, None, None, None, [0, 1], [0, 1])
+    (10, "uniform_float", 0.0, 1.0, 10, False, None, None, list(map(float, np.linspace(0.0, 1.0, 10)))),
+    (10, "uniform_float", 0.0, 1.0, None, False, None, None, list(map(float, np.linspace(0.0, 1.0, 10)))),
+    (10, "uniform_int", 0, 10, 10, False, None, None, list(set(np.linspace(0, 10, 10, dtype=int)))),
+    (10, "uniform_int", 0, 10, None, False, None, None, list(set(np.linspace(0, 10, 10, dtype=int)))),
+    (10, "categorical", None, None, None, None, ["a", "b"], None, ["a", "b"]),
+    (10, "ordinal", None, None, None, None, None, [0, 1], [0, 1]),
 ]
 
 
 class TestGridConditionCollection:
-    @ pytest.fixture(autouse=True)
+    @pytest.fixture(autouse=True)
     def setup_hyperparameters(self, request: pytest.FixtureRequest) -> Generator[None, None, None]:
         self.hyperparameters = [
             Parameter(
                 {
-                    'name': 'test',
-                    'type': 'uniform_int',
-                    'lower': 0.0,
-                    'upper': 1.0,
-                    'log': False,
-                    'num_numeric_choices': None,
+                    "name": "test",
+                    "type": "uniform_int",
+                    "lower": 0.0,
+                    "upper": 1.0,
+                    "log": False,
+                    "num_numeric_choices": None,
                 }
             )
         ]
@@ -568,33 +555,30 @@ class TestGridConditionCollection:
             m.setattr(self.grid_condition_collection, "_conditions", conditions)
             assert len(self.grid_condition_collection) == len(conditions)
 
-    @pytest.mark.parametrize(
-        argnames_grid_condition_collection_register,
-        argvalues_grid_condition_collection_register
-    )
+    @pytest.mark.parametrize(argnames_grid_condition_collection_register, argvalues_grid_condition_collection_register)
     def test_register_grid_conditions(
         self,
         num_trials: int,
-        parameter_type: Literal['uniform_float', 'uniform_int', 'categorical', 'ordinal'],
+        parameter_type: Literal["uniform_float", "uniform_int", "categorical", "ordinal"],
         lower: float | int | None,
         upper: float | int | None,
         num_numeric_choices: int | None,
         log: bool | None,
         choices: list[GridValueType] | None,
         sequence: list[GridValueType] | None,
-        expect: list[GridValueType]
+        expect: list[GridValueType],
     ) -> None:
         hyperparameters = [
             Parameter(
                 {
-                    'name': 'test',
-                    'type': parameter_type,
-                    'lower': lower,
-                    'upper': upper,
-                    'log': log,
-                    'num_numeric_choices': num_numeric_choices,
-                    'choices': choices,
-                    'sequence': sequence
+                    "name": "test",
+                    "type": parameter_type,
+                    "lower": lower,
+                    "upper": upper,
+                    "log": log,
+                    "num_numeric_choices": num_numeric_choices,
+                    "choices": choices,
+                    "sequence": sequence,
                 }
             )
         ]
@@ -604,25 +588,9 @@ class TestGridConditionCollection:
     def test_get_grid_conditions_with_empty_choices(self, monkeypatch: pytest.MonkeyPatch) -> None:
         conditions = [
             FloatGridCondition(
-                Parameter(
-                    {
-                        "name": "x1",
-                        "type": "uniform_float",
-                        "lower": 0.0,
-                        "upper": 1.0,
-                        "log": False
-                    }
-                )
+                Parameter({"name": "x1", "type": "uniform_float", "lower": 0.0, "upper": 1.0, "log": False})
             ),
-            CategoricalGridCondition(
-                Parameter(
-                    {
-                        "name": "x0",
-                        "type": "categorical",
-                        "choices": [0, 1, 2]
-                    }
-                )
-            )
+            CategoricalGridCondition(Parameter({"name": "x0", "type": "categorical", "choices": [0, 1, 2]})),
         ]
         with monkeypatch.context() as m:
             m.setattr(self.grid_condition_collection, "_conditions", conditions)
@@ -632,15 +600,7 @@ class TestGridConditionCollection:
     def test_set_num_choices(self, monkeypatch: pytest.MonkeyPatch) -> None:
         conditions = [
             FloatGridCondition(
-                Parameter(
-                    {
-                        "name": "x1",
-                        "type": "uniform_float",
-                        "lower": 0.0,
-                        "upper": 1.0,
-                        "log": False
-                    }
-                )
+                Parameter({"name": "x1", "type": "uniform_float", "lower": 0.0, "upper": 1.0, "log": False})
             )
         ]
         with monkeypatch.context() as m:
@@ -652,90 +612,73 @@ class TestGridConditionCollection:
         pass
 
 
-argnames_grid_point_generator = 'sampling_method, rng'
+argnames_grid_point_generator = "sampling_method, rng"
 argvalues_grid_point_generator = [
-    ('IN_ORDER', None),
-    ('UNIFORM', None),
-    ('RANDOM', RandomState(42)),
-    ('DUPLICATABLE_RANDOM', RandomState(42)),
-    ('INVALID', None)
+    ("IN_ORDER", None),
+    ("UNIFORM", None),
+    ("RANDOM", RandomState(42)),
+    ("DUPLICATABLE_RANDOM", RandomState(42)),
+    ("INVALID", None),
 ]
 
 
 class TestGridPointGenerator(BaseTest):
-    @ pytest.fixture(autouse=True)
+    @pytest.fixture(autouse=True)
     def setup_grid_point_generator(
-        self,
-        data_dir: Path,
-        create_tmp_config: Callable[[Path], Path]
+        self, data_dir: Path, create_tmp_config: Callable[[Path], Path]
     ) -> Generator[None, None, None]:
         self.data_dir = data_dir
 
-        config = self.load_config_for_test(self.configs['config_budget-specified-grid.json'])
+        config = self.load_config_for_test(self.configs["config_budget-specified-grid.yaml"])
         self.hyperparameters = load_parameter(config.optimize.parameters).get_parameter_list()
         self.trial_number = config.optimize.trial_number
-        self.grid_point_generator = GridPointGenerator(
-            self.trial_number, self.hyperparameters.copy()
-        )
+        self.grid_point_generator = GridPointGenerator(self.trial_number, self.hyperparameters.copy())
         yield
         self.grid_point_generator = None
 
     def test_init(self) -> None:
         with pytest.raises(ValueError):
             _ = GridPointGenerator(
-                num_trials=0,
-                hyperparameters=self.hyperparameters.copy(),
-                accept_small_trial_number=False
+                num_trials=0, hyperparameters=self.hyperparameters.copy(), accept_small_trial_number=False
             )
         grid_point_generator = GridPointGenerator(
-            num_trials=0,
-            hyperparameters=self.hyperparameters,
-            accept_small_trial_number=True
+            num_trials=0, hyperparameters=self.hyperparameters, accept_small_trial_number=True
         )
         assert len(grid_point_generator._grid_condition_collection) > 0
 
         grid_point_generator = GridPointGenerator(
             num_trials=self.trial_number,
             hyperparameters=self.hyperparameters,
-            sampling_method='IN_ORDER',
+            sampling_method="IN_ORDER",
             rng=None,
-            accept_small_trial_number=False
+            accept_small_trial_number=False,
         )
         assert len(grid_point_generator._grid_point_stack) == 0
 
         grid_point_generator = GridPointGenerator(
             num_trials=self.trial_number,
             hyperparameters=self.hyperparameters,
-            sampling_method='RANDOM',
+            sampling_method="RANDOM",
             rng=None,
-            accept_small_trial_number=False
+            accept_small_trial_number=False,
         )
         assert len(grid_point_generator._grid_point_stack) > 0
 
-    def test_all_grid_points_generated(
-        self, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
+    def test_all_grid_points_generated(self, monkeypatch: pytest.MonkeyPatch) -> None:
         assert self.grid_point_generator.all_grid_points_generated() is False
 
         with monkeypatch.context() as m:
-            m.setattr(
-                self.grid_point_generator,
-                '_num_generated_points',
-                self.grid_point_generator._grid_space_size
-            )
+            m.setattr(self.grid_point_generator, "_num_generated_points", self.grid_point_generator._grid_space_size)
             assert self.grid_point_generator.all_grid_points_generated()
 
-    @ pytest.mark.parametrize(argnames_grid_point_generator, argvalues_grid_point_generator)
+    @pytest.mark.parametrize(argnames_grid_point_generator, argvalues_grid_point_generator)
     def test_get_next_grid_point(
         self,
-        sampling_method: Literal['IN_ORDER', 'UNIFORM', 'RANDOM', 'DUPLICATABLE_RANDOM', 'INVALID'],
+        sampling_method: Literal["IN_ORDER", "UNIFORM", "RANDOM", "DUPLICATABLE_RANDOM", "INVALID"],
         rng: RandomState,
     ) -> None:
         grid_point_generator = GridPointGenerator(
-            self.trial_number,
-            self.hyperparameters,
-            sampling_method=sampling_method,
-            rng=rng
+            self.trial_number, self.hyperparameters, sampling_method=sampling_method, rng=rng
         )
         try:
             next_grid_point = grid_point_generator.get_next_grid_point()
@@ -754,10 +697,7 @@ class TestGridPointGenerator(BaseTest):
 
     def test_get_grid_point_randomly(self) -> None:
         grid_point_generator = GridPointGenerator(
-            num_trials=self.trial_number,
-            hyperparameters=self.hyperparameters,
-            sampling_method='RANDOM',
-            rng=None
+            num_trials=self.trial_number, hyperparameters=self.hyperparameters, sampling_method="RANDOM", rng=None
         )
         next_grid_point = grid_point_generator._get_grid_point_randomly(0)
         assert len(next_grid_point) > 0
@@ -766,12 +706,10 @@ class TestGridPointGenerator(BaseTest):
         grid_point_generator = GridPointGenerator(
             num_trials=self.trial_number,
             hyperparameters=self.hyperparameters,
-            sampling_method='DUPLICATABLE_RANDOM',
-            rng=None
+            sampling_method="DUPLICATABLE_RANDOM",
+            rng=None,
         )
-        next_grid_point = (
-            grid_point_generator._get_grid_point_duplicatable_randomly(0)
-        )
+        next_grid_point = grid_point_generator._get_grid_point_duplicatable_randomly(0)
         assert len(next_grid_point) > 0
 
     def test_num_generated_points(self) -> None:

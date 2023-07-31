@@ -1,34 +1,45 @@
+from __future__ import annotations
+
 import json
 import os
 import shutil
 import tempfile
 from pathlib import Path
+from typing import Any
 
-import fasteners
 import pytest
+import yaml
 
 from aiaccel.config import load_config
 from aiaccel.storage import Storage
-from aiaccel.util import create_yaml, interprocess_lock_file, load_yaml
+from aiaccel.util import create_yaml
 from aiaccel.workspace import Workspace
 
 WORK_SUB_DIRECTORIES = [
-    'abci_output', 'alive', 'hp', 'hp/finished', 'hp/ready', 'hp/running',
-    'lock', 'log', 'resource', 'result', 'runner', 'state'
+    "abci_output",
+    "alive",
+    "hp",
+    "hp/finished",
+    "hp/ready",
+    "hp/running",
+    "lock",
+    "log",
+    "resource",
+    "result",
+    "runner",
+    "state",
 ]
 WORK_FILES = [
-    'config.json',
-    'config.yml',
-    'hyperparameter.json',
-    'original_main.py',
-    'wrapper.py',
-    'wrapper_abci.sh',
-    'config_grid.json'
+    "config.yaml",
+    "hyperparameter.json",
+    "original_main.py",
+    "wrapper.py",
+    "wrapper_abci.sh",
+    "config_grid.yaml",
 ]
 
 
-def clean_directory(path: Path, exclude_dir: list = None,
-                    exclude_file: list = None, dict_lock: Path = None) -> bool:
+def clean_directory(path: Path, exclude_dir: list = None, exclude_file: list = None, dict_lock: Path = None) -> bool:
     """Remove all files in the directory recursively.
 
     Args:
@@ -53,17 +64,15 @@ def clean_directory(path: Path, exclude_dir: list = None,
         exclude_file = []
 
     if dict_lock is None:
-        for p in path.glob('**/*'):
+        for p in path.glob("**/*"):
             if p.is_file():
-                if True not in [p in d.parts for d in
-                                exclude_dir + exclude_file]:
+                if True not in [p in d.parts for d in exclude_dir + exclude_file]:
                     p.unlink()
     else:
-        with fasteners.InterProcessLock(interprocess_lock_file(path, dict_lock)):
-            for p in path.glob('**/*'):
-                if p.is_file():
-                    if True not in [p in d.parts for d in exclude_dir + exclude_file]:
-                        p.unlink()
+        for p in path.glob("**/*"):
+            if p.is_file():
+                if True not in [p in d.parts for d in exclude_dir + exclude_file]:
+                    p.unlink()
 
 
 def to_path(path):
@@ -81,6 +90,21 @@ def to_path(path):
     return Path(path).resolve()
 
 
+def load_yaml(path: Path) -> dict[str, Any]:
+    """Load a content of a yaml file.
+    Args:
+        path (Path): A path of a yaml file.
+        dict_lock (Path | None, optional): A directory to store lock files.
+            Defaults to None.
+
+    Returns:
+        dict: A loaded content.
+    """
+    with open(path, "r") as f:
+        yml = yaml.load(f, Loader=yaml.UnsafeLoader)
+    return yml
+
+
 @pytest.fixture
 def cd_work(tmpdir):
     cwd = Path.cwd().resolve()
@@ -90,57 +114,49 @@ def cd_work(tmpdir):
 
 
 @pytest.fixture(scope="session")
-def config_json(data_dir):
-    return data_dir.joinpath('config.json')
+def config_yaml(data_dir):
+    return data_dir.joinpath("config.yaml")
 
 
 @pytest.fixture(scope="session")
-def grid_config_json(data_dir):
-    return data_dir.joinpath('config_grid.json')
-
-
-@pytest.fixture
-def config_yaml(data_dir):
-    return data_dir.joinpath('config.yml')
+def grid_config_yaml(data_dir):
+    return data_dir.joinpath("config_grid.yaml")
 
 
 @pytest.fixture(scope="session")
 def data_dir(root_dir):
-    return root_dir.joinpath('test_data')
+    return root_dir.joinpath("test_data")
 
 
 @pytest.fixture(scope="session")
 def get_one_parameter(work_dir):
     def _get_one_parameter():
-        path = work_dir.joinpath('result/0.yml')
+        path = work_dir.joinpath("result/0.yml")
         return load_yaml(path)
 
     return _get_one_parameter
 
 
 @pytest.fixture(scope="session")
-def load_test_config(config_json):
-
+def load_test_config(config_yaml):
     def _load_test_config():
-        return load_config(config_json)
+        return load_config(config_yaml)
 
     return _load_test_config
 
 
 @pytest.fixture(scope="session")
-def load_test_config_org(config_json):
-
+def load_test_config_org(config_yaml):
     def _load_test_config():
-        return load_config(config_json)
+        return load_config(config_yaml)
 
     return _load_test_config
 
 
 @pytest.fixture(scope="session")
-def grid_load_test_config(grid_config_json):
-
+def grid_load_test_config(grid_config_yaml):
     def _load_test_config():
-        return load_config(grid_config_json)
+        return load_config(grid_config_yaml)
 
     return _load_test_config
 
@@ -152,7 +168,7 @@ def root_dir():
 
 @pytest.fixture(scope="session")
 def work_dir(tmpdir):
-    return tmpdir.joinpath('work')
+    return tmpdir.joinpath("work")
 
 
 @pytest.fixture(scope="session")
@@ -166,19 +182,19 @@ def tmpdir():
 def create_tmp_config(data_dir, tmpdir, work_dir):
     def _create_tmp_config(conf_path=None):
         if conf_path is None:
-            conf_path = data_dir.joinpath('config.yaml')
+            conf_path = data_dir.joinpath("config.yaml")
         conf_path.name
         if conf_path.suffix == ".yaml" or conf_path.suffix == ".yml":
             yml = load_yaml(conf_path)
-            yml['generic']['workspace'] = str(work_dir)
+            yml["generic"]["workspace"] = str(work_dir)
             tmp_conf_path = tmpdir.joinpath(conf_path.name)
             create_yaml(tmp_conf_path, yml)
         elif conf_path.suffix == ".json":
-            with open(conf_path, 'r') as f:
+            with open(conf_path, "r") as f:
                 json_obj = json.load(f)
-                json_obj['generic']['workspace'] = str(work_dir)
+                json_obj["generic"]["workspace"] = str(work_dir)
                 tmp_conf_path = tmpdir.joinpath(conf_path.name)
-            with open(tmp_conf_path, 'w') as f:
+            with open(tmp_conf_path, "w") as f:
                 json.dump(json_obj, f)
 
         workspace = Workspace(str(work_dir))
@@ -192,8 +208,8 @@ def create_tmp_config(data_dir, tmpdir, work_dir):
 @pytest.fixture(scope="session")
 def setup_hp_files(work_dir):
     def _setup_hp_files(hp_type, n=1):
-        if hp_type not in ['ready', 'running', 'finished']:
-            hp_type = 'ready'
+        if hp_type not in ["ready", "running", "finished"]:
+            hp_type = "ready"
 
         # hp_files = list(data_dir.joinpath('work/hp/finished').glob('*.hp'))
         # n = min(n, len(hp_files))
@@ -206,14 +222,15 @@ def setup_hp_files(work_dir):
         workspace = Workspace(str(work_dir))
         storage = Storage(workspace.storage_file_path)
         for i in range(n):
-            storage.trial.set_any_trial_state(trial_id=i, state=hp_type)
+            storage.state.set_any_trial_state(trial_id=i, state=hp_type)
+
     return _setup_hp_files
 
 
 @pytest.fixture(scope="session")
 def setup_hp_ready(setup_hp_files):
     def _setup_hp_ready(n=1):
-        setup_hp_files('ready', n=n)
+        setup_hp_files("ready", n=n)
 
     return _setup_hp_ready
 
@@ -221,7 +238,7 @@ def setup_hp_ready(setup_hp_files):
 @pytest.fixture(scope="session")
 def setup_hp_running(setup_hp_files):
     def _setup_hp_running(n=1):
-        setup_hp_files('running', n=n)
+        setup_hp_files("running", n=n)
 
     return _setup_hp_running
 
@@ -229,7 +246,7 @@ def setup_hp_running(setup_hp_files):
 @pytest.fixture(scope="session")
 def setup_hp_finished(setup_hp_files):
     def _setup_hp_finished(n=1):
-        setup_hp_files('finished', n=n)
+        setup_hp_files("finished", n=n)
 
     return _setup_hp_finished
 
@@ -252,6 +269,7 @@ def database_remove(work_dir):
         workspace = Workspace(str(work_dir))
         if workspace.storage_file_path.exists():
             workspace.storage_file_path.unlink()
+
     return _database_remove
 
 
@@ -269,16 +287,16 @@ def clean_work_dir(work_dir, data_dir):
         valid_dir += [work_dir]
         work_files = [work_dir.joinpath(wf) for wf in WORK_FILES]
 
-        clean_directory(
-            work_dir, exclude_file=work_files
-        )
+        clean_directory(work_dir, exclude_file=work_files)
 
-        for p in work_dir.glob('**/*'):
+        for p in work_dir.glob("**/*"):
             # TODO: this part can be replaced using PurePath.is_relative_to()
             #  from version 3.9
-            if p.is_dir() and \
-                    p not in [work_dir.joinpath(wsd) for wsd in WORK_SUB_DIRECTORIES] and \
-                    any([str(work_dir.joinpath(wsd)) in str(p) for wsd in WORK_SUB_DIRECTORIES]):
+            if (
+                p.is_dir()
+                and p not in [work_dir.joinpath(wsd) for wsd in WORK_SUB_DIRECTORIES]
+                and any([str(work_dir.joinpath(wsd)) in str(p) for wsd in WORK_SUB_DIRECTORIES])
+            ):
                 shutil.rmtree(p)
 
         for d in valid_dir:

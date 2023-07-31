@@ -1,67 +1,72 @@
 generic:
-  workspace: "./work"
-  job_command: "python user.py"
-  # python_file: "./user.py"
+  workspace: ./work
+  job_command: python user.py
+  # python_file: ./user.py
   # function: "main"
-  batch_job_timeout: 600
-  enabled_variable_name_argumentation: True
+  main_loop_sleep_seconds: 0.01
+  logging_level: INFO
+
+job_setting:
+    job_timeout_seconds: 600
+    max_failure_retries: 0
+    trial_id_digits: 7
 
 resource:
-  # type: "abci"
-  type: "local"
-  # type: "python_local"
+  # type: abci
+  type: local
+  # type: python_local
   num_workers: 4
 
 ABCI:
   group: "[group]"
-  job_script_preamble: "./job_script_preamble.sh"
+  job_script_preamble: ./job_script_preamble.sh
   job_execution_options: ""
 
 optimize:
-  # search_algorithm: "aiaccel.optimizer.NelderMeadOptimizer"
-  # search_algorithm: "aiaccel.optimizer.RandomOptimizer"
-  # search_algorithm: "aiaccel.optimizer.SobolOptimizer"
-  search_algorithm: "aiaccel.optimizer.GridOptimizer"
-  # search_algorithm: "aiaccel.optimizer.TpeOptimizer"
-  goal: "minimize"
+  # search_algorithm: aiaccel.optimizer.NelderMeadOptimizer
+  # search_algorithm: aiaccel.optimizer.RandomOptimizer
+  # search_algorithm: aiaccel.optimizer.SobolOptimizer
+  search_algorithm: aiaccel.optimizer.GridOptimizer
+  # search_algorithm: aiaccel.optimizer.TpeOptimizer
+  goal: minimize
   trial_number: 30
   rand_seed: 42
   parameters:
     -
-      name: "x1"
-      type: "uniform_float"
+      name: x1
+      type: uniform_float
       lower: -500.0
       upper: 500.0
       step: 10
       log: false
       base: 10
     -
-      name: "x2"
-      type: "uniform_float"
+      name: x2
+      type: uniform_float
       lower: -500.0
       upper: 500.0
       step: 10
       log: false
       base: 10
     -
-      name: "x3"
-      type: "uniform_float"
+      name: x3
+      type: uniform_float
       lower: -500.0
       upper: 500.0
       step: 10
       log: false
       base: 10
     -
-      name: "x4"
-      type: "uniform_float"
+      name: x4
+      type: uniform_float
       lower: -500.0
       upper: 500.0
       step: 10
       log: false
       base: 10
     -
-      name: "x5"
-      type: "uniform_float"
+      name: x5
+      type: uniform_float
       lower: -500.0
       upper: 500.0
       step: 10

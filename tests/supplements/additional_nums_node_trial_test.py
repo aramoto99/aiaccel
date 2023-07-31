@@ -10,7 +10,7 @@ import pytest
 import yaml
 from omegaconf.dictconfig import DictConfig
 
-from aiaccel.common import dict_result, file_final_result
+from aiaccel.common import dict_result
 from aiaccel.config import load_config
 from aiaccel.storage.storage import Storage
 from aiaccel.workspace import Workspace
@@ -19,41 +19,33 @@ from tests.base_test import BaseTest
 
 class AdditionalNumsNodeTrialTest(BaseTest):
     search_algorithm = None
-    python_program = 'user.py'
+    python_program = "user.py"
 
     @pytest.fixture(autouse=True)
     def setup_optimizer(self) -> None:
-        self.test_data_dir = Path(__file__).resolve().parent.joinpath(
-            'additional_nums_node_trial_test', 'test_data'
-        )
+        self.test_data_dir = Path(__file__).resolve().parent.joinpath("additional_nums_node_trial_test", "test_data")
         self.python_file = self.test_data_dir.joinpath(self.python_program)
 
     @pytest.mark.parametrize(
-        'num_workers, num_trial',
+        "num_workers, num_trial",
         [
             (2, 10),  # num_workers < num_grid < num_trials
             (5, 10),  # num_grid < num_workers < num_trials
             (10, 5),  # num_grid < num_trials < num_workers
             (10, 2),  # num_trials < num_grid < num_workers
-            (3, 2),   # num_trials < num_workers < num_grid
-            (2, 3)    # num_workers < num_trials < num_grid
-        ]
+            (3, 2),  # num_trials < num_workers < num_grid
+            (2, 3),  # num_workers < num_trials < num_grid
+        ],
     )
     def test_run(
-        self,
-        num_workers: int,
-        num_trial: int,
-        work_dir: Path,
-        create_tmp_config: Callable[[Path, Path]]
+        self, num_workers: int, num_trial: int, work_dir: Path, create_tmp_config: Callable[[Path, Path]]
     ) -> None:
-        config_file = self.test_data_dir.joinpath(
-            'config_{}.yaml'.format(self.search_algorithm)
-        )
-        with open(config_file, 'r') as f:
+        config_file = self.test_data_dir.joinpath("config_{}.yaml".format(self.search_algorithm))
+        with open(config_file, "r") as f:
             cfg = yaml.load(f, Loader=yaml.SafeLoader)
-        cfg['resource']['num_workers'] = num_workers
-        cfg['optimize']['trial_number'] = num_trial
-        with open(config_file, 'w') as f:
+        cfg["resource"]["num_workers"] = num_workers
+        cfg["optimize"]["trial_number"] = num_trial
+        with open(config_file, "w") as f:
             yaml.dump(cfg, f, default_flow_style=False)
         config_file = create_tmp_config(config_file)
         config = load_config(config_file)
@@ -62,10 +54,8 @@ class AdditionalNumsNodeTrialTest(BaseTest):
         storage = Storage(workspace.storage_file_path)
 
         with self.create_main(self.python_file):
-            popen = Popen(
-                ['aiaccel-start', '--config', str(config_file), '--clean']
-            )
-            popen.wait(timeout=config.generic.batch_job_timeout)
+            popen = Popen(["aiaccel-start", "--config", str(config_file), "--clean"])
+            popen.wait(timeout=config.job_setting.job_timeout_seconds)
         self.evaluate(work_dir, config, storage)
 
     def evaluate(self, work_dir: Path, config: DictConfig, storage: Storage) -> None:
@@ -75,5 +65,5 @@ class AdditionalNumsNodeTrialTest(BaseTest):
         assert finished <= config.optimize.trial_number
         assert ready == 0
         assert running == 0
-        final_result = work_dir.joinpath(dict_result, file_final_result)
+        final_result = work_dir.joinpath("final_result.result")
         assert final_result.exists()

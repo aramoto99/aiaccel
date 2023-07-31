@@ -4,6 +4,7 @@ import xml.etree.ElementTree as ElementTree
 from typing import Any
 from xml.etree.ElementTree import Element
 
+
 """ Example of stat
 stat = {
     'job-ID': 12345,

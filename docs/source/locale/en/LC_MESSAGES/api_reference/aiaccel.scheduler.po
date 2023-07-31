@@ -57,10 +57,10 @@ msgstr ""
 #: aiaccel.scheduler.abci_scheduler.AbciScheduler.get_stats
 #: aiaccel.scheduler.abci_scheduler.AbciScheduler.parse_trial_id
 #: aiaccel.scheduler.abstract_scheduler.AbstractScheduler.change_state_finished_trials
-#: aiaccel.scheduler.abstract_scheduler.AbstractScheduler.check_error
+#: aiaccel.scheduler.abstract_scheduler.AbstractScheduler.is_error_free
 #: aiaccel.scheduler.abstract_scheduler.AbstractScheduler.create_model
 #: aiaccel.scheduler.abstract_scheduler.AbstractScheduler.get_stats
-#: aiaccel.scheduler.abstract_scheduler.AbstractScheduler.inner_loop_main_process
+#: aiaccel.scheduler.abstract_scheduler.AbstractScheduler.run_in_main_loop
 #: aiaccel.scheduler.abstract_scheduler.AbstractScheduler.parse_trial_id
 #: aiaccel.scheduler.abstract_scheduler.AbstractScheduler.post_process
 #: aiaccel.scheduler.abstract_scheduler.AbstractScheduler.pre_process
@@ -106,14 +106,14 @@ msgstr ""
 #: aiaccel.scheduler.job.model.local_model.LocalModel.before_runner_create
 #: aiaccel.scheduler.job.model.local_model.LocalModel.conditions_result
 #: aiaccel.scheduler.job.model.local_model.LocalModel.conditions_runner_confirmed
-#: aiaccel.scheduler.job.model.local_model.LocalModel.create_result_file
+#: aiaccel.scheduler.job.model.local_model.LocalModel.write_result_to_storage
 #: aiaccel.scheduler.local_scheduler.LocalScheduler.create_model
 #: aiaccel.scheduler.local_scheduler.LocalScheduler.get_any_trial_xs
 #: aiaccel.scheduler.local_scheduler.LocalScheduler.get_stats
 #: aiaccel.scheduler.local_scheduler.LocalScheduler.parse_trial_id
 #: aiaccel.scheduler.pylocal_scheduler.PylocalScheduler.get_any_trial_xs
 #: aiaccel.scheduler.pylocal_scheduler.PylocalScheduler.get_result_file_path
-#: aiaccel.scheduler.pylocal_scheduler.PylocalScheduler.inner_loop_main_process
+#: aiaccel.scheduler.pylocal_scheduler.PylocalScheduler.run_in_main_loop
 #: aiaccel.scheduler.pylocal_scheduler.execute
 #: aiaccel.scheduler.pylocal_scheduler.initializer of
 msgid "戻り値"
@@ -126,9 +126,9 @@ msgstr ""
 
 #: aiaccel.scheduler.abci_scheduler.AbciScheduler.create_model
 #: aiaccel.scheduler.abci_scheduler.AbciScheduler.parse_trial_id
-#: aiaccel.scheduler.abstract_scheduler.AbstractScheduler.check_error
+#: aiaccel.scheduler.abstract_scheduler.AbstractScheduler.is_error_free
 #: aiaccel.scheduler.abstract_scheduler.AbstractScheduler.create_model
-#: aiaccel.scheduler.abstract_scheduler.AbstractScheduler.inner_loop_main_process
+#: aiaccel.scheduler.abstract_scheduler.AbstractScheduler.run_in_main_loop
 #: aiaccel.scheduler.abstract_scheduler.AbstractScheduler.parse_trial_id
 #: aiaccel.scheduler.abstract_scheduler.AbstractScheduler.start_job
 #: aiaccel.scheduler.algorithm.random_sampling.RandomSamplingSchedulingAlgorithm.select_hp
@@ -153,7 +153,7 @@ msgstr ""
 #: aiaccel.scheduler.local_scheduler.LocalScheduler.parse_trial_id
 #: aiaccel.scheduler.pylocal_scheduler.PylocalScheduler.get_any_trial_xs
 #: aiaccel.scheduler.pylocal_scheduler.PylocalScheduler.get_result_file_path
-#: aiaccel.scheduler.pylocal_scheduler.PylocalScheduler.inner_loop_main_process
+#: aiaccel.scheduler.pylocal_scheduler.PylocalScheduler.run_in_main_loop
 #: aiaccel.scheduler.pylocal_scheduler.execute of
 msgid "戻り値の型"
 msgstr ""
@@ -193,7 +193,7 @@ msgstr ""
 #: aiaccel.scheduler.job.model.abstract_model.AbstractModel.before_runner_create:8
 #: aiaccel.scheduler.job.model.local_model.LocalModel.before_job_submitted:8
 #: aiaccel.scheduler.job.model.local_model.LocalModel.before_runner_create:8
-#: aiaccel.scheduler.job.model.local_model.LocalModel.create_result_file:6
+#: aiaccel.scheduler.job.model.local_model.LocalModel.write_result_to_storage:6
 #: aiaccel.scheduler.local_scheduler.LocalScheduler.get_stats:3
 #: aiaccel.scheduler.pylocal_scheduler.initializer:6 of
 msgid "None"
@@ -207,7 +207,7 @@ msgstr ""
 
 #: aiaccel.scheduler.abci_scheduler.AbciScheduler.parse_trial_id
 #: aiaccel.scheduler.abstract_scheduler.AbstractScheduler
-#: aiaccel.scheduler.abstract_scheduler.AbstractScheduler.check_error
+#: aiaccel.scheduler.abstract_scheduler.AbstractScheduler.is_error_free
 #: aiaccel.scheduler.abstract_scheduler.AbstractScheduler.parse_trial_id
 #: aiaccel.scheduler.abstract_scheduler.AbstractScheduler.resume
 #: aiaccel.scheduler.abstract_scheduler.AbstractScheduler.start_job
@@ -247,7 +247,7 @@ msgstr ""
 #: aiaccel.scheduler.job.model.local_model.LocalModel.before_runner_create
 #: aiaccel.scheduler.job.model.local_model.LocalModel.conditions_result
 #: aiaccel.scheduler.job.model.local_model.LocalModel.conditions_runner_confirmed
-#: aiaccel.scheduler.job.model.local_model.LocalModel.create_result_file
+#: aiaccel.scheduler.job.model.local_model.LocalModel.write_result_to_storage
 #: aiaccel.scheduler.local_scheduler.LocalScheduler.get_any_trial_xs
 #: aiaccel.scheduler.local_scheduler.LocalScheduler.parse_trial_id
 #: aiaccel.scheduler.pylocal_scheduler.PylocalScheduler.get_any_trial_xs
@@ -363,11 +363,11 @@ msgid ""
 "running files are in running directory."
 msgstr ""
 
-#: aiaccel.scheduler.abstract_scheduler.AbstractScheduler.check_error:1 of
+#: aiaccel.scheduler.abstract_scheduler.AbstractScheduler.is_error_free:1 of
 msgid "Check to confirm if an error has occurred."
 msgstr ""
 
-#: aiaccel.scheduler.abstract_scheduler.AbstractScheduler.check_error:5 of
+#: aiaccel.scheduler.abstract_scheduler.AbstractScheduler.is_error_free:5 of
 msgid "True if no error, False if with error."
 msgstr ""
 
@@ -402,14 +402,14 @@ msgstr ""
 msgid "Updates the number of files in hp(hyper parameter) directories."
 msgstr ""
 
-#: aiaccel.scheduler.abstract_scheduler.AbstractScheduler.inner_loop_main_process:1
-#: aiaccel.scheduler.pylocal_scheduler.PylocalScheduler.inner_loop_main_process:1
+#: aiaccel.scheduler.abstract_scheduler.AbstractScheduler.run_in_main_loop:1
+#: aiaccel.scheduler.pylocal_scheduler.PylocalScheduler.run_in_main_loop:1
 #: of
 msgid "A main loop process. This process is repeated every main loop."
 msgstr ""
 
-#: aiaccel.scheduler.abstract_scheduler.AbstractScheduler.inner_loop_main_process:3
-#: aiaccel.scheduler.pylocal_scheduler.PylocalScheduler.inner_loop_main_process:3
+#: aiaccel.scheduler.abstract_scheduler.AbstractScheduler.run_in_main_loop:3
+#: aiaccel.scheduler.pylocal_scheduler.PylocalScheduler.run_in_main_loop:3
 #: of
 msgid "The process succeeds or not. The main loop exits if failed."
 msgstr ""
@@ -1078,11 +1078,11 @@ msgstr ""
 msgid "Schedule to run this execution."
 msgstr ""
 
-#: aiaccel.scheduler.job.model.local_model.LocalModel.create_result_file:1 of
+#: aiaccel.scheduler.job.model.local_model.LocalModel.write_result_to_storage:1 of
 msgid "Create result file."
 msgstr ""
 
-#: aiaccel.scheduler.job.model.local_model.LocalModel.create_result_file:3 of
+#: aiaccel.scheduler.job.model.local_model.LocalModel.write_result_to_storage:3 of
 msgid "Job object."
 msgstr ""
 

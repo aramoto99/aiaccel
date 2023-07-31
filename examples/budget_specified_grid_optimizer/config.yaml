@@ -1,46 +1,51 @@
 generic:
-  workspace: "./work"
-  job_command: "python user.py"
-  batch_job_timeout: 600
-  enabled_variable_name_argumentation: True
+  workspace: ./work
+  job_command: python user.py
+  main_loop_sleep_seconds: 0.01
+  logging_level: INFO
+
+job_setting:
+    job_timeout_seconds: 600
+    max_failure_retries: 0
+    trial_id_digits: 7
 
 resource:
-  type: "local"
+  type: local
   num_workers: 4
 
 # ABCI:
 #   group: "[group]"
-#   job_script_preamble: "./job_script_preamble.sh"
+#   job_script_preamble: ./job_script_preamble.sh
 #   job_execution_options: ""
 
 optimize:
-  search_algorithm: "aiaccel.optimizer.BudgetSpecifiedGridOptimizer"
-  goal: "minimize"
+  search_algorithm: aiaccel.optimizer.BudgetSpecifiedGridOptimizer
+  goal: minimize
   trial_number: 30
   rand_seed: 42
   parameters:
     -
-      name: "x1"
-      type: "uniform_float"
+      name: x1
+      type: uniform_float
       lower: -500.0
       upper: 500.0
     -
-      name: "x2"
-      type: "uniform_float"
+      name: x2
+      type: uniform_float
       lower: 50.0
       upper: 500.0
       log: true
     -
-      name: "x3"
-      type: "uniform_int"
+      name: x3
+      type: uniform_int
       lower: -500
       upper: 500
       num_grid_points: 3
     -
-      name: "x4"
-      type: "categorical"
+      name: x4
+      type: categorical
       choices: [-500, 0, 500]
     -
-      name: "x5"
-      type: "ordinal"
+      name: x5
+      type: ordinal
       sequence: [-500, 0, 500]

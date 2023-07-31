@@ -4,12 +4,11 @@ from omegaconf.dictconfig import DictConfig
 from tensorboardX import SummaryWriter
 
 from aiaccel.common import goal_maximize
-from aiaccel.module import AbstractModule
+from aiaccel.module import AiaccelCore
 from aiaccel.util.buffer import Buffer
-from aiaccel.util.trialid import TrialId
 
 
-class TensorBoard(AbstractModule):
+class TensorBoard(AiaccelCore):
     """A class for TensorBoard.
     Args:
         options (dict[str, str | int | bool]): A dictionary containing
@@ -23,34 +22,26 @@ class TensorBoard(AbstractModule):
 
     def __init__(self, config: DictConfig) -> None:
         super().__init__(config, "tensorboard")
-
-        self.writer = SummaryWriter(str(self.workspace.tensorboard))
-
         self.buff = Buffer(["finished"])
         self.buff.d["finished"].set_max_len(2)
 
-    def pre_process(self) -> None:
-        return None
-
-    def inner_loop_main_process(self) -> bool:
+    def update(self) -> None:
         self.buff.d["finished"].Add(self.storage.get_finished())
 
         if self.buff.d["finished"].Len == 0:
-            return True
-
+            return
         if self.buff.d["finished"].Len >= 2 and self.buff.d["finished"].has_difference() is False:
-            return True
-
+            return
         if self.buff.d["finished"].Len == 1:
             trial_ids = self.buff.d["finished"].Now
         else:
             trial_ids = list(set(self.buff.d["finished"].Now) - set(self.buff.d["finished"].Pre))
 
+        self.writer = SummaryWriter(str(self.workspace.tensorboard))
         for trial_id in trial_ids:
             objective_ys, best_values = self.storage.result.get_any_trial_objective_and_best_value(
                 trial_id, goals=self.goals
             )
-
             if objective_ys is None or best_values is None:
                 continue
 
@@ -69,13 +60,8 @@ class TensorBoard(AbstractModule):
 
             # hyperparameters
             params = self.storage.hp.get_any_trial_params_dict(trial_id)
-            _trial_id = TrialId(self.config).zero_padding_any_trial_id(trial_id)
+            _trial_id = self.trial_id.zero_padding_any_trial_id(trial_id)
             self.writer.add_hparams(params, objectives, name=_trial_id)
 
             self.writer.flush()
-
-        return True
-
-    def post_process(self) -> None:
         self.writer.close()
-        return None

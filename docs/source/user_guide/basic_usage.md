@@ -104,12 +104,12 @@ import aiaccel
 generic:
     workspace: "./work"
     job_command: "python user.py"
-    batch_job_timeout: 600
+    job_timeout_seconds: 600
 ```
 
 - **workspace** - 途中経過の保存先を指定します。
 - **job_command** - ユーザプログラムを実行するコマンドを記述します。
-- **batch_job_timeout** - jobのタイムアウト時間を設定します。[単位: 秒]
+- **job_timeout_seconds** - jobのタイムアウト時間を設定します。[単位: 秒]
 
 ### resource
 
@@ -131,7 +131,7 @@ resource:
 ```yaml
 ABCI:
     group: "[group]"
-    job_script_preamble: "./job_script_preamble.sh"
+    job_script_preamble: ./job_script_preamble.sh
     job_execution_options: ""
 ```
 
@@ -375,7 +375,7 @@ config.yaml
 generic:
     workspace: "./work"
     job_command: "python user.py"
-    batch_job_timeout: 600
+    job_timeout_seconds: 600
 
 resource:
     type: "local"
@@ -383,7 +383,7 @@ resource:
 
 ABCI:
     group: "[group]"
-    job_script_preamble: "./job_script_preamble.sh"
+    job_script_preamble: ./job_script_preamble.sh
     job_execution_options: ""
 
 optimize:
@@ -465,7 +465,7 @@ aiaccelでwrapperプログラムを最適化させる場合はコンフィグフ
     generic:
         workspace: "./work"
         job_command: "python wrapper.py"
-        batch_job_timeout: 600
+        job_timeout_seconds: 600
 ```
 
 5. job_script_preamble.shの作成
@@ -489,9 +489,6 @@ aiaccelでwrapperプログラムを最適化させる場合はコンフィグフ
     module load cudnn/8.0/8.0.5
     module load nccl/2.8/2.8.4-1
     source ~/optenv/bin/activate
-
-    AIACCELPATH=$HOME/local/aiaccel-dev
-    export PYTHONPATH=$AIACCELPATH:$AIACCELPATH/lib
 ~~~
 
 6. 最適化実行
@@ -541,7 +538,7 @@ resource:
 ```yaml
 ABCI:
     group: "[group]"
-    job_script_preamble: "./job_script_preamble.sh"
+    job_script_preamble: ./job_script_preamble.sh
     job_execution_options: ""
 ```
 
