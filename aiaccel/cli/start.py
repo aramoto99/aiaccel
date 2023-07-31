@@ -87,14 +87,12 @@ def main() -> None:  # pragma: no cover
         storage.delete_trial_data_after_this(config.resume)
 
     # optimizer
-    Optimizer = create_optimizer(config.optimize.search_algorithm)
-    optimizer = Optimizer(config)
+    optimizer = create_optimizer(config.optimize.search_algorithm)(config)
     if config.resume is not None:
         optimizer.resume()
 
     # scheduler
-    Scheduler = create_scheduler(config.resource.type.value)
-    scheduler = Scheduler(config, optimizer)
+    scheduler = create_scheduler(config.resource.type.value)(config, optimizer)
 
     # tensorboard
     tensorboard = TensorBoard(config)
