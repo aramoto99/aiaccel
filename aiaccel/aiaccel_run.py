@@ -225,7 +225,7 @@ class Run:
         """
 
         if y is not None:
-            sys.stdout.write(f"\n{y}\n")
+            sys.stdout.write(f"{y}\n")
         if err != "":
             sys.stderr.write(f"{err}\n")
             exit(1)

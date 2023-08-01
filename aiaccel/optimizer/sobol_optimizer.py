@@ -56,7 +56,7 @@ class SobolOptimizer(AbstractOptimizer):
         for hyperparameter in self.params.get_parameter_list():
             if hyperparameter.initial is not None:
                 self.logger.warning(
-                    "Initial values cannot be specified for grid search. " "The set initial value has been invalidated."
+                    "Initial values cannot be specified for sobol search. " "The set initial value has been invalidated."
                 )
                 break
 
