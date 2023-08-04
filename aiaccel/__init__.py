@@ -1,6 +1,6 @@
 from aiaccel import (abci, cli, common, config, module, optimizer, parameter, scheduler, storage, tensorboard, util,
                      workspace)
-from aiaccel.aiaccel_run import Run
+from aiaccel.aiaccel_run import Run, Run2
 
 __all__ = [
     "common",
@@ -16,4 +16,5 @@ __all__ = [
     "tensorboard",
     "util",
     "Run",
+    "Run2",
 ]

@@ -22,9 +22,6 @@ class AbstractOptimizer(AiaccelCore):
     Attributes:
         options (dict[str, str | int | bool]): A dictionary containing
             command line options.
-        num_ready (int): A ready number of hyperparameters.
-        num_running (int): A running number of hyperprameters.
-        num_finished (int): A finished number of hyperparameters.
         num_of_generated_parameter (int): A number of generated hyperparamters.
         params (HyperParameterConfiguration): A loaded parameter configuration
             object.
@@ -134,14 +131,20 @@ class AbstractOptimizer(AiaccelCore):
                 new_param["value"] = int(new_param["value"])
         return new_params
 
-    def run_optimizer_multiple_times(self, available_pool_size: int) -> None:
-        if available_pool_size <= 0:
-            return
-        for _ in range(available_pool_size):
-            if new_params := self.generate_new_parameter():
-                self.register_new_parameters(self.convert_type_by_config(new_params))
-                self.trial_id.increment()
-                self.serialize(self.trial_id.integer)
+    def run_optimizer(self) -> None:
+        if new_params := self.generate_new_parameter():
+            self.register_new_parameters(self.convert_type_by_config(new_params))
+            self.trial_id.increment()
+            self.serialize(self.trial_id.integer)
+
+    # def run_optimizer_multiple_times(self, available_pool_size: int) -> None:
+    #     if available_pool_size <= 0:
+    #         return
+    #     for _ in range(available_pool_size):
+    #         if new_params := self.generate_new_parameter():
+    #             self.register_new_parameters(self.convert_type_by_config(new_params))
+    #             self.trial_id.increment()
+    #             self.serialize(self.trial_id.integer)
 
     def resume(self) -> None:
         """When in resume mode, load the previous optimization data in advance.
