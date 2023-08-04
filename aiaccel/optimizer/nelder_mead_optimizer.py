@@ -122,24 +122,40 @@ class NelderMeadOptimizer(AbstractOptimizer):
         new_param = self.convert_ndarray_to_parameter(new_params.coordinates)
         return new_param
 
-    def run_optimizer_multiple_times(self, available_pool_size: int) -> None:
-        if available_pool_size <= 0:
-            return
-        for _ in range(available_pool_size):
-            if new_params := self.generate_new_parameter():
-                if self.out_of_boundary(new_params):
-                    self.logger.debug(f"out of boundary: {new_params}")
-                    self.register_new_parameters(self.convert_type_by_config(new_params), state="finished")
-                    objective = np.inf
-                    if self.goals[0] == "maximize":
-                        objective = -np.inf
-                    self.storage.result.set_any_trial_objective(trial_id=self.trial_id.integer, objective=[objective])
-                    self.trial_id.increment()
-                    self.serialize(self.trial_id.integer)
-                    continue
-                self.register_new_parameters(self.convert_type_by_config(new_params))
+    def run_optimizer(self) -> None:
+        if new_params := self.generate_new_parameter():
+            if self.out_of_boundary(new_params):
+                self.logger.debug(f"out of boundary: {new_params}")
+                self.register_new_parameters(self.convert_type_by_config(new_params), state="finished")
+                objective = np.inf
+                if self.goals[0] == "maximize":
+                    objective = -np.inf
+                self.storage.result.set_any_trial_objective(trial_id=self.trial_id.integer, objective=[objective])
                 self.trial_id.increment()
                 self.serialize(self.trial_id.integer)
+                return
+            self.register_new_parameters(self.convert_type_by_config(new_params))
+            self.trial_id.increment()
+            self.serialize(self.trial_id.integer)
+
+    # def run_optimizer_multiple_times(self, available_pool_size: int) -> None:
+    #     if available_pool_size <= 0:
+    #         return
+    #     for _ in range(available_pool_size):
+    #         if new_params := self.generate_new_parameter():
+    #             if self.out_of_boundary(new_params):
+    #                 self.logger.debug(f"out of boundary: {new_params}")
+    #                 self.register_new_parameters(self.convert_type_by_config(new_params), state="finished")
+    #                 objective = np.inf
+    #                 if self.goals[0] == "maximize":
+    #                     objective = -np.inf
+    #                 self.storage.result.set_any_trial_objective(trial_id=self.trial_id.integer, objective=[objective])
+    #                 self.trial_id.increment()
+    #                 self.serialize(self.trial_id.integer)
+    #                 continue
+    #             self.register_new_parameters(self.convert_type_by_config(new_params))
+    #             self.trial_id.increment()
+    #             self.serialize(self.trial_id.integer)
 
     def out_of_boundary(self, params: list[dict[str, float | int | str]]) -> bool:
         for param in params:

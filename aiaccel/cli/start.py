@@ -97,10 +97,8 @@ def main() -> None:  # pragma: no cover
                     break
             else:
                 if int((time.time() - time_s)) % 10 == 0:
-                    nun_ready = scheduler.get_num_ready()
-                    num_running = scheduler.get_num_running()
-                    num_finished = scheduler.get_num_finished()
-                    available_pool_size = scheduler.get_available_pool_size()
+                    num_ready, num_running, num_finished = storage.get_num_running_ready_finished()
+                    available_pool_size = scheduler.get_available_pool_size(num_ready, num_running, num_finished)
                     now = datetime.now()
                     looping_time = now - loop_start_time
 
@@ -114,7 +112,7 @@ def main() -> None:  # pragma: no cover
                         scheduler.logger.info(
                             f"{num_finished}/{max_trial_number} finished, "
                             f"max trial number: {max_trial_number}, "
-                            f"ready: {nun_ready} ,"
+                            f"ready: {num_ready} ,"
                             f"running: {num_running}, "
                             f"end estimated time: {end_estimated_time}"
                         )
