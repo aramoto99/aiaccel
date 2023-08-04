@@ -85,6 +85,27 @@ class State(Abstract):
                 raise e
 
     @retry(_MAX_NUM=60, _DELAY=1.0)
+    def get_first_trial_id_for_resume(self) -> int | None:
+        """Get the trial id whose status is ready.
+
+        Returns:
+            int | None: Trial id. None if no trials match the specified state.
+        """
+        with self.create_session() as session:
+            trials = (
+                session.query(StateTable)
+                .filter(StateTable.state != "finished")
+                .order_by(StateTable.trial_id.asc())
+                .with_for_update(read=True)
+                .first()
+            )
+
+        if trials is None:
+            return None
+
+        return trials.trial_id
+
+    @retry(_MAX_NUM=60, _DELAY=1.0)
     def all_delete(self) -> None:
         """Clear table
 

@@ -40,10 +40,10 @@ class PylocalScheduler(AbstractScheduler):
             bool: The process succeeds or not. The main loop exits if failed.
         """
 
-        self.num_ready, self.num_running, self.num_finished = self.storage.get_num_running_ready_finished()
-        self.search_hyperparameters(self.num_ready, self.num_running, self.num_finished)
+        num_ready, num_running, num_finished = self.storage.get_num_running_ready_finished()
+        self.search_hyperparameters(num_ready, num_running, num_finished)
 
-        if self.check_finished():
+        if num_finished >= self.config.optimize.trial_number:
             return False
 
         trial_ids = self.storage.state.get_ready()
@@ -57,9 +57,6 @@ class PylocalScheduler(AbstractScheduler):
             self.serialize(trial_id)
 
         for trial_id, xs, ys, err, start_time, end_time in self.pool.imap_unordered(execute, args):
-            self.report(trial_id, ys, err, start_time, end_time)
-            self.storage.state.set_any_trial_state(trial_id=trial_id, state="finished")
-
             write_results_to_database(
                 storage_file_path=self.workspace.storage_file_path,
                 trial_id=trial_id,
@@ -69,7 +66,7 @@ class PylocalScheduler(AbstractScheduler):
                 error=err,
                 returncode=None
             )
-
+            self.storage.state.set_any_trial_state(trial_id=trial_id, state="finished")
         return True
 
     def post_process(self) -> None:

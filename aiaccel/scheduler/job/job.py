@@ -146,7 +146,7 @@ class Job:
         returncode = self.storage.returncode.get_any_trial_returncode(trial_id=self.trial_id)
         end_state = "success"
         if returncode != 0:
-            end_state = "failed"
+            end_state = "failure"
         self.storage.jobstate.set_any_trial_jobstate(trial_id=self.trial_id, state=end_state)
 
     def get_job_elapsed_time_in_seconds(self) -> float:
