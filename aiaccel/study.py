@@ -36,8 +36,10 @@ class Study():
             return float(y)
 
         if __name__ == "__main__":
-            run = aiaccel.Run2("./config.yaml")
-            run.optimize(main, n_trials=1)
+            study = aiaccel.create_study("./config.yaml")
+            study.optimize(main)
+            study.evaluate()
+            study.show_result()
     """
     def __init__(self, config_path: str | Path) -> None:
         self.config = None
