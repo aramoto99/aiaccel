@@ -16,7 +16,7 @@ class TrialId:
     Attributes:
         config (Config): Config object.
         ws (Path): Path to the workspace.
-        name_length (int): Name length of hp files.
+        trial_id_digits (int): Name length of hp files.
         file_hp_count_fmt (str): String format of hp file name.
         count_path (Path): Path to "count.txt" containing current trial id,
             i.e. `ws`/hp/count.txt.
@@ -27,8 +27,8 @@ class TrialId:
     def __init__(self, config: DictConfig) -> None:
         self.config = config
         self.workspace = Workspace(self.config.generic.workspace)
-        self.name_length = self.config.job_setting.name_length
-        self.file_hp_count_fmt = f"%0{self.name_length}d"
+        self.trial_id_digits = self.config.job_setting.trial_id_digits
+        self.file_hp_count_fmt = f"%0{self.trial_id_digits}d"
 
         self.count_path = self.workspace.hp / file_hp_count
         self.lock_path = self.workspace.hp / file_hp_count_lock

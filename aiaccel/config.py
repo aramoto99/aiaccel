@@ -11,12 +11,20 @@ from omegaconf.base import Container
 from omegaconf.dictconfig import DictConfig
 from omegaconf.listconfig import ListConfig
 
+from aiaccel.common import (
+    resource_type_abci,
+    resource_type_local,
+    resource_type_memory,
+    resource_type_mpi,
+    goal_maximize,
+    goal_minimize
+)
 
 class ResourceType(Enum):
-    abci: str = "abci"
-    local: str = "local"
-    python_local: str = "python_local"
-    mpi: str = "mpi"
+    abci: str = resource_type_abci
+    local: str = resource_type_local
+    python_local: str = resource_type_memory
+    mpi: str = resource_type_mpi
 
     @classmethod
     def _missing_(cls, value: Any) -> Any | None:
@@ -28,8 +36,8 @@ class ResourceType(Enum):
 
 
 class OptimizerDirection(Enum):
-    minimize: str = "minimize"
-    maximize: str = "maximize"
+    minimize: str = goal_minimize
+    maximize: str = goal_maximize
 
     @classmethod
     def _missing_(cls, value: Any) -> Any | None:
@@ -46,10 +54,9 @@ class GenericConfig:
     job_command: str
     python_file: str
     function: str
-    batch_job_timeout: int
-    sleep_time: Union[float, int]
     enabled_variable_name_argumentation: bool
-    is_ignore_warning: bool
+    main_loop_sleep_seconds: Union[float, int]
+    logging_level: str
 
 
 @dataclass
@@ -74,9 +81,9 @@ class ResourceConifig:
 @dataclass
 class AbciConifig:
     group: str
+    job_script_preamble_inline: str
     job_script_preamble: str
     job_execution_options: Optional[str]
-    runner_search_pattern: Optional[str]
 
 
 @dataclass
@@ -109,38 +116,9 @@ class OptimizeConifig:
 
 @dataclass
 class JobConfig:
-    cancel_retry: int
-    cancel_timeout: int
-    expire_retry: int
-    expire_timeout: int
-    finished_retry: int
-    finished_timeout: int
-    job_retry: int
-    job_timeout: int
-    kill_retry: int
-    kill_timeout: int
-    result_retry: int
-    runner_retry: int
-    runner_timeout: int
-    running_retry: int
-    running_timeout: int
-    init_fail_count: int
-    name_length: int
-    random_scheduling: bool
-
-
-@dataclass
-class LoggingItemConifig:
-    master: str
-    optimizer: str
-    scheduler: str
-
-
-@dataclass
-class LoggerConfig:
-    file: LoggingItemConifig
-    log_level: LoggingItemConifig
-    stream_level: LoggingItemConifig
+    job_timeout_seconds: float
+    max_failure_retries: int
+    trial_id_digits: int
 
 
 @dataclass
@@ -159,7 +137,6 @@ class Config:
     ABCI: AbciConifig
     optimize: OptimizeConifig
     job_setting: JobConfig
-    logger: Optional[LoggerConfig]
     clean: Optional[bool]
     resume: Optional[Union[None, int]]
     config_path: Optional[Union[None, Path, str]]

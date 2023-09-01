@@ -31,11 +31,11 @@
 generic:
   workspace: "./work"
   job_command: "python user.py"
-  batch_job_timeout: 600
+  job_timeout_seconds: 600
 ```
 - **workspace** - aiaccel の実行に必要な一時ファイルを保存するディレクトリを指定します．
 - **job_command** - ユーザープログラムを実行するためのコマンドです．
-- **batch_job_timeout** - ジョブのタイムアウト時間を設定します．[単位: 秒]
+- **job_timeout_seconds** - ジョブのタイムアウト時間を設定します．[単位: 秒]
 
 #### resource
 ```yaml
@@ -52,7 +52,7 @@ resource:
 ```yaml
 ABCI:
   group: "[group]"
-  job_script_preamble: "./job_script_preamble.sh"
+  job_script_preamble: ./job_script_preamble.sh
   job_execution_options: ""
 
 ```

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import numpy as np
 
-from aiaccel.util.aiaccel import Run
+from aiaccel.aiaccel_run import Run
 
 
 def main(p: dict[str, float | int]) -> float:
@@ -11,6 +11,6 @@ def main(p: dict[str, float | int]) -> float:
     return y
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     run = Run()
     run.execute_and_report(main)

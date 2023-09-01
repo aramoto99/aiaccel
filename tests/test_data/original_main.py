@@ -1,13 +1,11 @@
 import numpy as np
-from aiaccel.util import aiaccel
+
+import aiaccel
 
 
 def main(p):
 
-    x = np.array([
-        p['x1'], p['x2'], p['x3'], p['x4'], p['x5'],
-        p['x6'], p['x7'], p['x8'], p['x9'], p['x10']
-    ])
+    x = np.array([p["x1"], p["x2"], p["x3"], p["x4"], p["x5"], p["x6"], p["x7"], p["x8"], p["x9"], p["x10"]])
 
     print(p)
 

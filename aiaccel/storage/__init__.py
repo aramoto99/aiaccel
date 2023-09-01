@@ -2,20 +2,12 @@ from aiaccel.storage.abstract import Abstract
 from aiaccel.storage.error import Error
 from aiaccel.storage.hp import Hp
 from aiaccel.storage.jobstate import JobState
-from aiaccel.storage.model import (
-    Base,
-    ErrorTable,
-    HpTable,
-    JobStateTable,
-    ResultTable,
-    TimestampTable,
-    TrialTable,
-    VariableTable,
-)
+from aiaccel.storage.model import (Base, ErrorTable, HpTable, JobStateTable, ResultTable, ReturnCodeTable, StateTable,
+                                   TimestampTable, VariableTable)
 from aiaccel.storage.result import Result
+from aiaccel.storage.state import State
 from aiaccel.storage.storage import Storage
 from aiaccel.storage.timestamp import TimeStamp
-from aiaccel.storage.trial import Trial
 from aiaccel.storage.variable import Serializer, Value, Variable
 
 __all__ = [
@@ -29,12 +21,13 @@ __all__ = [
     "JobStateTable",
     "Result",
     "ResultTable",
+    "ReturnCodeTable",
     "Serializer",
     "Storage",
     "TimeStamp",
     "TimestampTable",
-    "Trial",
-    "TrialTable",
+    "State",
+    "StateTable",
     "Variable",
     "VariableTable",
     "Value",

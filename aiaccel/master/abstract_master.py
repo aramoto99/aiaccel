@@ -9,8 +9,7 @@ from omegaconf.dictconfig import DictConfig
 
 from aiaccel.common import datetime_format
 from aiaccel.module import AbstractModule
-from aiaccel.util.filesystem import create_yaml
-from aiaccel.util.logger import str_to_logging_level
+from aiaccel.util.file import create_yaml
 
 
 class AbstractMaster(AbstractModule):
@@ -41,11 +40,11 @@ class AbstractMaster(AbstractModule):
         self.logger = logging.getLogger("root.master")
         self.logger.setLevel(logging.DEBUG)
         self.set_logger(
-            "root.master",
-            self.workspace.log / self.config.logger.file.master,
-            str_to_logging_level(self.config.logger.log_level.master),
-            str_to_logging_level(self.config.logger.stream_level.master),
-            "Master   ",
+            logger_name="root.master",
+            logfile=self.workspace.log / "master.log",
+            file_level=self.config.generic.logging_level,
+            stream_level=self.config.generic.logging_level,
+            module_type="Master",
         )
 
         self.goals = [item.value for item in self.config.optimize.goal]

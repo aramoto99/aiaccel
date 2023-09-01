@@ -28,6 +28,6 @@ class RandomOptimizer(AbstractOptimizer):
         """
         new_params = []
         for param in self.params.sample(self._rng):
-            new_params.append({"parameter_name": param["name"], "type": param["type"], "value": param["value"]})
+            new_params.append({"name": param["name"], "type": param["type"], "value": param["value"]})
 
         return self.params.to_original_repr(new_params)
