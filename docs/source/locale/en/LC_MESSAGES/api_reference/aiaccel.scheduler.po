@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: aiaccel \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-04-03 15:25+0900\n"
+"POT-Creation-Date: 2023-08-07 12:53+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: en\n"
@@ -448,132 +448,12 @@ msgstr ""
 msgid "aiaccel.scheduler.create module"
 msgstr ""
 
-#: aiaccel.scheduler.create.create_scheduler:1 of
-msgid "Returns scheduler type."
-msgstr ""
-
-#: aiaccel.scheduler.create.create_scheduler:3 of
-msgid "Path to configuration file."
-msgstr ""
-
-#: aiaccel.scheduler.algorithm.abstract_scheduling_algorithm.AbstractSchedulingAlgorithm.select_hp
-#: aiaccel.scheduler.create.create_scheduler aiaccel.scheduler.job.job.Job of
-msgid "例外"
-msgstr ""
-
-#: aiaccel.scheduler.create.create_scheduler:6 of
-msgid "Causes when specified resource type is invalid."
-msgstr ""
-
-#: aiaccel.scheduler.create.create_scheduler:8 of
-msgid ""
-"`LocalScheduler` , `PylocalScheduler` , or `AbciScheduler` if resource "
-"type is 'local', 'python_local', or 'abci', respectively."
-msgstr ""
-
 #: ../../source/api_reference/aiaccel.scheduler.rst:41
 msgid "aiaccel.scheduler.local\\_scheduler module"
 msgstr ""
 
-#: aiaccel.scheduler.local_scheduler.LocalScheduler:1
-#: aiaccel.scheduler.pylocal_scheduler.PylocalScheduler:1 of
-msgid "A scheduler class running on a local computer."
-msgstr ""
-
-#: aiaccel.scheduler.local_scheduler.LocalScheduler.get_any_trial_xs:1
-#: aiaccel.scheduler.pylocal_scheduler.PylocalScheduler.get_any_trial_xs:1 of
-msgid "Gets a parameter list of specific trial ID from Storage object."
-msgstr ""
-
-#: aiaccel.scheduler.local_scheduler.LocalScheduler.get_any_trial_xs:3
-#: aiaccel.scheduler.pylocal_scheduler.PylocalScheduler.get_any_trial_xs:3
-#: aiaccel.scheduler.pylocal_scheduler.PylocalScheduler.report:3 of
-msgid "Trial ID."
-msgstr ""
-
-#: aiaccel.scheduler.local_scheduler.LocalScheduler.get_any_trial_xs:6
-#: aiaccel.scheduler.pylocal_scheduler.PylocalScheduler.get_any_trial_xs:6 of
-msgid ""
-"A dictionary of parameters. None if the parameter     specified by the "
-"given trial ID is not registered."
-msgstr ""
-
-#: aiaccel.scheduler.local_scheduler.LocalScheduler.get_any_trial_xs:8
-#: aiaccel.scheduler.pylocal_scheduler.PylocalScheduler.get_any_trial_xs:8 of
-msgid "A dictionary of parameters. None if the parameter"
-msgstr ""
-
-#: aiaccel.scheduler.local_scheduler.LocalScheduler.get_any_trial_xs:9
-#: aiaccel.scheduler.pylocal_scheduler.PylocalScheduler.get_any_trial_xs:9 of
-msgid "specified by the given trial ID is not registered."
-msgstr ""
-
 #: ../../source/api_reference/aiaccel.scheduler.rst:49
 msgid "aiaccel.scheduler.pylocal\\_scheduler module"
-msgstr ""
-
-#: aiaccel.scheduler.pylocal_scheduler.PylocalScheduler.create_model:1 of
-msgid ""
-"Creates model object of state machine. :returns: Because it does not use "
-"the state transition model. :rtype: None"
-msgstr ""
-
-#: aiaccel.scheduler.job.job.Job.get_result_file_path:1
-#: aiaccel.scheduler.pylocal_scheduler.PylocalScheduler.get_result_file_path:1
-#: of
-msgid "Get a path to the result file."
-msgstr ""
-
-#: aiaccel.scheduler.job.job.Job.get_result_file_path:3
-#: aiaccel.scheduler.pylocal_scheduler.PylocalScheduler.get_result_file_path:3
-#: of
-msgid "Trial Id."
-msgstr ""
-
-#: aiaccel.scheduler.job.job.Job.get_result_file_path:6
-#: aiaccel.scheduler.pylocal_scheduler.PylocalScheduler.get_result_file_path:6
-#: of
-msgid "A Path object which points to the result file."
-msgstr ""
-
-#: aiaccel.scheduler.pylocal_scheduler.PylocalScheduler.report:1 of
-msgid "Saves results in the Storage object."
-msgstr ""
-
-#: aiaccel.scheduler.pylocal_scheduler.PylocalScheduler.report:5 of
-msgid "A dictionary of parameters."
-msgstr ""
-
-#: aiaccel.scheduler.pylocal_scheduler.PylocalScheduler.report:7 of
-msgid "Objective value."
-msgstr ""
-
-#: aiaccel.scheduler.pylocal_scheduler.PylocalScheduler.report:9 of
-msgid "Error string."
-msgstr ""
-
-#: aiaccel.scheduler.pylocal_scheduler.PylocalScheduler.report:11 of
-msgid "Execution start time."
-msgstr ""
-
-#: aiaccel.scheduler.pylocal_scheduler.PylocalScheduler.report:13 of
-msgid "Execution end time."
-msgstr ""
-
-#: aiaccel.scheduler.pylocal_scheduler.execute:1 of
-msgid "Executes the specified function with the specified arguments."
-msgstr ""
-
-#: aiaccel.scheduler.pylocal_scheduler.execute:3 of
-msgid "Arguments."
-msgstr ""
-
-#: aiaccel.scheduler.pylocal_scheduler.execute:6 of
-msgid "Trial ID, arguments, objective value, error string, start time, end time."
-msgstr ""
-
-#: aiaccel.scheduler.pylocal_scheduler.initializer:1 of
-msgid "Initializer for multiprocessing.Pool."
 msgstr ""
 
 #: ../../source/api_reference/aiaccel.scheduler.rst:57

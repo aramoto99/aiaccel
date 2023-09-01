@@ -11,12 +11,20 @@ from omegaconf.base import Container
 from omegaconf.dictconfig import DictConfig
 from omegaconf.listconfig import ListConfig
 
-from aiaccel.common import resource_type_abci, resource_type_local, resource_type_memory, goal_maximize, goal_minimize
+from aiaccel.common import (
+    resource_type_abci,
+    resource_type_local,
+    resource_type_memory,
+    resource_type_mpi,
+    goal_maximize,
+    goal_minimize
+)
 
 class ResourceType(Enum):
     abci: str = resource_type_abci
     local: str = resource_type_local
     python_local: str = resource_type_memory
+    mpi: str = resource_type_mpi
 
     @classmethod
     def _missing_(cls, value: Any) -> Any | None:
@@ -42,6 +50,7 @@ class OptimizerDirection(Enum):
 
 @dataclass
 class GenericConfig:
+    venv_dir: Optional[str]
     workspace: str
     job_command: str
     python_file: str
@@ -55,6 +64,19 @@ class GenericConfig:
 class ResourceConifig:
     type: ResourceType
     num_workers: int
+    mpi_npernode: Optional[int]
+    mpi_enviroment: Optional[str]
+    mpi_bat_rt_type: Optional[str]
+    mpi_bat_rt_num: Optional[int]
+    mpi_bat_h_rt: Optional[str]
+    mpi_bat_root_dir: Optional[str]
+    mpi_bat_venv_dir: Optional[str]
+    mpi_bat_aiaccel_dir: Optional[str]
+    mpi_bat_config_dir: Optional[str]
+    mpi_bat_file: Optional[str]
+    mpi_hostfile: Optional[str]
+    mpi_gpu_mode: Optional[bool]
+    mpi_bat_make_file: Optional[bool]
 
 
 @dataclass

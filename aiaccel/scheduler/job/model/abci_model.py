@@ -21,6 +21,7 @@ class AbciModel(AbstractModel):
         self.create_abci_batch_file(
             trial_id=obj.trial_id,
             param_content=obj.content,
+            venv_dir=obj.config.generic.venv_dir,
             storage_file_path=obj.workspace.storage_file_path,
             error_file_path=obj.workspace.get_error_output_file(obj.trial_id),
             config_file_path=obj.config.config_path,
@@ -64,6 +65,7 @@ class AbciModel(AbstractModel):
         self,
         trial_id: int,
         param_content: dict[str, Any],
+        venv_dir: Path | str,
         storage_file_path: Path | str,
         error_file_path: Path | str,
         config_file_path: Path | str,
@@ -164,6 +166,9 @@ class AbciModel(AbstractModel):
         #                 script += line + "\n"
         script = self.create_job_script_preamble(job_script_preamble, job_script_preamble_inline)
         script += "\n"
+        # venv
+        if venv_dir is not None and venv_dir != "":
+            script += f"source {venv_dir}/bin/activate" + "\n"
         # parameters
         for param in param_content["parameters"]:
             if "name" in param.keys() and "value" in param.keys():

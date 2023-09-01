@@ -5,8 +5,8 @@ from pathlib import Path
 
 import fasteners
 
-from aiaccel.common import (dict_error, dict_hp, dict_lock, dict_log, dict_output, dict_runner, dict_storage,
-                            dict_tensorboard)
+from aiaccel.common import (dict_error, dict_hp, dict_lock, dict_log, dict_mpi, dict_output,
+                            dict_rank_log,dict_runner, dict_storage, dict_tensorboard)
 from aiaccel.util import Suffix
 
 
@@ -85,6 +85,8 @@ class Workspace:
         self.hp = self.path / dict_hp
         self.lock = self.path / dict_lock
         self.log = self.path / dict_log
+        self.mpi = self.path / dict_mpi
+        self.rank_log = self.mpi / dict_rank_log
         self.output = self.path / dict_output
         self.runner = self.path / dict_runner
         self.storage = self.path / dict_storage
@@ -95,7 +97,9 @@ class Workspace:
             self.hp,
             self.lock,
             self.log,
+            self.mpi,
             self.output,
+            self.rank_log,
             self.runner,
             self.storage,
             self.tensorboard,
