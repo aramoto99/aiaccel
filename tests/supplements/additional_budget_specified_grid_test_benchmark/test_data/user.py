@@ -1,6 +1,6 @@
 import numpy as np
 
-from aiaccel.aiaccel_run import Run
+import aiaccel
 
 numbers = {"a": -5, "b": 0, "c": 5}
 
@@ -16,5 +16,5 @@ def main(p):
 
 
 if __name__ == "__main__":
-    run = Run()
+    run = aiaccel.Run()
     run.execute_and_report(main)

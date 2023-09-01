@@ -9,7 +9,7 @@ from typing import Any
 
 from omegaconf.dictconfig import DictConfig
 
-from aiaccel.aiaccel_run import set_logging_file_for_trial_id
+from aiaccel.run import set_logging_file_for_trial_id
 from aiaccel.common import datetime_format
 from aiaccel.config import load_config
 from aiaccel.optimizer import AbstractOptimizer
