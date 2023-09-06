@@ -19,9 +19,9 @@ job_setting:
 
 ABCI:
   group: "[group]"
-  job_script_preamble: ./job_script_preamble.sh
   job_execution_options: ""
-  job_script_preamble_inline: |
+  job_script_preamble_path: ./job_script_preamble.sh
+  job_script_preamble: |
     #!/bin/bash
 
     #$-l rt_C.small=1

@@ -23,6 +23,7 @@ from aiaccel.common import (
 )
 from aiaccel.util.error import MpiError
 from aiaccel.util.mpi_log import MpiLog
+from aiaccel.util import create_job_script_preamble
 
 if TYPE_CHECKING:
     from aiaccel.scheduler import AbstractScheduler
@@ -265,10 +266,6 @@ class Mpi:
 
     @classmethod
     def run_bat(cls, config: DictConfig, logger: Logger) -> None:
-        mpi_env = config.resource.mpi_enviroment
-        if mpi_env.lower() != resource_type_abci:
-            logger.error(f"{mpi_env}, the mpi_enviroment, is not supported.")
-            return
         if config.resource.mpi_bat_make_file:
             cls._make_bat_file(config, logger)
         cls._run_bat_file(config, logger)
@@ -286,33 +283,32 @@ class Mpi:
     @classmethod
     def _make_bat_file(cls, config: DictConfig, logger: Logger) -> None:
         logger.info("make bat file")
-        venv_dir = config.generic.venv_dir
 
+        aiaccel_dir = config.generic.aiaccel_dir
+        if aiaccel_dir == "":
+            raise(MpiError("aiaccel_dir is empty."))
+        venv_dir = config.generic.venv_dir
+        if venv_dir == "":
+            raise(MpiError("venv_dir is empty."))
         rt_type = config.resource.mpi_bat_rt_type
         rt_num = config.resource.mpi_bat_rt_num
         h_rt = config.resource.mpi_bat_h_rt
         num_workers = config.resource.num_workers
-        root_path = Path(config.resource.mpi_bat_root_dir)
-        aiaccel_dir = str(root_path / config.resource.mpi_bat_aiaccel_dir)
-        config_path = root_path / config.resource.mpi_bat_config_dir
-        config_dir = str(config_path)
-        qsub_file_path = config_path / config.resource.mpi_bat_file
-        hostfile = str(config_path / config.resource.mpi_hostfile)
-        qsub_str = f"""#!/bin/bash
+        qsub_file_path = config.resource.mpi_bat_file
+        hostfile = config.resource.mpi_hostfile
 
-#$ -l rt_{rt_type}={rt_num}
-#$ -l h_rt={h_rt}
-#$ -j y
-#$ -cwd
+        qsub_str = create_job_script_preamble(config.ABCI.job_script_preamble_path, config.ABCI.job_script_preamble)
+        qsub_str += "\n"
 
-source /etc/profile.d/modules.sh
-module load python/3.11
-module load hpcx-mt/2.12
-source {venv_dir}/bin/activate
-export PYTHONPATH={aiaccel_dir}/:$PYTHONPATH
+        # aiaccel
+        if aiaccel_dir != "":
+            qsub_str += f"export PYTHONPATH={aiaccel_dir}:$PYTHONPATH" + "\n"
+        # venv
+        if venv_dir != "":
+            qsub_str += f"source {venv_dir}/bin/activate" + "\n"
+        qsub_str += "\n"
 
-cd {config_dir}
-
+        qsub_str += f"""
 python -m aiaccel.cli.start --config config.yaml --make_hostfile
 
 mpiexec -n {num_workers+1} -hostfile {hostfile} \
@@ -320,6 +316,26 @@ python -m mpi4py.futures -m aiaccel.cli.start --config config.yaml --clean --fro
 
 deactivate
 """
+
+# #$ -l rt_{rt_type}={rt_num}
+# #$ -l h_rt={h_rt}
+# #$ -j y
+# #$ -cwd
+
+# source /etc/profile.d/modules.sh
+# module load python/3.11
+# module load hpcx-mt/2.12
+# source {venv_dir}/bin/activate
+# export PYTHONPATH={aiaccel_dir}/:$PYTHONPATH
+
+# python -m aiaccel.cli.start --config config.yaml --make_hostfile
+
+# mpiexec -n {num_workers+1} -hostfile {hostfile} \
+# python -m mpi4py.futures -m aiaccel.cli.start --config config.yaml --clean --from_mpi_bat
+
+# deactivate
+# """
+
         # 'mpiexec -n {num_workers+1} -npernode {mpi_npernode}'
         qsub_file_path = Path(os_path.expanduser(str(qsub_file_path)))
         qsub_file_path.write_text(qsub_str)
@@ -335,8 +351,7 @@ deactivate
     @classmethod
     def _make_hostfile(cls, config: DictConfig, logger: Logger) -> None:
         logger.info("make hostfile")
-        root_path = Path(config.resource.mpi_bat_root_dir)
-        hostfile_path = root_path / config.resource.mpi_bat_config_dir / config.resource.mpi_hostfile
+        hostfile_path = config.resource.mpi_hostfile
         rt_num = config.resource.mpi_bat_rt_num
         mpi_npernode = config.resource.mpi_npernode
         mpi_gpu_mode = config.resource.mpi_gpu_mode
