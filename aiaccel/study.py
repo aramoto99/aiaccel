@@ -6,6 +6,7 @@ import logging
 import sys
 import threading
 import traceback
+from argparse import ArgumentParser
 from collections.abc import Callable
 from contextlib import contextmanager
 from datetime import datetime
@@ -22,6 +23,13 @@ from aiaccel.workspace import Workspace
 from aiaccel.cli.set_result import write_results_to_database
 from aiaccel.cli import CsvWriter
 from aiaccel.util import cast_y, create_yaml
+
+
+# parser = ArgumentParser()
+# parser.add_argument("--clean", nargs="?", const=True, default=False)
+# args = parser.parse_args()
+
+# clean: bool = args.clean
 
 
 class Study():
@@ -69,6 +77,9 @@ class Study():
     def load_config(self, config_path: str | Path) -> None:
         self.config = load_config(self.config_path)
         self.workspace = Workspace(self.config.generic.workspace)
+        # if clean:
+        #     self.workspace.clean()
+        #     print(f"Workspace directory {str(self.workspace.path)} is cleaned.")
         self.workspace.create()
 
     def load_optimizer(self) -> None:
@@ -114,6 +125,14 @@ class Study():
             if n_count == 0 and trial_id > 0:
                 self.config.resume = self.optimizer.get_trial_id()
                 self.optimizer.resume()
+
+            state = self.storage.state.get_any_trial_state(trial_id)
+            if state == "finished":
+                self.optimizer.logger.warning(f"Trial ID {trial_id} is already finished.")
+                self.optimizer.trial_id.increment()
+                continue
+            elif state == "running":
+                continue
             self.optimizer.run_optimizer()
             self.execute_and_report(trial_id, func)
             n_count += 1
@@ -180,9 +199,6 @@ class Study():
         func: Callable[[dict[str, float | int | str]], float],
         y_data_type: str | None = None
     ) -> None:
-        if self.storage.state.get_any_trial_state(trial_id) == "finished":
-            self.optimizer.logger.warning(f"Trial ID {trial_id} is already finished.")
-            return
         start_time = datetime.now().strftime(datetime_format)
         xs = self.storage.hp.get_any_trial_params_dict(trial_id)
         y: Any = None
@@ -224,8 +240,10 @@ class Study():
             hp_results.append(self.storage.get_hp_dict(best_trial_id))
         create_yaml(self.workspace.final_result_file, hp_results, self.workspace.lock)
 
-    def show_result(self):
+    def show_result(self) -> None:
         total_seconds = self.get_total_seconds()
+        if total_seconds is not None:
+            total_seconds = round(total_seconds)
         csv_writer = CsvWriter(self.config)
         csv_writer.create()
         print("moving...")
@@ -244,7 +262,7 @@ class Study():
                     print(f"Best trial [{i}] : {best_id}")
                     print(f"\tvalue : {best_value}")
         print(f"result file : {dst}/{'results.csv'}")
-        print(f"Total time [s] : {round(total_seconds)}")
+        print(f"Total time [s] : {total_seconds}")
         print("For more details, execute the following command.")
         print(f"aiaccel-view --config {self.config_path}")
 
