@@ -5,7 +5,14 @@ from typing import Any
 
 import numpy as np
 
+# constants for Nelder-Mead
+# r: reflect
+# e: expand
+# ic: inside_contract
+# oc: outside_contract
+# s: shrink
 coef: dict[str, float] = {"r": 1.0, "ic": -0.5, "oc": 0.5, "e": 2.0, "s": 0.5}
+
 name_rng = np.random.RandomState()
 
 

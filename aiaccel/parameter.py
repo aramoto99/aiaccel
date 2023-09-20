@@ -24,6 +24,13 @@ def is_ordinal(data_type: str) -> bool:
     return data_type.lower() == "ordinal"
 
 
+class ParameterInfo:
+    def __init__(self, name: str | None = None, type: str | None = None, value: float | int | str | None = None) -> None:
+        self.name = name
+        self.type = type
+        self.value = value
+
+
 class AbstractParameter:
     """
     A parameter class.
@@ -91,12 +98,13 @@ class AbstractParameter:
 
 
 class IntParameter(AbstractParameter):
-    def sample(self, rng: RandomState, initial: bool = False) -> dict[str, Any]:
+    def sample(self, rng: RandomState, initial: bool = False) -> ParameterInfo:
         if initial and self.initial is not None:
             value = self.initial
         else:
             value = rng.randint(self.lower, self.upper)
-        return {"name": self.name, "type": self.type, "value": self.unwrap(value)}
+        # return {"name": self.name, "type": self.type, "value": self.unwrap(value)}
+        return ParameterInfo(name=self.name, type=self.type, value=self.unwrap(value))
 
 
 class FloatParameter(AbstractParameter):

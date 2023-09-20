@@ -11,6 +11,7 @@ from aiaccel.config import is_multi_objective
 from aiaccel.converted_parameter import ConvertedParameterConfiguration
 from aiaccel.optimizer import AbstractOptimizer
 from aiaccel.optimizer._nelder_mead import NelderMead, Value, Vertex
+from aiaccel.common import goal_maximize
 
 
 class NelderMeadOptimizer(AbstractOptimizer):
@@ -43,13 +44,6 @@ class NelderMeadOptimizer(AbstractOptimizer):
         self.map_trial_id_and_vertex_id: dict[int, str] = {}
         self.completed_trial_ids: list[int] = []
 
-    def create_initial_values(self, initial_parameters: list[dict[str, Any]]) -> np.ndarray[Any, Any]:
-        initial_values = [
-            [self.create_initial_value(initial_parameters, dim, num_of_initials) for dim in range(self.n_params)]
-            for num_of_initials in range(self.n_dim + 1)
-        ]
-        return np.array(initial_values)
-
     def convert_ndarray_to_parameter(self, ndarray: np.ndarray[Any, Any]) -> list[dict[str, float | int | str]]:
         """Convert a list of numpy.ndarray to a list of parameters."""
         new_params = copy.deepcopy(self.base_params)
@@ -63,7 +57,11 @@ class NelderMeadOptimizer(AbstractOptimizer):
                     new_param["out_of_boundary"] = True
         return new_params
 
-    def create_initial_value(self, initial_parameters: Any, dim: int, num_of_initials: int) -> Any:
+    def new_finished(self) -> list[int]:
+        finished = self.storage.get_finished()
+        return list(set(finished) ^ set(self.completed_trial_ids))
+
+    def _generate_initial_parameter(self, initial_parameters: Any, dim: int, num_of_initials: int) -> Any:
         params = self.params.get_parameter_list()
         val = params[dim].sample(rng=self._rng)["value"]
         if initial_parameters is None:
@@ -83,10 +81,6 @@ class NelderMeadOptimizer(AbstractOptimizer):
             val = params[dim].sample(rng=self._rng)["value"]
             return val
 
-    def new_finished(self) -> list[int]:
-        finished = self.storage.get_finished()
-        return list(set(finished) ^ set(self.completed_trial_ids))
-
     def generate_initial_parameter(self) -> list[dict[str, float | int | str]] | None:
         """Generate initial parameters.
 
@@ -95,7 +89,10 @@ class NelderMeadOptimizer(AbstractOptimizer):
             parameters. None if `self.nelder_mead` is already defined.
         """
         initial_parameters = super().generate_initial_parameter()
-        initial_parameters = self.create_initial_values(initial_parameters)
+        initial_parameters = np.array(
+            [[self._generate_initial_parameter(initial_parameters, dim, num_of_initials) for dim in range(self.n_params)]
+                for num_of_initials in range(self.n_dim + 1)])
+
         self.logger.debug(f"initial_parameters: {initial_parameters}")
         if self.nelder_mead is not None:
             return None
@@ -128,7 +125,7 @@ class NelderMeadOptimizer(AbstractOptimizer):
                 self.logger.debug(f"out of boundary: {new_params}")
                 self.register_new_parameters(self.convert_type_by_config(new_params), state="finished")
                 objective = np.inf
-                if self.goals[0] == "maximize":
+                if self.goals[0] == goal_maximize:
                     objective = -np.inf
                 self.storage.result.set_any_trial_objective(trial_id=self.trial_id.integer, objective=[objective])
                 self.trial_id.increment()
@@ -137,25 +134,6 @@ class NelderMeadOptimizer(AbstractOptimizer):
             self.register_new_parameters(self.convert_type_by_config(new_params))
             self.trial_id.increment()
             self.serialize(self.trial_id.integer)
-
-    # def run_optimizer_multiple_times(self, available_pool_size: int) -> None:
-    #     if available_pool_size <= 0:
-    #         return
-    #     for _ in range(available_pool_size):
-    #         if new_params := self.generate_new_parameter():
-    #             if self.out_of_boundary(new_params):
-    #                 self.logger.debug(f"out of boundary: {new_params}")
-    #                 self.register_new_parameters(self.convert_type_by_config(new_params), state="finished")
-    #                 objective = np.inf
-    #                 if self.goals[0] == "maximize":
-    #                     objective = -np.inf
-    #                 self.storage.result.set_any_trial_objective(trial_id=self.trial_id.integer, objective=[objective])
-    #                 self.trial_id.increment()
-    #                 self.serialize(self.trial_id.integer)
-    #                 continue
-    #             self.register_new_parameters(self.convert_type_by_config(new_params))
-    #             self.trial_id.increment()
-    #             self.serialize(self.trial_id.integer)
 
     def out_of_boundary(self, params: list[dict[str, float | int | str]]) -> bool:
         for param in params:
@@ -190,6 +168,8 @@ class NelderMeadOptimizer(AbstractOptimizer):
                         self.completed_trial_ids.append(trial_id)
                         vertex_id = self.map_trial_id_and_vertex_id[trial_id]
                         objective = self.storage.result.get_any_trial_objective(trial_id)[0]
+                        if self.goals[0] == goal_maximize:
+                            objective *= -1.0
                         values.append(Value(id=vertex_id, value=objective))
                     if nm_state == "initialize_pending":
                         self.nelder_mead.after_initialize(values)
@@ -199,6 +179,8 @@ class NelderMeadOptimizer(AbstractOptimizer):
                     trial_id = new_finished[-1]
                     vertex_id = self.map_trial_id_and_vertex_id[trial_id]
                     objective = self.storage.result.get_any_trial_objective(trial_id)[0]
+                    if self.goals[0] == goal_maximize:
+                        objective *= -1.0
                     value = Value(id=vertex_id, value=objective)
                     self.completed_trial_ids.append(trial_id)
                     if nm_state == "reflect_pending":
@@ -209,6 +191,8 @@ class NelderMeadOptimizer(AbstractOptimizer):
                         self.nelder_mead.after_inside_contract(value)
                     elif nm_state == "outside_contract_pending":
                         self.nelder_mead.after_outside_contract(value)
+        elif nm_state == "initialize":
+            ...
         elif nm_state == "reflect":
             ...
         elif nm_state == "expand":
@@ -219,5 +203,7 @@ class NelderMeadOptimizer(AbstractOptimizer):
             ...
         elif nm_state == "shrink":
             ...
+        else:
+            raise NotImplementedError(f"Invalid state: {nm_state}")  # not reachable
         searched_params = self.nelder_mead.search()
         return searched_params
