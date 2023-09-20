@@ -8,6 +8,7 @@ from aiaccel.optimizer.nelder_mead_optimizer import NelderMeadOptimizer
 from aiaccel.optimizer.random_optimizer import RandomOptimizer
 from aiaccel.optimizer.sobol_optimizer import SobolOptimizer
 from aiaccel.optimizer.tpe_optimizer import TpeOptimizer, create_distributions
+from aiaccel.optimizer.particle_swarm_optimizer import ParticleSwarmOptimizer
 
 __all__ = [
     "AbstractOptimizer",
@@ -15,6 +16,7 @@ __all__ = [
     "GridOptimizer",
     "NelderMead",
     "NelderMeadOptimizer",
+    "ParticleSwarmOptimizer",
     "RandomOptimizer",
     "SobolOptimizer",
     "TpeOptimizer",
