@@ -25,20 +25,24 @@ class Value:
 
 
 class Particle:
-    def __init__(self, num_dimensions: int, initial_position: list[float] | None = None) -> None:
-        if initial_position is None:
-            self.position = np.random.rand(num_dimensions)
-        else:
-            self.position = np.array(initial_position)
-        self.position = np.array(initial_position)
-        self.velocity = np.zeros(num_dimensions)   # 初期速度はゼロ
-        self.best_position = self.position.copy()  # 最良位置は初期位置と同じ
-        self.best_value = np.inf  # 最良評価値は無限大で初期化
-        self.value = None         # 評価値はまだ計算していないためNone
+    def __init__(
+        self,
+        num_dimensions: int,
+        initial_position: list[float],
+        inertia_weight: float,
+        cognitive_weight: float,
+        social_weight: float
+    ) -> None:
 
-        self.inertia_weight = 0.9    # 慣性重み
-        self.cognitive_weight = 2.0  # 認知重み
-        self.social_weight = 2.0     # 社会的重み
+        self.position = np.array(initial_position)
+        self.velocity = np.zeros(num_dimensions)
+        self.best_position = self.position.copy()
+        self.best_value = np.inf
+        self.value = None
+
+        self.inertia_weight = inertia_weight
+        self.cognitive_weight = cognitive_weight
+        self.social_weight = social_weight
 
         self.id: str = self.generate_random_name()
         self.count_eval = 0
@@ -54,14 +58,23 @@ class Particle:
         return "".join(rands)
 
     def update_velocity(self, global_best_position: np.ndarray):
-        # 速度の更新を実装する
-        self.velocity = self.inertia_weight * self.velocity + self.cognitive_weight * np.random.rand() \
-            * (self.best_position - self.position) + self.social_weight \
-            * np.random.rand() * (global_best_position - self.position)
+        self.velocity = \
+            self.inertia_weight * self.velocity \
+            + self.cognitive_weight * np.random.rand() * (self.best_position - self.position) \
+            + self.social_weight * np.random.rand() * (global_best_position - self.position)
 
     def update_position(self):
-        # 位置の更新を実装する
         self.position += self.velocity
+
+    def update_best_position(self, goal: str):
+        if goal == 'minimize':
+            if self.value < self.best_value:
+                self.best_position = self.position
+                self.best_value = self.value
+        else:
+            if self.value > self.best_value:
+                self.best_position = self.position
+                self.best_value = self.value
 
     def initial_best_value(self, value):
         self.best_value = value
@@ -71,20 +84,33 @@ class Particle:
 
 
 class Aggregate:
-    def __init__(self, partical_coordinates: np.ndarray[Any, Any], goals: list[str]) -> None:
+    def __init__(
+        self,
+        partical_coordinates: np.ndarray[Any, Any],
+        inertia_weight: float,
+        cognitive_weight: float,
+        social_weight: float,
+        goals: list[str]
+    ) -> None:
+
         self.n_dim = partical_coordinates.shape[1]
         self.goals = goals
         self.global_best_position: ndarray | None = None
         self.global_best_value = None
+        if self.goals[0] == 'minimize':
+            self.global_best_value = np.inf
+        else:
+            self.global_best_value = -np.inf
         self.particles: list[Particle] = []
         for xs in partical_coordinates:
-            self.particles.append(Particle(self.n_dim, xs))
+            self.particles.append(Particle(self.n_dim, xs, inertia_weight, cognitive_weight, social_weight))
         if self.goals[0] == 'minimize':
             for i in range(len(self.particles)):
                 self.particles[i].initial_best_value(np.inf)
         else:
             for i in range(len(self.particles)):
                 self.particles[i].initial_best_value(-np.inf)
+        self.update_global_best_position()
 
     def get_particle_coordinates(self) -> np.ndarray[Any, Any]:
         return np.array([p.xs for p in self.particles])
@@ -100,26 +126,35 @@ class Aggregate:
     def update_global_best_position(self) -> None:
         if self.goals[0] == 'minimize':
             for particle in self.particles:
-                if self.global_best_value is None or particle.best_value < self.global_best_value:
+                if self.global_best_value is None or self.global_best_value == np.inf or particle.best_value < self.global_best_value:
                     self.global_best_value = particle.best_value
                     self.global_best_position = particle.best_position
         else:
             for particle in self.particles:
-                if self.global_best_value is None or particle.best_value > self.global_best_value:
+                if self.global_best_value is None or self.global_best_value == -np.inf or particle.best_value > self.global_best_value:
                     self.global_best_value = particle.best_value
                     self.global_best_position = particle.best_position
 
     def move(self) -> None:
-        self.update_global_best_position()
         for p in self.particles:
             p.update_velocity(self.global_best_position)
             p.update_position()
+            p.update_best_position(self.goals[0])
+        self.update_global_best_position()
         return self.particles
 
 
 class ParticleSwarm:
-    def __init__(self, initial_parameters: np.ndarray[Any, Any], goals: list) -> None:
-        self.aggregate = Aggregate(initial_parameters, goals)
+    def __init__(
+        self,
+        initial_parameters: np.ndarray[Any, Any],
+        inertia_weight: float,
+        cognitive_weight: float,
+        social_weight: float,
+        goals: list
+    ) -> None:
+
+        self.aggregate = Aggregate(initial_parameters, inertia_weight, cognitive_weight, social_weight, goals)
         self.state = "initialize"
         self.eval_completed_count = 0
 
@@ -183,8 +218,15 @@ class ParticleSwarmOptimizer(AbstractOptimizer):
         self.n_params = len(self.params.get_parameter_list())
         self.param_names = self.params.get_parameter_names()
         self.bdrys = np.array([[p.lower, p.upper] for p in self.params.get_parameter_list()])
-        # self.n_particle = self.config.n_particle
-        self.n_particle = 10  # TODO: 仮置き
+        # self.num_particle = self.config.num_particle
+        self.num_particle = self.config.optimize.num_particle
+        self.inertia_weight = self.config.optimize.inertia_weight
+        self.cognitive_weight = self.config.optimize.cognitive_weight
+        self.social_weight = self.config.optimize.social_weight
+
+        if self.num_particle < 1:
+            raise ValueError(
+                "optimize.num_particle should be greater than 0. default: 0")
         self.particle_swarm: Any = None
         self.completed_trial_ids: list[int] = []
         self.single_or_multiple_trial_params: list[Particle] = []
@@ -229,11 +271,16 @@ class ParticleSwarmOptimizer(AbstractOptimizer):
         initial_parameters = super().generate_initial_parameter()
         initial_parameters = np.array(
             [[self._generate_initial_parameter(initial_parameters, dim, num_of_initials) for dim in range(self.n_params)]
-                for num_of_initials in range(self.n_particle)])
+                for num_of_initials in range(self.num_particle)])
         if self.particle_swarm is not None:
             return None
         self.particle_swarm = ParticleSwarm(
-            initial_parameters=initial_parameters, goals=self.goals)
+            initial_parameters=initial_parameters,
+            inertia_weight=self.inertia_weight,
+            cognitive_weight=self.cognitive_weight,
+            social_weight=self.social_weight,
+            goals=self.goals
+        )
         return self.generate_parameter()
 
     def generate_parameter(self) -> list[dict[str, float | int | str]]:
@@ -251,18 +298,22 @@ class ParticleSwarmOptimizer(AbstractOptimizer):
         finished = self.storage.get_finished()
         return list(set(finished) ^ set(self.completed_trial_ids))
 
+    def out_of_boundary(self, params: list[dict[str, float | int | str]]) -> bool:
+        for param in params:
+            if param["out_of_boundary"]:
+                return True
+        return False
+
     def particle_swarm_main(self):
         ps_state = self.particle_swarm.get_state()
         if ps_state in {"initialize_pending", "evaluate_pending"}:
             new_finished = self.new_finished()
-            if len(new_finished) == self.n_particle:
+            if len(new_finished) == self.num_particle:
                 values = []
                 for trial_id in new_finished:
                     self.completed_trial_ids.append(trial_id)
                     particle_id = self.map_trial_id_and_particle_id[trial_id]
                     objective = self.storage.result.get_any_trial_objective(trial_id)[0]
-                    if self.goals[0] == goal_maximize:
-                        objective *= -1.0
                     values.append(Value(id=particle_id, value=objective))
                 if ps_state == "initialize_pending":
                     self.particle_swarm.after_initialize(values)
@@ -276,3 +327,19 @@ class ParticleSwarmOptimizer(AbstractOptimizer):
             raise NotImplementedError(f"Invalid state: {ps_state}")  # not reachable
         searched_params = self.particle_swarm.search()
         return searched_params
+
+    # def run_optimizer(self) -> None:
+    #     if new_params := self.generate_new_parameter():
+    #         # if self.out_of_boundary(new_params):
+    #         #     self.logger.debug(f"out of boundary: {new_params}")
+    #         #     self.register_new_parameters(self.convert_type_by_config(new_params), state="finished")
+    #         #     objective = np.inf
+    #         #     if self.goals[0] == goal_maximize:
+    #         #         objective = -np.inf
+    #         #     self.storage.result.set_any_trial_objective(trial_id=self.trial_id.integer, objective=[objective])
+    #         #     self.trial_id.increment()
+    #         #     self.serialize(self.trial_id.integer)
+    #         #     return
+    #         self.register_new_parameters(self.convert_type_by_config(new_params))
+    #         self.trial_id.increment()
+    #         self.serialize(self.trial_id.integer)

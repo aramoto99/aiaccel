@@ -35,6 +35,10 @@ optimize:
     sobol_scramble: True
     grid_accept_small_trial_number: False
     grid_sampling_method: 'IN_ORDER'
+    num_particle: 10
+    inertia_weight: 0.9
+    cognitive_weight: 0.1
+    social_weight: 0.1
     parameters: []
 
 job_setting:
