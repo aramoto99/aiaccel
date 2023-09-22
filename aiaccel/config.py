@@ -101,6 +101,10 @@ class OptimizeConifig:
     sobol_scramble: bool
     grid_accept_small_trial_number: bool
     grid_sampling_method: str
+    num_particle: Optional[int]
+    inertia_weight: Optional[Union[None, float]]
+    cognitive_weight: Optional[Union[None, float]]
+    social_weight: Optional[Union[None, float]]
     parameters: List[ParameterConfig]
 
 
