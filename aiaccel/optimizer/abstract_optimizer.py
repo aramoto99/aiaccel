@@ -213,3 +213,14 @@ class AbstractOptimizer(AiaccelCore):
             self.logger.error(error_message)
             return False
         return True
+
+    def finalize_operation(self) -> None:
+        """Finalize the operation.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
+        ...
