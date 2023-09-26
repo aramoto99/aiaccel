@@ -18,12 +18,6 @@ from aiaccel.optimizer import AbstractOptimizer
 name_rng = np.random.RandomState()
 
 
-class Value:
-    def __init__(self, id: str, value: Any) -> None:
-        self.id: str = id
-        self.value: Any = value
-
-
 class Particle:
     def __init__(
         self,
@@ -45,11 +39,12 @@ class Particle:
         self.social_weight = social_weight
 
         self.id: str = self.generate_random_name()
+        self.history: list[dict[str, Any]] = []
         self.count_eval = 0
 
     @property
     def coordinates(self) -> np.ndarray[Any, Any]:
-        return self.position
+        return self.position.copy()
 
     def generate_random_name(self, length: int = 10) -> str:
         if length < 1:
@@ -82,8 +77,17 @@ class Particle:
     def set_value(self, value: Any) -> None:
         self.value = value
 
+    def append_history(self) -> None:
+        self.history.append({
+            "count_eval": self.count_eval,
+            "position": self.position.tolist(),
+            "value": self.value,
+            "best_position": self.best_position,
+            "best_value": self.best_value,
+            "velocity": self.velocity,
+        })
 
-class Aggregate:
+class Swarm:
     def __init__(
         self,
         partical_coordinates: np.ndarray[Any, Any],
@@ -123,6 +127,13 @@ class Aggregate:
                 return True
         return False
 
+    def append_any_particle_history(self, particle_id: str) -> bool:
+        for p in self.particles:
+            if p.id == particle_id:
+                p.append_history()
+                return True
+        return False
+
     def update_global_best_position(self) -> None:
         if self.goals[0] == 'minimize':
             for particle in self.particles:
@@ -154,12 +165,8 @@ class ParticleSwarm:
         goals: list
     ) -> None:
 
-        self.aggregate = Aggregate(initial_parameters, inertia_weight, cognitive_weight, social_weight, goals)
+        self.swarm = Swarm(initial_parameters, inertia_weight, cognitive_weight, social_weight, goals)
         self.state = "initialize"
-        self.eval_completed_count = 0
-
-    # def initialize(self) -> list[Particle]:
-    #     return self.particles
 
     def change_state(self, state: str) -> None:
         self.state = state
@@ -168,20 +175,26 @@ class ParticleSwarm:
         return self.state
 
     def initialize(self) -> list[Particle]:
-        return self.aggregate.particles
+        return self.swarm.particles
 
     def after_initialize(self, yis: list[Value]) -> None:
         for y in yis:
-            self.aggregate.set_value(y.id, y.value)
+            if self.swarm.set_value(y.id, y.value) is False:
+                raise ValueError(f"{y.id} Unknown particle id.")
+            if self.swarm.append_any_particle_history(y.id) is False:
+                raise ValueError(f"{y.id} Unknown particle id.")
         self.change_state("move")
 
     def move(self) -> list[Particle]:
-        self.aggregate.move()
-        return self.aggregate.get_particle_coordinates()
+        self.swarm.move()
+        return self.swarm.get_particle_coordinates()
 
     def after_evaluate(self, yis: list[Value]) -> None:
         for y in yis:
-            self.aggregate.set_value(y.id, y.value)
+            if self.swarm.set_value(y.id, y.value) is False:
+                raise ValueError(f"{y.id} Unknown particle id.")
+            if self.swarm.append_any_particle_history(y.id) is False:
+                raise ValueError(f"{y.id} Unknown particle id.")
         self.change_state("move")
 
     def search(self) -> list[Particle]:
@@ -189,20 +202,22 @@ class ParticleSwarm:
             xs = self.initialize()
             self.change_state("initialize_pending")
             return xs
-
         elif self.state == "initialize_pending":
             return []
-
         elif self.state == "move":
-            xs = self.aggregate.move()
+            xs = self.swarm.move()
             self.change_state("evaluate_pending")
             return xs
-
         elif self.state == "evaluate_pending":
             return []
-
         else:
             raise ValueError(f"{self.state} Unknown state.")
+
+
+class Value:
+    def __init__(self, id: str, value: Any) -> None:
+        self.id: str = id
+        self.value: Any = value
 
 
 class ParticleSwarmOptimizer(AbstractOptimizer):
@@ -328,18 +343,13 @@ class ParticleSwarmOptimizer(AbstractOptimizer):
         searched_params = self.particle_swarm.search()
         return searched_params
 
-    # def run_optimizer(self) -> None:
-    #     if new_params := self.generate_new_parameter():
-    #         # if self.out_of_boundary(new_params):
-    #         #     self.logger.debug(f"out of boundary: {new_params}")
-    #         #     self.register_new_parameters(self.convert_type_by_config(new_params), state="finished")
-    #         #     objective = np.inf
-    #         #     if self.goals[0] == goal_maximize:
-    #         #         objective = -np.inf
-    #         #     self.storage.result.set_any_trial_objective(trial_id=self.trial_id.integer, objective=[objective])
-    #         #     self.trial_id.increment()
-    #         #     self.serialize(self.trial_id.integer)
-    #         #     return
-    #         self.register_new_parameters(self.convert_type_by_config(new_params))
-    #         self.trial_id.increment()
-    #         self.serialize(self.trial_id.integer)
+    def finalize_operation(self) -> None:
+        root_path = self.workspace.path / f"particle_swarm_optimizer"
+        if not root_path.exists():
+            root_path.mkdir(parents=True)
+        for p in self.particle_swarm.swarm.particles:
+            path = root_path / f"{p.id}.csv"
+            for d in p.history:
+                with open(path, mode="a") as f:
+                    pos = ", ".join([str(x) for x in d["position"]])
+                    f.write(f"{d['count_eval']}, {pos}, {d['value']}\n")
