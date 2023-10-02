@@ -6,14 +6,13 @@ from typing import TYPE_CHECKING, Any
 
 from aiaccel.scheduler.job.model.abstract_model import AbstractModel
 from aiaccel.util import OutputHandler
-from aiaccel.cli.set_result import write_results_to_database
 
 if TYPE_CHECKING:
     from aiaccel.scheduler import Job
 
 
 class LocalModel(AbstractModel):
-    def runner_create(self, obj: Job) -> None:
+    def runner_create(self, obj: Job) -> None:  # noqa: U100
         pass
 
     def job_submitted(self, obj: Job) -> None:

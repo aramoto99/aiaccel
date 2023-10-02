@@ -153,7 +153,7 @@ class AbstractScheduler(AbstractModule):
                 continue
             # Only log if the state has changed.
             if job.trial_id in self.buff.d.keys():
-                self.buff.d[job.trial_id].Add(state_name)
+                self.buff.d[job.trial_id].add(state_name)
                 if self.buff.d[job.trial_id].has_difference():
                     self.logger.info(f"name: {job.trial_id}, state: {state_name}")
 

@@ -13,7 +13,7 @@ import yaml
 
 import aiaccel
 from aiaccel.cli import CsvWriter
-from aiaccel.common import datetime_format, dict_result, extension_hp, resource_type_mpi
+from aiaccel.common import datetime_format, resource_type_mpi
 from aiaccel.config import Config, load_config
 from aiaccel.optimizer import create_optimizer
 from aiaccel.scheduler import create_scheduler
@@ -133,8 +133,8 @@ def main() -> None:  # pragma: no cover
                         finishing_time = now + (max_trial_number - num_finished) * one_loop_time
                         end_estimated_time = finishing_time.strftime(datetime_format)
 
-                    buff.d["num_finished"].Add(num_finished)
-                    if buff.d["num_finished"].Len == 1 or buff.d["num_finished"].has_difference():
+                    buff.d["num_finished"].add(num_finished)
+                    if buff.d["num_finished"].length == 1 or buff.d["num_finished"].has_difference():
                         scheduler.logger.info(
                             f"{num_finished}/{max_trial_number} finished, "
                             f"max trial number: {max_trial_number}, "
@@ -145,12 +145,12 @@ def main() -> None:  # pragma: no cover
                         # TensorBoard
                         tensorboard.update()
 
-                    buff.d["available_pool_size"].Add(available_pool_size)
-                    if buff.d["available_pool_size"].Len == 1 or buff.d["available_pool_size"].has_difference():
+                    buff.d["available_pool_size"].add(available_pool_size)
+                    if buff.d["available_pool_size"].length == 1 or buff.d["available_pool_size"].has_difference():
                         scheduler.logger.info(f"pool_size: {available_pool_size}")
                 else:
-                    buff.d["num_finished"].Clear()
-                    buff.d["available_pool_size"].Clear()
+                    buff.d["num_finished"].clear()
+                    buff.d["available_pool_size"].clear()
                 time.sleep(config.generic.main_loop_sleep_seconds)
                 continue
             break
@@ -185,7 +185,6 @@ def main() -> None:  # pragma: no cover
             best_value = final_result["result"][i]
             if best_id is not None and best_value is not None:
                 logger.info(f"Best trial [{i}] : {best_id}")
-                # logger.info(f"Best result [{i}] : {dst}/{dict_result}/{best_id}.{extension_hp}")
                 logger.info(f"\tvalue : {best_value}")
     logger.info(f"result file : {dst}/{'results.csv'}")
     logger.info(f"Total time [s] : {round(time.time() - time_s)}")

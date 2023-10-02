@@ -25,8 +25,7 @@ class RandomGenerationTest(BaseTest):
         storage = Storage(workspace.storage_file_path)
 
         with self.create_main(python_file):
-            # subprocess.Popen(["aiaccel-start", "--config", str(config_file), "--clean"]).wait()
-            subprocess.Popen(["python -m aiaccel.cli.start", "--config", str(config_file), "--clean"]).wait()
+            subprocess.Popen(["aiaccel-start", "--config", str(config_file), "--clean"]).wait()
         final_result_random = self.get_final_result(storage)
         print("random", final_result_random)
 
@@ -39,8 +38,7 @@ class RandomGenerationTest(BaseTest):
         storage = Storage(workspace.storage_file_path)
 
         with self.create_main(python_file):
-            # subprocess.Popen(["aiaccel-start", "--config", str(config_file), "--clean"]).wait()
-            subprocess.Popen(["python -m aiaccel.cli.start", "--config", str(config_file), "--clean"]).wait()
+            subprocess.Popen(["aiaccel-start", "--config", str(config_file), "--clean"]).wait()
         final_result_tpe = self.get_final_result(storage)
         print("tpe", final_result_tpe)
 
@@ -55,8 +53,7 @@ class RandomGenerationTest(BaseTest):
         storage = Storage(workspace.storage_file_path)
 
         with self.create_main(python_file):
-            # subprocess.Popen(["aiaccel-start", "--config", str(config_file), "--clean"]).wait()
-            subprocess.Popen(["python -m aiaccel.cli.start", "--config", str(config_file), "--clean"]).wait()
+            subprocess.Popen(["aiaccel-start", "--config", str(config_file), "--clean"]).wait()
         final_result_neldermead = self.get_final_result(storage)
         print("nelder-mead", final_result_neldermead)
 

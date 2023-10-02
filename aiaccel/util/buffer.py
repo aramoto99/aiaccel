@@ -4,7 +4,7 @@ import copy
 from typing import Any
 
 
-class _buffer:
+class BufferData:
     def __init__(self, label: str) -> None:
         """
         Args:
@@ -21,45 +21,45 @@ class _buffer:
         """Set any max size of this label length."""
         self._max_size = int(value)
 
-    def Add(self, value: Any) -> None:
+    def add(self, value: Any) -> None:
         """Append any data."""
-        if self.Len == self._max_size:
+        if self.length == self._max_size:
             self.arr.pop(0)
         self.arr.append(value)
 
     @property
-    def Pre(self) -> Any:
+    def pre(self) -> Any:
         """Refers to the previous value."""
-        if self.Len >= 2:
+        if self.length >= 2:
             return self.arr[-2]
         else:
             return None
 
     @property
-    def Now(self) -> Any:
+    def now(self) -> Any:
         """Refers to the current value."""
         return self.arr[-1]
 
-    def Clear(self) -> None:
+    def clear(self) -> None:
         """Initialize list."""
         self.arr = []
 
-    def Replace(self, arr: list[Any]) -> None:
+    def replace(self, arr: list[Any]) -> None:
         """Replace to any list data."""
-        self.Clear()
+        self.clear()
         self.arr = copy.deepcopy(arr)
 
     @property
-    def Len(self) -> int:
+    def length(self) -> int:
         """Get list length."""
         return len(self.arr)
 
     @property
-    def Data(self) -> list[Any]:
+    def data(self) -> list[Any]:
         """Get the list data itself."""
         return self.arr
 
-    def Value(self, index: int) -> None:
+    def value(self, index: int) -> None:
         """Get any data in list.
 
         Args:
@@ -67,7 +67,7 @@ class _buffer:
         """
         return self.arr[index]
 
-    def Del(self, index: int) -> None:
+    def delete(self, index: int) -> None:
         """Delete any data in list.
 
         Args:
@@ -76,14 +76,14 @@ class _buffer:
         self.arr.pop(index)
 
     @property
-    def Is_Empty(self) -> bool:
+    def is_empty(self) -> bool:
         """Itself is empty or not"""
         if self.arr == []:
             return True
         else:
             return False
 
-    def Duplicate(self, value: Any) -> int:
+    def duplicate(self, value: Any) -> int:
         """Get index if exists duplicate data in list else -1.
 
         Args:
@@ -99,7 +99,7 @@ class _buffer:
 
     def delta(self) -> Any:
         """Get numerical difference."""
-        return self.Now - self.Pre
+        return self.now - self.pre
 
     def point_diff(self, idx_pre: int, idx_now: int) -> Any:
         """Get the difference between any two points.
@@ -122,9 +122,9 @@ class _buffer:
         """
         if len(self.arr) >= 2:
             if digit is None:
-                return self.Pre != self.Now
+                return self.pre != self.now
             else:
-                return round(self.Pre, digit) != round(self.Now, digit)
+                return round(self.pre, digit) != round(self.now, digit)
         else:
             return False
 
@@ -147,13 +147,13 @@ class Buffer:
         buff = Buffer(["data1", "data2", "data3"])
 
         # add data
-        buff.d["data1"].Add(x)
-        buff.d["data2"].Add(x)
-        buff.d["data3"].Add(x)
+        buff.d["data1"].add(x)
+        buff.d["data2"].add(x)
+        buff.d["data3"].add(x)
         # or
-        buff.Add("data1", x)
-        buff.Add("data2", x)
-        buff.Add("data3", x)
+        buff.add("data1", x)
+        buff.add("data2", x)
+        buff.add("data3", x)
     """
 
     def __init__(self, *labels: Any) -> None:
@@ -161,30 +161,30 @@ class Buffer:
         self.num_buff = len(self.labels)
         self.d = {}
         for i in range(self.num_buff):
-            self.d[self.labels[i]] = _buffer(self.labels[i])
+            self.d[self.labels[i]] = BufferData(self.labels[i])
 
-    def Add(self, label: str, value: Any) -> None:
-        """Add a data to any buffer.
+    def add(self, label: str, value: Any) -> None:
+        """add a data to any buffer.
 
         Args:
             label (str): A target buffer labele.
-            value (any): Additional.
+            value (any): additional.
         """
-        self.d[label].Add(value)
+        self.d[label].add(value)
 
-    def Del(self, label: str, index: int) -> None:
+    def delete(self, label: str, index: int) -> None:
         """Delete a any data in any buffer.
 
         Args:
             label (str): A target label.
             index (int): A Index to be deleted in the target buffer.
         """
-        self.d[label].Del(index)
+        self.d[label].delete(index)
 
-    def Clear(self, label: str) -> None:
+    def clear(self, label: str) -> None:
         """Delete all buffer data of the target.
 
         Args:
             label (str): A target label.
         """
-        self.d[label].Clear()
+        self.d[label].clear()

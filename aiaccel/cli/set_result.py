@@ -17,7 +17,6 @@ def write_results_to_database(
     error: str,
     returncode: int | None,
 ) -> None:
-
     storage = Storage(storage_file_path)
 
     if objective is None:

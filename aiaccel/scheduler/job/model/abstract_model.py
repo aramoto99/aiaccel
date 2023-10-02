@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import datetime, timedelta
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
@@ -13,7 +14,7 @@ def _threshold_timeout(timeout_seconds: float) -> datetime:
 class AbstractModel(object):
     state: str
     expire: Any
-    next: Any
+    next_state: Any
     timeout: Any
 
     # ready
@@ -24,17 +25,17 @@ class AbstractModel(object):
         obj.write_start_time_to_storage()
         self.job_submitted(obj)
 
-    def runner_create(self, obj: Job) -> None:
+    def runner_create(self, obj: Job) -> None:  # noqa: U100
         ...
 
-    def job_submitted(self, obj: Job) -> None:
+    def job_submitted(self, obj: Job) -> None:  # noqa: U100
         ...
 
     # running
     def before_running(self, obj: Job) -> None:
         obj.write_state_to_storage("running")
 
-    def after_running(self, obj: Job) -> None:
+    def after_running(self, obj: Job) -> None:  # noqa: U100
         ...
 
     def conditions_job_finished(self, obj: Job) -> bool:
@@ -57,7 +58,7 @@ class AbstractModel(object):
     def after_timeout(self, obj: Job) -> None:
         self.stop_job(obj)
 
-    def stop_job(self, obj: Job) -> None:
+    def stop_job(self, obj: Job) -> None:  # noqa: U100
         ...
 
     ...

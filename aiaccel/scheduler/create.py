@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Type, Union
 
-from aiaccel.common import resource_type_abci, resource_type_local, resource_type_mpi, resource_type_memory
+from aiaccel.common import resource_type_abci, resource_type_local, resource_type_memory, resource_type_mpi
 from aiaccel.scheduler.abci_scheduler import AbciScheduler
 from aiaccel.scheduler.local_scheduler import LocalScheduler
 from aiaccel.scheduler.mpi_scheduler import MpiScheduler

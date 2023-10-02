@@ -4,17 +4,16 @@ from datetime import datetime
 from importlib.util import module_from_spec, spec_from_file_location
 from multiprocessing.pool import Pool, ThreadPool
 from pathlib import Path
-from subprocess import Popen
 from typing import Any
 
 from omegaconf.dictconfig import DictConfig
 
-from aiaccel.run import set_logging_file_for_trial_id
+from aiaccel.cli.set_result import write_results_to_database
 from aiaccel.common import datetime_format
 from aiaccel.config import load_config
 from aiaccel.optimizer import AbstractOptimizer
+from aiaccel.run import set_logging_file_for_trial_id
 from aiaccel.scheduler.abstract_scheduler import AbstractScheduler
-from aiaccel.cli.set_result import write_results_to_database
 
 # These are for avoiding mypy-errors from initializer().
 # `global` does not work well.
@@ -30,7 +29,7 @@ class PylocalScheduler(AbstractScheduler):
         super().__init__(config, optimizer)
         self.processes: list[Any] = []
 
-        Pool_ = Pool if self.num_workers > 1 else ThreadPool
+        Pool_: Pool | ThreadPool = Pool if self.num_workers > 1 else ThreadPool  # noqa: N806
         self.pool = Pool_(self.num_workers, initializer=initializer, initargs=(self.config.config_path,))
 
     def run_in_main_loop(self) -> bool:
@@ -56,7 +55,7 @@ class PylocalScheduler(AbstractScheduler):
             args.append([trial_id, self.get_any_trial_xs(trial_id)])
             self.serialize(trial_id)
 
-        for trial_id, xs, ys, err, start_time, end_time in self.pool.imap_unordered(execute, args):
+        for trial_id, _, ys, err, start_time, end_time in self.pool.imap_unordered(execute, args):
             write_results_to_database(
                 storage_file_path=self.workspace.storage_file_path,
                 trial_id=trial_id,
@@ -64,7 +63,7 @@ class PylocalScheduler(AbstractScheduler):
                 start_time=start_time,
                 end_time=end_time,
                 error=err,
-                returncode=None
+                returncode=None,
             )
             self.storage.state.set_any_trial_state(trial_id=trial_id, state="finished")
         return True

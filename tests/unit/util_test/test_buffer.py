@@ -9,119 +9,119 @@ def test_set_max_len():
     assert buff.d["test"]._max_size == 255
 
 
-def test_Add():
+def test_add():
     buff = Buffer(["test"])
     print(buff.d["test"])
-    assert buff.d["test"].Data == []
-    buff.Add("test", 1)
-    assert buff.d["test"].Data[0] == 1
+    assert buff.d["test"].data == []
+    buff.add("test", 1)
+    assert buff.d["test"].data[0] == 1
     assert buff.d["test"](0) == 1
 
 
-def test_Add_lengthover():
+def test_add_lengthover():
     buff = Buffer(["test"])
     buff.d["test"].set_max_len(2)
     assert buff.d["test"]._max_size == 2
 
-    buff.Add("test", 1)
-    buff.Add("test", 2)
-    assert buff.d["test"].Len == 2
+    buff.add("test", 1)
+    buff.add("test", 2)
+    assert buff.d["test"].length == 2
     assert buff.d["test"](0) == 1
     assert buff.d["test"](1) == 2
 
-    buff.Add("test", 3)
-    assert buff.d["test"].Len == 2
+    buff.add("test", 3)
+    assert buff.d["test"].length == 2
     assert buff.d["test"](0) == 2
     assert buff.d["test"](1) == 3
 
-    buff.Add("test", 4)
-    assert buff.d["test"].Len == 2
+    buff.add("test", 4)
+    assert buff.d["test"].length == 2
     assert buff.d["test"](0) == 3
     assert buff.d["test"](1) == 4
 
 
-def test_Pre():
+def test_pre():
     buff = Buffer(["test"])
-    buff.Add("test", 6)
-    assert buff.d["test"].Pre is None
-    buff.Add("test", 7)
-    assert buff.d["test"].Pre == 6
+    buff.add("test", 6)
+    assert buff.d["test"].pre is None
+    buff.add("test", 7)
+    assert buff.d["test"].pre == 6
 
 
-def test_Now():
+def test_now():
     buff = Buffer(["test"])
-    buff.Add("test", 4)
-    assert buff.d["test"].Now == 4
+    buff.add("test", 4)
+    assert buff.d["test"].now == 4
 
 
-def test_Del():
+def test_delete():
     buff = Buffer(["test"])
-    buff.Add("test", 1)
+    buff.add("test", 1)
     assert buff.d["test"](0) == 1
-    assert buff.d["test"].Len == 1
-    buff.Del("test", 0)
-    assert buff.d["test"].Len == 0
+    assert buff.d["test"].length == 1
+    buff.delete("test", 0)
+    assert buff.d["test"].length == 0
 
 
-def test_Clear():
+def test_clear():
     buff = Buffer(["test"])
-    buff.Add("test", 1)
+    buff.add("test", 1)
     assert buff.d["test"](0) == 1
-    assert buff.d["test"].Len == 1
-    buff.Clear("test")
-    assert buff.d["test"].Len == 0
+    assert buff.d["test"].length == 1
+    buff.clear("test")
+    assert buff.d["test"].length == 0
 
 
 def test_replace():
     buff = Buffer(["test"])
-    buff.Add("test", 1)
-    buff.Add("test", 2)
-    buff.Add("test", 3)
-    buff.Add("test", 4)
-    buff.Add("test", 5)
-    assert buff.d["test"].Data == [1, 2, 3, 4, 5]
+    buff.add("test", 1)
+    buff.add("test", 2)
+    buff.add("test", 3)
+    buff.add("test", 4)
+    buff.add("test", 5)
+    assert buff.d["test"].data == [1, 2, 3, 4, 5]
     new_arr = [6, 7, 8, 8, 9]
-    buff.d["test"].Replace(new_arr)
-    assert buff.d["test"].Data == [6, 7, 8, 8, 9]
+    buff.d["test"].replace(new_arr)
+    assert buff.d["test"].data == [6, 7, 8, 8, 9]
 
 
-def test_Value():
+def test_value():
     buff = Buffer(["test"])
-    buff.Add("test", 1)
-    buff.Add("test", 2)
-    assert buff.d["test"].Value(0) == 1
-    assert buff.d["test"].Value(1) == 2
+    buff.add("test", 1)
+    buff.add("test", 2)
+    assert buff.d["test"].value(0) == 1
+    assert buff.d["test"].value(1) == 2
 
 
-def test_Is_Empty():
+def test_is_empty():
     buff = Buffer(["test"])
-    assert buff.d["test"].Is_Empty is True
-    buff.Add("test", 1)
-    assert buff.d["test"].Is_Empty is False
+    assert buff.d["test"].is_empty is True
+    buff.add("test", 1)
+    assert buff.d["test"].is_empty is False
 
 
-def test_Duplicate():
+def test_duplicate():
     buff = Buffer(["test"])
-    buff.Add("test", 1)
-    buff.Add("test", 2)
-    buff.Add("test", 3)
-    assert buff.d["test"].Duplicate(1) == 0
-    assert buff.d["test"].Duplicate(2) == 1
-    assert buff.d["test"].Duplicate(3) == 2
-    assert buff.d["test"].Duplicate(4) == -1
+    buff.add("test", 1)
+    buff.add("test", 2)
+    buff.add("test", 3)
+    assert buff.d["test"].duplicate(1) == 0
+    assert buff.d["test"].duplicate(2) == 1
+    assert buff.d["test"].duplicate(3) == 2
+    assert buff.d["test"].duplicate(4) == -1
 
 
 def test_delta():
     buff = Buffer(["test"])
-    buff.Add("test", 1)
-    buff.Add("test", 5)
+    buff.add("test", 1)
+    buff.add("test", 5)
     assert buff.d["test"].delta() == 4
 
 
 def test_point_diff():
     buff = Buffer(["test"])
-    buff.Add("test", 1)
-    buff.Add("test", 5)
+    buff.add("test", 1)
+    buff.add("test", 5)
     assert buff.d["test"].point_diff(0, 1) == 4
 
 
@@ -129,17 +129,17 @@ def test_has_difference():
     buff = Buffer(["test"])
     assert buff.d["test"].has_difference() is False
 
-    buff.Add("test", 1.12)
-    buff.Add("test", 5.45)
+    buff.add("test", 1.12)
+    buff.add("test", 5.45)
     assert buff.d["test"].has_difference() is True
     assert buff.d["test"].has_difference(digit=1) is True
 
-    buff.Add("test", 1.12)
-    buff.Add("test", 1.12)
+    buff.add("test", 1.12)
+    buff.add("test", 1.12)
     assert buff.d["test"].has_difference() is False
     assert buff.d["test"].has_difference(digit=1) is False
 
-    buff.Add("test", 1.12)
-    buff.Add("test", 1.13)
+    buff.add("test", 1.12)
+    buff.add("test", 1.13)
     assert buff.d["test"].has_difference() is True
     assert buff.d["test"].has_difference(digit=1) is False

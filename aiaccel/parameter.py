@@ -25,7 +25,9 @@ def is_ordinal(data_type: str) -> bool:
 
 
 class ParameterInfo:
-    def __init__(self, name: str | None = None, type: str | None = None, value: float | int | str | None = None) -> None:
+    def __init__(
+        self, name: str | None = None, type: str | None = None, value: float | int | str | None = None  # noqa A002
+    ) -> None:
         self.name = name
         self.type = type
         self.value = value
@@ -68,7 +70,7 @@ class AbstractParameter:
         self.sequence = parameter.get("sequence", None)
         self.num_numeric_choices = parameter.get("num_numeric_choices", None)
 
-    def sample(self, rng: RandomState, initial: bool = False) -> dict[str, Any]:
+    def sample(self, rng: RandomState, initial: bool = False) -> dict[str, Any]:  # noqa U100
         """Sample a parameter.
 
         Args:
@@ -90,7 +92,7 @@ class AbstractParameter:
             if isinstance(value, (IntegerNode, PathNode, StringNode, BooleanNode, BytesNode, FloatNode)):
                 return value._value()
             else:
-                assert False, f"Invalid type: {type(value)}"
+                AssertionError(f"Invalid type: {type(value)}")
         elif isinstance(value, (IntegerNode, PathNode, StringNode, BooleanNode, BytesNode, FloatNode)):
             return value._value()
         else:
@@ -145,7 +147,7 @@ class OrdinalParameter(AbstractParameter):
 
 
 class Parameter(AbstractParameter):
-    def __new__(cls, parameter: dict[str, Any]) -> Any:
+    def __new__(cls, parameter: dict[str, Any]) -> Any:  # noqa U100
         data_type = parameter["type"].lower()
         if is_uniform_int(data_type):
             return IntParameter(parameter)

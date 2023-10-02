@@ -5,8 +5,18 @@ from pathlib import Path
 
 import fasteners
 
-from aiaccel.common import (dict_error, dict_hp, dict_lock, dict_log, dict_mpi, dict_output,
-                            dict_rank_log,dict_runner, dict_storage, dict_tensorboard)
+from aiaccel.common import (
+    dict_error,
+    dict_hp,
+    dict_lock,
+    dict_log,
+    dict_mpi,
+    dict_output,
+    dict_rank_log,
+    dict_runner,
+    dict_storage,
+    dict_tensorboard,
+)
 from aiaccel.util import Suffix
 
 

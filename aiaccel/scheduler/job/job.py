@@ -31,21 +31,21 @@ JOB_STATES = [
 
 JOB_TRANSITIONS: list[dict[str, str | list[str]]] = [
     {
-        "trigger": "next",
+        "trigger": "next_state",
         "source": "init",
         "dest": "ready",
         "before": "before_ready",
         "after": "after_ready",
     },
     {
-        "trigger": "next",
+        "trigger": "next_state",
         "source": "ready",
         "dest": "running",
         "before": "before_running",
         "after": "after_running",
     },
     {
-        "trigger": "next",
+        "trigger": "next_state",
         "source": "running",
         "dest": "finished",
         "conditions": "conditions_job_finished",
@@ -53,7 +53,7 @@ JOB_TRANSITIONS: list[dict[str, str | list[str]]] = [
         "after": "after_finished",
     },
     {
-        "trigger": "next",
+        "trigger": "next_state",
         "source": "finished",
         "dest": "success",
     },
@@ -186,13 +186,13 @@ class Job:
         state = self.machine.get_state(self.model.state)
         try:
             if state.name.lower() == "init":
-                self.model.next(self)
+                self.model.next_state(self)
             elif state.name.lower() == "ready":
-                self.model.next(self)
+                self.model.next_state(self)
             elif state.name.lower() == "running":
-                self.model.next(self)
+                self.model.next_state(self)
             elif state.name.lower() == "finished":
-                self.model.next(self)
+                self.model.next_state(self)
         except BaseException as e:
             self.logger.error(f"An error occurred in the job thread. {e}")
             self.model.expire(self)
