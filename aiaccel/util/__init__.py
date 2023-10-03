@@ -3,7 +3,6 @@ from aiaccel.util.buffer import Buffer
 from aiaccel.util.cast import cast_y
 from aiaccel.util.easy_visualizer import EasyVisualizer
 from aiaccel.util.file import create_yaml
-from aiaccel.util.job_script_preamble import create_job_script_preamble
 from aiaccel.util.logger import ColoredHandler, str_to_logging_level
 from aiaccel.util.process import OutputHandler
 from aiaccel.util.retry import retry
@@ -34,5 +33,4 @@ __all__ = [
     "get_now_str",
     "get_timestamp",
     "cast_y",
-    "create_job_script_preamble",
 ]
