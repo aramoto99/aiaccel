@@ -29,7 +29,6 @@ try:
     from mpi4py.futures import MPIPoolExecutor
 except ImportError:
     mpi_enable = False
-    MPIPoolExecutor: None = None
 
 
 class Mpi:

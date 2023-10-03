@@ -85,7 +85,7 @@ class AbstractOptimizer(AiaccelCore):
 
         return new_params
 
-    def generate_parameter(self) -> list[Any] | None:
+    def generate_parameter(self) -> list[dict[str, float | int | str]]:
         """Generate a list of parameters.
 
         Raises:
@@ -98,7 +98,7 @@ class AbstractOptimizer(AiaccelCore):
         """
         raise NotImplementedError
 
-    def generate_new_parameter(self) -> list[dict[str, float | int | str]] | None:
+    def generate_new_parameter(self) -> list[dict[str, float | int | str]]:
         """Generate a list of parameters.
 
         Returns:
@@ -109,7 +109,6 @@ class AbstractOptimizer(AiaccelCore):
             new_params = self.generate_initial_parameter()
         else:
             new_params = self.generate_parameter()
-
         return new_params
 
     def convert_type_by_config(

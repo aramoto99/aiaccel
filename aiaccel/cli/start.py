@@ -10,11 +10,12 @@ from pathlib import Path
 from typing import Any
 
 import yaml
+from omegaconf.dictconfig import DictConfig
 
 import aiaccel
 from aiaccel.cli import CsvWriter
 from aiaccel.common import datetime_format, resource_type_mpi
-from aiaccel.config import Config, load_config
+from aiaccel.config import load_config
 from aiaccel.optimizer import create_optimizer
 from aiaccel.scheduler import create_scheduler
 from aiaccel.storage import Storage
@@ -42,11 +43,7 @@ def main() -> None:  # pragma: no cover
     parser.add_argument("--make_hostfile", action="store_true", help="Only aiaccel is used when mpi bat.")
     args = parser.parse_args()
 
-    config: Config = load_config(args.config)
-    if config is None:
-        logger.error(f"Invalid workspace: {args.workspace} or config: {args.config}")
-        return
-
+    config: DictConfig = load_config(args.config)
     if config.resource.type.value.lower() == resource_type_mpi:  # MPI
         if not mpi_enable:
             raise Exception("MPI is not enabled.")
