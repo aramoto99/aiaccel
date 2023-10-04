@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-import re
+# import re
 from pathlib import Path
 
-from aiaccel.config import Config
+# from aiaccel.config import Config
 
 
 def create_job_script_preamble(job_script_preamble_path: Path | str | None, job_script_preamble_str: str) -> str:
