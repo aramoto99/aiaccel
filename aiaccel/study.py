@@ -90,7 +90,6 @@ class Study:
         func: Callable[[dict[str, float | int | str]], float],
         n_trials: int | None = None,
     ) -> None:
-
         n_count = 0
         while True:
             trial_id = self.optimizer.get_trial_id()
