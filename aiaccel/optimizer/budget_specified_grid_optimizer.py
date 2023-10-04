@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-from omegaconf.dictconfig import DictConfig
 from numpy import nan as np_nan
+from omegaconf.dictconfig import DictConfig
+
 from aiaccel.optimizer._grid_point_generator import GridPointGenerator
 from aiaccel.optimizer.abstract_optimizer import AbstractOptimizer
 

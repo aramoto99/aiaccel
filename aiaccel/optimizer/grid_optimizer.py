@@ -4,8 +4,8 @@ import math
 from functools import reduce
 from operator import mul
 from typing import Any
-from numpy import nan as np_nan
 
+from numpy import nan as np_nan
 from omegaconf.dictconfig import DictConfig
 
 from aiaccel.optimizer import AbstractOptimizer
