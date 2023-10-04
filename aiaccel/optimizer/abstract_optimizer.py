@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import copy
 from typing import Any
+
 from numpy import isnan
 from omegaconf.dictconfig import DictConfig
 
