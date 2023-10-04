@@ -146,6 +146,14 @@ class AbstractOptimizer(AiaccelCore):
     #             self.trial_id.increment()
     #             self.serialize(self.trial_id.integer)
 
+    def get_trial_id(self) -> int:
+        """Get the current trial ID.
+
+        Returns:
+            int: The current trial ID.
+        """
+        return self.trial_id.integer
+
     def resume(self) -> None:
         """When in resume mode, load the previous optimization data in advance.
 
