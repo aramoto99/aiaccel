@@ -89,11 +89,11 @@ class NelderMeadOptimizer(AbstractOptimizer):
             list[dict[str, float | int | str]] | None: A list of new
             parameters. None if `self.nelder_mead` is already defined.
         """
-        initial_parameters = super().generate_initial_parameter()
+        _initial_parameters = super().generate_initial_parameter()
         initial_parameters = np.array(
             [
                 [
-                    self._generate_initial_parameter(initial_parameters, dim, num_of_initials)
+                    self._generate_initial_parameter(_initial_parameters, dim, num_of_initials)
                     for dim in range(self.n_params)
                 ]
                 for num_of_initials in range(self.n_dim + 1)

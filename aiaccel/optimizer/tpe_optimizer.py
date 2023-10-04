@@ -146,7 +146,7 @@ class TpeOptimizer(AbstractOptimizer):
 
         return new_params
 
-    def generate_initial_parameter(self) -> list[dict[str, float | int | str]]:
+    def generate_initial_parameter(self) -> list[dict[str, float | int | str]] | None:
         """Generate initial parameters.
 
         Returns:
@@ -210,10 +210,7 @@ class TpeOptimizer(AbstractOptimizer):
             if optuna_trial.number >= self.config.resume:
                 resumed_trial = session.query(models.TrialModel).filter_by(number=optuna_trial.number).first()
                 session.delete(resumed_trial)
-                self.logger.info(f"resume_trial deletes the trial number {resumed_trial.number} from optuna db.")
-
         session.commit()
-
         for trial_id in list(self.parameter_pool.keys()):
             objective = self.get_any_trial_objective(int(trial_id))
             if objective is not None:
@@ -231,7 +228,6 @@ class TpeOptimizer(AbstractOptimizer):
             if optuna_trial.number >= self.config.resume:
                 resumed_trial = session.query(models.TrialModel).filter_by(number=optuna_trial.number).first()
                 session.delete(resumed_trial)
-                self.logger.info(f"resume_trial deletes the trial number {resumed_trial.number} from optuna db.")
         session.commit()
         for trial_id in list(self.parameter_pool.keys()):
             objective = self.get_any_trial_objective(int(trial_id))

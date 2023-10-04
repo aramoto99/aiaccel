@@ -100,13 +100,12 @@ class AbstractParameter:
 
 
 class IntParameter(AbstractParameter):
-    def sample(self, rng: RandomState, initial: bool = False) -> ParameterInfo:
+    def sample(self, rng: RandomState, initial: bool = False) -> dict[str, Any]:
         if initial and self.initial is not None:
             value = self.initial
         else:
             value = rng.randint(self.lower, self.upper)
-        # return {"name": self.name, "type": self.type, "value": self.unwrap(value)}
-        return ParameterInfo(name=self.name, type=self.type, value=self.unwrap(value))
+        return {"name": self.name, "type": self.type, "value": self.unwrap(value)}
 
 
 class FloatParameter(AbstractParameter):

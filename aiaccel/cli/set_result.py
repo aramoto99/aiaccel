@@ -11,7 +11,7 @@ from aiaccel.util.data_type import str_or_float_or_int
 def write_results_to_database(
     storage_file_path: str | Path,
     trial_id: int,
-    objective: float | None,
+    objective: list[str | float | int] | None,
     start_time: str,
     end_time: str,
     error: str,
