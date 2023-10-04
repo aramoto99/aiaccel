@@ -1,8 +1,7 @@
 from __future__ import annotations
 
-import numpy as np
 from omegaconf.dictconfig import DictConfig
-
+from numpy import nan as np_nan
 from aiaccel.optimizer._grid_point_generator import GridPointGenerator
 from aiaccel.optimizer.abstract_optimizer import AbstractOptimizer
 
@@ -84,7 +83,7 @@ class BudgetSpecifiedGridOptimizer(AbstractOptimizer):
         Returns:
             list[dict[str, float | int | str]]: A list of new parameters.
         """
-        return [{"name": param.name, "type": param.type, "value": np.nan} for param in self.params.get_parameter_list()]
+        return [{"name": param.name, "type": param.type, "value": np_nan} for param in self.params.get_parameter_list()]
 
     def run_optimizer(self) -> None:
         if new_params := self.generate_new_parameter():
@@ -94,6 +93,6 @@ class BudgetSpecifiedGridOptimizer(AbstractOptimizer):
         else:
             self.logger.info("Generated all of parameters.")
             self.register_new_parameters(self.convert_type_by_config(self.nan_parameter()), state="finished")
-            self.storage.result.set_any_trial_objective(trial_id=self.trial_id.integer, objective=[np.nan])
+            self.storage.result.set_any_trial_objective(trial_id=self.trial_id.integer, objective=[np_nan])
             self.trial_id.increment()
             self.serialize(self.trial_id.integer)

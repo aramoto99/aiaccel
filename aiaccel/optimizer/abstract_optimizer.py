@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import copy
 from typing import Any
-
+from numpy import isnan
 from omegaconf.dictconfig import DictConfig
 
 from aiaccel.config import is_multi_objective
@@ -128,6 +128,8 @@ class AbstractOptimizer(AiaccelCore):
         for new_param in new_params:
             name = str(new_param["name"])
             if isinstance(config_params[name], IntParameter) or isinstance(config_params[name], ConvertedIntParameter):
+                if isnan(new_param["value"]):
+                    continue
                 new_param["value"] = int(new_param["value"])
         return new_params
 
