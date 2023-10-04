@@ -14,15 +14,15 @@ def create_abci_batch_file(
     error_file_path: Path | str,
     config_file_path: Path | str,
     batch_file: Path,
-    job_script_preamble: Path | str | None,
+    job_script_preamble_path: Path | str | None,
     command: str,
     enabled_variable_name_argumentation: bool,
     dict_lock: Path,
 ) -> None:
     """Create a ABCI batch file.
 
-    The 'job_script_preamble' is a base of the ABCI batch file. At first, loads
-    'job_script_preamble', and adds the 'commands' to the loaded contents. Finally,
+    The 'job_script_preamble_path' is a base of the ABCI batch file. At first, loads
+    'job_script_preamble_path', and adds the 'commands' to the loaded contents. Finally,
     writes the contents to 'batch_file'.
 
     Args:
@@ -32,7 +32,7 @@ def create_abci_batch_file(
         error_file_path (Path | str): A path of a error file.
         config_file_path (Path | str): A path of a config file.
         batch_file (Path): A path of a creating file.
-        job_script_preamble (str): A wrapper file of ABCI batch file.
+        job_script_preamble_path (str): A wrapper file of ABCI batch file.
         command (str): A command to execute.
         dict_lock (Path): A directory to store lock files.
 
@@ -57,7 +57,8 @@ def create_abci_batch_file(
     commands.append("$error_file_path")
 
     set_retult = _generate_command_line(
-        command="aiaccel-set-result",
+        # command="aiaccel-set-result",
+        command="python -m aiaccel.cli.set_result",
         args=[
             "--file=$output_file_path",
             "--trial_id=$trial_id",
@@ -72,7 +73,8 @@ def create_abci_batch_file(
     )
 
     set_retult_no_error = _generate_command_line(
-        command="aiaccel-set-result",
+        # command="aiaccel-set-result",
+        command="python -m aiaccel.cli.set_result",
         args=[
             "--file=$output_file_path",
             "--trial_id=$trial_id",
@@ -106,8 +108,8 @@ def create_abci_batch_file(
     script = ""
 
     # preamble
-    if job_script_preamble is not None:
-        with open(job_script_preamble, "r") as f:
+    if job_script_preamble_path is not None:
+        with open(job_script_preamble_path, "r") as f:
             lines = f.read().splitlines()
             if len(lines) > 0:
                 for line in lines:

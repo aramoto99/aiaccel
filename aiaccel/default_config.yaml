@@ -1,4 +1,6 @@
 generic:
+    aiaccel_dir: ''
+    venv_dir: ''
     workspace: ''
     job_command: ''
     python_file: ''
@@ -11,14 +13,9 @@ resource:
     type: local
     num_workers: 1
     mpi_npernode: 4
-    mpi_enviroment: "ABCI"
     mpi_bat_rt_type: "F"
     mpi_bat_rt_num: 1
     mpi_bat_h_rt: "72:00:00"
-    mpi_bat_root_dir: "~/mpi_work"
-    mpi_bat_venv_dir: "./mpienv"
-    mpi_bat_aiaccel_dir: "./aiaccel"
-    mpi_bat_config_dir: "./sphere_cpu_1node_1try"
     mpi_bat_file: "./qsub.sh"
     mpi_hostfile: "./hostfile"
     mpi_gpu_mode: True
@@ -28,11 +25,10 @@ ABCI:
     group: '[group]'
     job_execution_options: ''
     job_script_preamble: ''
-    job_script_preamble_inline: ''
+    job_script_preamble_path: ''
 
 optimize:
     search_algorithm: aiaccel.optimizer.NelderMeadOptimizer
-    # goal: minimize
     goal: [minimize]
     trial_number: 30
     rand_seed: 42

@@ -9,6 +9,7 @@ from aiaccel.util.suffix import Suffix
 from aiaccel.util.time import get_now_str, get_timestamp
 from aiaccel.util.trialid import TrialId
 from aiaccel.util.cast import cast_y
+from aiaccel.util.job_script_preamble import create_job_script_preamble
 
 # from aiaccel.util.aiaccel import Run
 
@@ -30,5 +31,8 @@ __all__ = [
     "IntParameter",
     "OrdinalParameter",
     "Parameter",
-    "cast_y"
+    "get_now_str",
+    "get_timestamp",
+    "cast_y",
+    "create_job_script_preamble"
 ]
