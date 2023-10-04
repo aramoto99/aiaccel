@@ -5,10 +5,10 @@ from aiaccel.optimizer.create import create_optimizer
 from aiaccel.optimizer.grid_optimizer import GridOptimizer, generate_grid_points, get_grid_options
 from aiaccel.optimizer.motpe_optimizer import MOTpeOptimizer
 from aiaccel.optimizer.nelder_mead_optimizer import NelderMeadOptimizer
+from aiaccel.optimizer.particle_swarm_optimizer import ParticleSwarmOptimizer
 from aiaccel.optimizer.random_optimizer import RandomOptimizer
 from aiaccel.optimizer.sobol_optimizer import SobolOptimizer
 from aiaccel.optimizer.tpe_optimizer import TpeOptimizer, create_distributions
-from aiaccel.optimizer.particle_swarm_optimizer import ParticleSwarmOptimizer
 
 __all__ = [
     "AbstractOptimizer",

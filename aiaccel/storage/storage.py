@@ -3,6 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
+from aiaccel.common import goal_maximize, goal_minimize
 from aiaccel.storage.error import Error
 from aiaccel.storage.hp import Hp
 from aiaccel.storage.jobstate import JobState
@@ -12,7 +13,6 @@ from aiaccel.storage.state import State
 from aiaccel.storage.timestamp import TimeStamp
 from aiaccel.storage.variable import Serializer
 
-from aiaccel.common import goal_maximize, goal_minimize
 
 class Storage:
     """Database"""
