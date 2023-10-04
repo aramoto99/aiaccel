@@ -90,6 +90,7 @@ class Study:
         func: Callable[[dict[str, float | int | str]], float],
         n_trials: int | None = None,
     ) -> None:
+
         n_count = 0
         while True:
             trial_id = self.optimizer.get_trial_id()
@@ -118,7 +119,7 @@ class Study:
         self,
         func: Callable[[dict[str, float | int | str]], float],
         xs: dict[str, float | int | str],
-        y_data_type: str | None,
+        y_data_type: "str | None",
     ) -> Any:
         """Executes the target function.
 
@@ -170,6 +171,9 @@ class Study:
     ) -> None:
         start_time = datetime.now().strftime(datetime_format)
         xs = self.storage.hp.get_any_trial_params_dict(trial_id)
+        if xs is None:
+            logging.error(f"Failed to get parameters of trial ID {trial_id}.")
+            return
         y: Any = None
         self.storage.state.set_any_trial_state(trial_id=trial_id, state="running")
         _, y, err = self.execute(func, xs, y_data_type)
