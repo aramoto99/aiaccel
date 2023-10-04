@@ -25,7 +25,7 @@ class Hp(Abstract):
             param_type (str)  : Hyperparameter data type
 
         Returns:
-            TrialTable | None
+            StateTable | None
         """
         with self.create_session() as session:
             try:
@@ -41,9 +41,7 @@ class Hp(Abstract):
         with self.create_session() as session:
             try:
                 hps = [
-                    HpTable(
-                        trial_id=trial_id, param_name=d["parameter_name"], param_value=d["value"], param_type=d["type"]
-                    )
+                    HpTable(trial_id=trial_id, param_name=d["name"], param_value=d["value"], param_type=d["type"])
                     for d in params
                 ]
                 session.bulk_save_objects(hps)
@@ -68,6 +66,26 @@ class Hp(Abstract):
         if len(hp) == 0:
             return None
         return hp
+
+    @retry(_MAX_NUM=60, _DELAY=1.0)
+    def get_any_trials_params(self, trial_ids: list[int]) -> list[dict[str, dict[str, int | float | str]]] | None:
+        """Obtain the set parameter information for any given trial.
+
+        Args:
+            trial_id(int): Any trial id.
+
+        Returns:
+            list[HpTable] | None:
+        """
+
+        def _to_dict(data: HpTable) -> dict[str, int | float | str]:
+            return {d.param_name: d.param_value for d in data}
+
+        with self.create_session() as session:
+            datas = session.query(HpTable).filter(HpTable.trial_id.in_(trial_ids)).with_for_update(read=True)
+        if len(datas) == 0:
+            return None
+        return [{"trial_id": data.trial_id, "param": _to_dict(data)} for data in datas]
 
     def get_any_trial_params_dict(self, trial_id: int) -> dict[str, int | float | str] | None:
         """Obtain the set parameter information for any given trial.

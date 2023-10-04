@@ -5,7 +5,6 @@ from typing import TYPE_CHECKING, Any
 
 from aiaccel.scheduler.job.model import LocalModel
 from aiaccel.util.mpi import Mpi, MpiOutputHandler
-from aiaccel.wrapper_tools import create_runner_command
 
 if TYPE_CHECKING:
     from aiaccel.scheduler import Job
@@ -13,7 +12,7 @@ if TYPE_CHECKING:
 
 class MpiModel(LocalModel):
     def before_job_submitted(self, obj: Job) -> None:
-        runner_command = create_runner_command(
+        runner_command = self.create_runner_command(
             obj.config.generic.job_command,
             obj.content,
             obj.trial_id,
@@ -86,15 +85,15 @@ class MpiModel(LocalModel):
 
         commands = ["python", "-m", "aiaccel.cli.set_result"]
         for key in args.keys():
-            commands.append(f"--{key}={str(args[key])}")
+            commands.append(f"--{key}={args[key]}")
 
         commands.append("--objective")
         for objective in objectives:
             commands.append(str(objective))
 
         for param in params:
-            if "parameter_name" in param.keys() and "value" in param.keys():
-                commands.append(f"--{param['parameter_name']}={str(param['value'])}")
+            if "name" in param.keys() and "value" in param.keys():
+                commands.append(f"--{param['name']}={param['value']}")
         print(commands)
         Popen(commands)
 

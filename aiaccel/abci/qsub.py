@@ -7,6 +7,7 @@ from omegaconf.listconfig import ListConfig
 
 from aiaccel.common import dict_output
 
+
 """ Example of stat
 stat = {
     'job-ID': 12345,

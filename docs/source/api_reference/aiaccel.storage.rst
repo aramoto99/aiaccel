@@ -68,10 +68,10 @@ aiaccel.storage.timestamp module
    :undoc-members:
    :show-inheritance:
 
-aiaccel.storage.trial module
+aiaccel.storage.state module
 ----------------------------
 
-.. automodule:: aiaccel.storage.trial
+.. automodule:: aiaccel.storage.state
    :members:
    :undoc-members:
    :show-inheritance:
