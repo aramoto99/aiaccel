@@ -20,10 +20,6 @@ resource:
   mpi_npernode: 2
   mpi_bat_rt_num: 1
   mpi_bat_h_rt: "2:00:00"
-  mpi_bat_root_dir: "~/mpi_work"
-  mpi_bat_venv_dir: "./mpienv"
-  mpi_bat_aiaccel_dir: "./aiaccel"
-  mpi_bat_config_dir: "./sphere_cpu_1node_1try"
   mpi_bat_file: "./qsub.sh"
   mpi_hostfile: "./hostfile"
   mpi_gpu_mode: False

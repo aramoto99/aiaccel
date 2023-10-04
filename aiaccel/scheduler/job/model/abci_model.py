@@ -10,6 +10,7 @@ import fasteners
 from aiaccel.abci import create_qsub_command
 from aiaccel.scheduler.job.model.abstract_model import AbstractModel
 from aiaccel.util import OutputHandler
+from aiaccel.util import create_job_script_preamble
 
 if TYPE_CHECKING:
     from aiaccel.scheduler.job import Job
@@ -21,12 +22,14 @@ class AbciModel(AbstractModel):
         self.create_abci_batch_file(
             trial_id=obj.trial_id,
             param_content=obj.content,
+            aiaccel_dir=obj.config.generic.aiaccel_dir,
+            venv_dir=obj.config.generic.venv_dir,
             storage_file_path=obj.workspace.storage_file_path,
             error_file_path=obj.workspace.get_error_output_file(obj.trial_id),
             config_file_path=obj.config.config_path,
             runner_file_path=runner_file_path,
-            job_script_preamble=obj.config.ABCI.job_script_preamble,
-            job_script_preamble_inline=obj.config.ABCI.job_script_preamble_inline,
+            job_script_preamble_path=obj.config.ABCI.job_script_preamble_path,
+            job_script_preamble_str=obj.config.ABCI.job_script_preamble,
             command=obj.config.generic.job_command,
             enabled_variable_name_argumentation=obj.config.generic.enabled_variable_name_argumentation,
             dict_lock=obj.workspace.lock,
@@ -52,24 +55,18 @@ class AbciModel(AbstractModel):
                 param_args += f'--{param["name"]}=${param["name"]} '
         return param_args
 
-    def create_job_script_preamble(self, job_script_preamble: Path | str | None, job_script_preamble_inline: str) -> str:
-        if job_script_preamble is None or job_script_preamble == "":
-            return job_script_preamble_inline
-        else:
-            with open(job_script_preamble, "r") as f:
-                job_script_preamble = f.read()
-            return job_script_preamble
-
     def create_abci_batch_file(
         self,
         trial_id: int,
         param_content: dict[str, Any],
+        aiaccel_dir: str,
+        venv_dir: str,
         storage_file_path: Path | str,
         error_file_path: Path | str,
         config_file_path: Path | str,
         runner_file_path: Path,
-        job_script_preamble: Path | str | None,
-        job_script_preamble_inline: str,
+        job_script_preamble_path: Path | str | None,
+        job_script_preamble_str: str,
         command: str,
         enabled_variable_name_argumentation: bool,
         dict_lock: Path,
@@ -81,16 +78,7 @@ class AbciModel(AbstractModel):
         writes the contents to 'runner_file_path'.
 
         Args:
-            trial_id (int): A trial id.
-            param_content (dict): A dictionary of parameters.
-            storage_file_path (Path | str): A path of a db file.
-            error_file_path (Path | str): A path of a error file.
-            config_file_path (Path | str): A path of a config file.
-            runner_file_path (Path): A path of a creating file.
-            job_script_preamble (str): A wrapper file of ABCI batch file.
-            command (str): A command to execute.
-            dict_lock (Path): A directory to store lock files.
-
+            -
         Returns:
             None
         """
@@ -112,7 +100,8 @@ class AbciModel(AbstractModel):
         commands.append("$error_file_path")
 
         set_retult = self.generate_command_line(
-            command="aiaccel-set-result",
+            # command="aiaccel-set-result",
+            command="python -m aiaccel.cli.set_result",
             args=[
                 "--storage_file_path=$storage_file_path",
                 "--trial_id=$trial_id",
@@ -125,7 +114,8 @@ class AbciModel(AbstractModel):
         )
 
         set_retult_no_error = self.generate_command_line(
-            command="aiaccel-set-result",
+            # command="aiaccel-set-result",
+            command="python -m aiaccel.cli.set_result",
             args=[
                 "--storage_file_path=$storage_file_path",
                 "--trial_id=$trial_id",
@@ -162,7 +152,15 @@ class AbciModel(AbstractModel):
         #         if len(lines) > 0:
         #             for line in lines:
         #                 script += line + "\n"
-        script = self.create_job_script_preamble(job_script_preamble, job_script_preamble_inline)
+        script = create_job_script_preamble(job_script_preamble_path, job_script_preamble_str)
+        script += "\n"
+
+        # aiaccel
+        if aiaccel_dir != "":
+            script += f"export PYTHONPATH={aiaccel_dir}:$PYTHONPATH" + "\n"
+        # venv
+        if venv_dir != "":
+            script += f"source {venv_dir}/bin/activate" + "\n"
         script += "\n"
         # parameters
         for param in param_content["parameters"]:
