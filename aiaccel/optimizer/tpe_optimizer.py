@@ -9,8 +9,13 @@ from omegaconf.dictconfig import DictConfig
 from optuna.storages._rdb import models
 
 from aiaccel.optimizer import AbstractOptimizer
-from aiaccel.parameter import (CategoricalParameter, FloatParameter, HyperParameterConfiguration, IntParameter,
-                               OrdinalParameter)
+from aiaccel.parameter import (
+    CategoricalParameter,
+    FloatParameter,
+    HyperParameterConfiguration,
+    IntParameter,
+    OrdinalParameter,
+)
 
 
 class TPESamplerWrapper(optuna.samplers.TPESampler):

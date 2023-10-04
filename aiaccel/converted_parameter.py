@@ -7,8 +7,15 @@ from typing import Any
 import numpy as np
 from numpy.random import RandomState
 
-from aiaccel.parameter import (AbstractParameter, CategoricalParameter, FloatParameter, HyperParameterConfiguration,
-                               IntParameter, OrdinalParameter, Parameter)
+from aiaccel.parameter import (
+    AbstractParameter,
+    CategoricalParameter,
+    FloatParameter,
+    HyperParameterConfiguration,
+    IntParameter,
+    OrdinalParameter,
+    Parameter,
+)
 
 
 class ConvertedParameter(AbstractParameter):

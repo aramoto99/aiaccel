@@ -9,8 +9,7 @@ import fasteners
 
 from aiaccel.abci import create_qsub_command
 from aiaccel.scheduler.job.model.abstract_model import AbstractModel
-from aiaccel.util import OutputHandler
-from aiaccel.util import create_job_script_preamble
+from aiaccel.util import OutputHandler, create_job_script_preamble
 
 if TYPE_CHECKING:
     from aiaccel.scheduler.job import Job

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+
 def cast_y(y_value: Any, y_data_type: str | None) -> float | int | str:
     """Casts y to the appropriate data type.
 

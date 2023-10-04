@@ -12,13 +12,14 @@ from omegaconf.dictconfig import DictConfig
 from omegaconf.listconfig import ListConfig
 
 from aiaccel.common import (
+    goal_maximize,
+    goal_minimize,
     resource_type_abci,
     resource_type_local,
     resource_type_memory,
     resource_type_mpi,
-    goal_maximize,
-    goal_minimize
 )
+
 
 class ResourceType(Enum):
     abci: str = resource_type_abci

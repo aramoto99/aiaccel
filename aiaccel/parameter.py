@@ -25,7 +25,9 @@ def is_ordinal(data_type: str) -> bool:
 
 
 class ParameterInfo:
-    def __init__(self, name: str | None = None, type: str | None = None, value: float | int | str | None = None) -> None:
+    def __init__(
+        self, name: str | None = None, type: str | None = None, value: float | int | str | None = None
+    ) -> None:
         self.name = name
         self.type = type
         self.value = value

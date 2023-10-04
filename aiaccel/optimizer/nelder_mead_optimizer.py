@@ -7,11 +7,11 @@ import numpy as np
 from omegaconf.dictconfig import DictConfig
 from omegaconf.listconfig import ListConfig
 
+from aiaccel.common import goal_maximize
 from aiaccel.config import is_multi_objective
 from aiaccel.converted_parameter import ConvertedParameterConfiguration
 from aiaccel.optimizer import AbstractOptimizer
 from aiaccel.optimizer._nelder_mead import NelderMead, Value, Vertex
-from aiaccel.common import goal_maximize
 
 
 class NelderMeadOptimizer(AbstractOptimizer):
@@ -90,8 +90,14 @@ class NelderMeadOptimizer(AbstractOptimizer):
         """
         initial_parameters = super().generate_initial_parameter()
         initial_parameters = np.array(
-            [[self._generate_initial_parameter(initial_parameters, dim, num_of_initials) for dim in range(self.n_params)]
-                for num_of_initials in range(self.n_dim + 1)])
+            [
+                [
+                    self._generate_initial_parameter(initial_parameters, dim, num_of_initials)
+                    for dim in range(self.n_params)
+                ]
+                for num_of_initials in range(self.n_dim + 1)
+            ]
+        )
 
         self.logger.debug(f"initial_parameters: {initial_parameters}")
         if self.nelder_mead is not None:

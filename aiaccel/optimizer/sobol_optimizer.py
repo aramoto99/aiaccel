@@ -45,7 +45,6 @@ class SobolOptimizer(AbstractOptimizer):
             new_params.append({"name": param.name, "type": param.type, "value": value})
         return self.params.to_original_repr(new_params)
 
-
     def generate_initial_parameter(self) -> list[dict[str, float | int | str]]:
         """Generate initial parameters.
 
@@ -56,7 +55,8 @@ class SobolOptimizer(AbstractOptimizer):
         for hyperparameter in self.params.get_parameter_list():
             if hyperparameter.initial is not None:
                 self.logger.warning(
-                    "Initial values cannot be specified for sobol search. " "The set initial value has been invalidated."
+                    "Initial values cannot be specified for sobol search. "
+                    "The set initial value has been invalidated."
                 )
                 break
 
