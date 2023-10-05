@@ -1,18 +1,9 @@
-import omegaconf
-import unittest
-import tempfile
-import shutil
-import os
-
-from unittest.mock import MagicMock, patch
-from aiaccel.util.mpi import Mpi, MpiOutputHandler
-from subprocess import PIPE, STDOUT, Popen, run
-
+from os import environ
 from pathlib import Path
 
 
 def get_root():
-    return Path(os.environ['GITHUB_WORKSPACE'])/'mpi_work'
+    return Path(environ["GITHUB_WORKSPACE"]) / "mpi_work"
 
 
 def get_rank_log():

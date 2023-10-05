@@ -699,7 +699,7 @@ class TestGridPointGenerator(BaseTest):
         grid_point_generator = GridPointGenerator(
             num_trials=self.trial_number, hyperparameters=self.hyperparameters, sampling_method="RANDOM", rng=None
         )
-        next_grid_point = grid_point_generator._get_grid_point_randomly(0)
+        next_grid_point = grid_point_generator._get_grid_point_randomly()
         assert len(next_grid_point) > 0
 
     def test_get_grid_point_duplicatable_randomly(self) -> None:
@@ -709,7 +709,7 @@ class TestGridPointGenerator(BaseTest):
             sampling_method="DUPLICATABLE_RANDOM",
             rng=None,
         )
-        next_grid_point = grid_point_generator._get_grid_point_duplicatable_randomly(0)
+        next_grid_point = grid_point_generator._get_grid_point_duplicatable_randomly()
         assert len(next_grid_point) > 0
 
     def test_num_generated_points(self) -> None:

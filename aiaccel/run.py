@@ -8,16 +8,9 @@ import threading
 import traceback
 from argparse import ArgumentParser
 from collections.abc import Callable
-from contextlib import contextmanager
-from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-import yaml
-
-from aiaccel.cli import CsvWriter
-from aiaccel.cli.set_result import write_results_to_database
-from aiaccel.common import datetime_format
 from aiaccel.config import load_config
 from aiaccel.optimizer import create_optimizer
 from aiaccel.parameter import (
@@ -31,6 +24,14 @@ from aiaccel.storage import Storage
 from aiaccel.util import cast_y, create_yaml
 from aiaccel.util.data_type import str_or_float_or_int
 from aiaccel.workspace import Workspace
+
+
+def set_logging_file_for_trial_id(workspace: Path, trial_id: int) -> None:
+    log_dir = workspace / "log"
+    log_path = log_dir / f"job_{trial_id}.log"
+    if not log_dir.exists():
+        log_dir.mkdir(parents=True)
+    logging.basicConfig(filename=log_path, level=logging.DEBUG, force=True)
 
 
 def set_logging_file_for_trial_id(workspace: Path, trial_id: int) -> None:

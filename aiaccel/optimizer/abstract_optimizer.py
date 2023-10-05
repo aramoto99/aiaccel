@@ -3,6 +3,7 @@ from __future__ import annotations
 import copy
 from typing import Any
 
+from numpy import isnan
 from omegaconf.dictconfig import DictConfig
 
 from aiaccel.config import is_multi_objective
@@ -69,7 +70,7 @@ class AbstractOptimizer(AiaccelCore):
         self.num_of_generated_parameter += 1
         self.logger.debug(f"generated parameters: {params}")
 
-    def generate_initial_parameter(self) -> list[Any]:
+    def generate_initial_parameter(self) -> list[dict[str, float | int | str]] | None:
         """Generate a list of initial parameters.
 
         Returns:
@@ -85,7 +86,7 @@ class AbstractOptimizer(AiaccelCore):
 
         return new_params
 
-    def generate_parameter(self) -> list[Any] | None:
+    def generate_parameter(self) -> list[dict[str, float | int | str]] | None:
         """Generate a list of parameters.
 
         Raises:
@@ -109,7 +110,6 @@ class AbstractOptimizer(AiaccelCore):
             new_params = self.generate_initial_parameter()
         else:
             new_params = self.generate_parameter()
-
         return new_params
 
     def convert_type_by_config(
@@ -129,6 +129,8 @@ class AbstractOptimizer(AiaccelCore):
         for new_param in new_params:
             name = str(new_param["name"])
             if isinstance(config_params[name], IntParameter) or isinstance(config_params[name], ConvertedIntParameter):
+                if isnan(new_param["value"]):
+                    continue
                 new_param["value"] = int(new_param["value"])
         return new_params
 

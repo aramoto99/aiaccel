@@ -11,7 +11,8 @@ from aiaccel.common import goal_maximize
 from aiaccel.config import is_multi_objective
 from aiaccel.converted_parameter import ConvertedParameterConfiguration
 from aiaccel.optimizer import AbstractOptimizer
-from aiaccel.optimizer._nelder_mead import NelderMead, Value, Vertex
+from aiaccel.optimizer._nelder_mead import NelderMead, Vertex
+from aiaccel.optimizer.value import Value
 
 
 class NelderMeadOptimizer(AbstractOptimizer):
@@ -88,11 +89,11 @@ class NelderMeadOptimizer(AbstractOptimizer):
             list[dict[str, float | int | str]] | None: A list of new
             parameters. None if `self.nelder_mead` is already defined.
         """
-        initial_parameters = super().generate_initial_parameter()
+        _initial_parameters = super().generate_initial_parameter()
         initial_parameters = np.array(
             [
                 [
-                    self._generate_initial_parameter(initial_parameters, dim, num_of_initials)
+                    self._generate_initial_parameter(_initial_parameters, dim, num_of_initials)
                     for dim in range(self.n_params)
                 ]
                 for num_of_initials in range(self.n_dim + 1)

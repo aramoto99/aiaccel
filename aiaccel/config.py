@@ -64,7 +64,7 @@ class GenericConfig:
 
 @dataclass
 class ResourceConifig:
-    type: ResourceType
+    type: ResourceType  # noqa: A003
     num_workers: int
     mpi_npernode: Optional[int]
     mpi_bat_rt_type: Optional[str]
@@ -87,7 +87,7 @@ class AbciConifig:
 @dataclass
 class ParameterConfig:
     name: str
-    type: str
+    type: str  # noqa: A003
     lower: Union[float, int]
     upper: Union[float, int]
     # initial: Optional[Union[None, float, int, str, List[Union[float, int]]]]  # Unions of containers are not supported
@@ -190,3 +190,15 @@ def is_multi_objective(config: DictConfig) -> bool:
         bool: Is the multi--objective option set in the configuration or not.
     """
     return isinstance(config.optimize.goal, ListConfig) and len(config.optimize.goal) > 1
+
+
+def is_maximize(config: DictConfig) -> bool:
+    """Is the maximize option set in the configuration.
+
+    Args:
+        config (Config): A configuration object.
+
+    Returns:
+        bool: Is the maximize option set in the configuration or not.
+    """
+    return config.optimize.goal[0] == goal_maximize

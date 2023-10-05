@@ -5,6 +5,8 @@ from typing import Any
 
 import numpy as np
 
+from aiaccel.optimizer.value import Value
+
 # constants for Nelder-Mead
 # r: reflect
 # e: expand
@@ -35,8 +37,8 @@ class Vertex:
     def set_value(self, value: Any) -> None:
         self.value = value
 
-    def set_id(self, id: str) -> None:
-        self.id = id
+    def set_id(self, vertex_id: str) -> None:
+        self.id = vertex_id
 
     def set_new_id(self) -> None:
         self.id = self.generate_random_name()
@@ -170,12 +172,6 @@ class Simplex:
         for i in range(1, len(self.vertices)):
             self.vertices[i] = self.vertices[0] + (self.vertices[i] - self.vertices[0]) * self.coef["s"]
         return self.vertices
-
-
-class Value:
-    def __init__(self, id: str, value: Any) -> None:
-        self.id: str = id
-        self.value: Any = value
 
 
 class Store:

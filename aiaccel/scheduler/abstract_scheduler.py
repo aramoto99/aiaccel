@@ -89,7 +89,7 @@ class AbstractScheduler(AbstractModule):
         self.optimizer.finalize_operation()
         self.logger.info("scheduler finished.")
 
-    def get_available_pool_size(self, num_ready: int, num_running: int, num_finished: int) -> None:
+    def get_available_pool_size(self, num_ready: int, num_running: int, num_finished: int) -> int:
         sum_status = num_ready + num_running + num_finished
         if sum_status >= self.trial_number:
             return 0
@@ -153,7 +153,7 @@ class AbstractScheduler(AbstractModule):
                 continue
             # Only log if the state has changed.
             if job.trial_id in self.buff.d.keys():
-                self.buff.d[job.trial_id].Add(state_name)
+                self.buff.d[job.trial_id].add(state_name)
                 if self.buff.d[job.trial_id].has_difference():
                     self.logger.info(f"name: {job.trial_id}, state: {state_name}")
 

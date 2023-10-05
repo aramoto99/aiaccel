@@ -95,7 +95,7 @@ class Value(Variable):
     def set_process_name(self, process_name: str) -> None:
         self.process_name = process_name
 
-    def set(self, trial_id: int, value: Any, update_allow: bool = True) -> None:
+    def set(self, trial_id: int, value: Any, update_allow: bool = True) -> None:  # noqa: A003
         self.set_any_trial_variable(
             trial_id=trial_id, process_name=self.process_name, label=self.label, value=value, update_allow=update_allow
         )

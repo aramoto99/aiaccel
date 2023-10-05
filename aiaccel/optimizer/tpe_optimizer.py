@@ -205,16 +205,30 @@ class TpeOptimizer(AbstractOptimizer):
         optuna_trials = self.study.get_trials()
         storage_path = f"sqlite:///{self.workspace.path}/optuna-{self.study_name}.db"
         engine = sqlalchemy.create_engine(storage_path, echo=False)
-        Session = sqlalchemy_orm.sessionmaker(bind=engine)
-        session = Session()
+        session = sqlalchemy_orm.sessionmaker(bind=engine)()
         for optuna_trial in optuna_trials:
             if optuna_trial.number >= self.config.resume:
                 resumed_trial = session.query(models.TrialModel).filter_by(number=optuna_trial.number).first()
                 session.delete(resumed_trial)
-                self.logger.info(f"resume_trial deletes the trial number {resumed_trial.number} from optuna db.")
-
         session.commit()
+        for trial_id in list(self.parameter_pool.keys()):
+            objective = self.get_any_trial_objective(int(trial_id))
+            if objective is not None:
+                del self.parameter_pool[trial_id]
+                self.logger.info(f"resume_trial trial_id {trial_id} is deleted from parameter_pool")
 
+    def resume(self) -> None:
+        super().resume()
+
+        optuna_trials = self.study.get_trials()
+        storage_path = f"sqlite:///{self.workspace.path}/optuna-{self.study_name}.db"
+        engine = sqlalchemy.create_engine(storage_path, echo=False)
+        session = sqlalchemy_orm.sessionmaker(bind=engine)()
+        for optuna_trial in optuna_trials:
+            if optuna_trial.number >= self.config.resume:
+                resumed_trial = session.query(models.TrialModel).filter_by(number=optuna_trial.number).first()
+                session.delete(resumed_trial)
+        session.commit()
         for trial_id in list(self.parameter_pool.keys()):
             objective = self.get_any_trial_objective(int(trial_id))
             if objective is not None:

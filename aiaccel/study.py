@@ -3,12 +3,8 @@ from __future__ import annotations
 import logging
 import os
 import shutil
-import sys
-import threading
 import traceback
-from argparse import ArgumentParser
 from collections.abc import Callable
-from contextlib import contextmanager
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -18,17 +14,11 @@ import yaml
 from aiaccel.cli import CsvWriter
 from aiaccel.cli.set_result import write_results_to_database
 from aiaccel.common import datetime_format
-from aiaccel.config import load_config
+from aiaccel.config import load_config as load_config
 from aiaccel.optimizer import create_optimizer
 from aiaccel.storage import Storage
 from aiaccel.util import cast_y, create_yaml
 from aiaccel.workspace import Workspace
-
-# parser = ArgumentParser()
-# parser.add_argument("--clean", nargs="?", const=True, default=False)
-# args = parser.parse_args()
-
-# clean: bool = args.clean
 
 
 class Study:
@@ -50,13 +40,12 @@ class Study:
     """
 
     def __init__(self, config_path: str | Path) -> None:
-        self.config = None
-        self.workspace = None
-        self.optimizer = None
-        self.storage = None
         self.config_path = Path(config_path).resolve()
-        self.load_config(config_path)
-        self.load_optimizer()
+        self.config = load_config(self.config_path)
+        self.workspace = Workspace(self.config.generic.workspace)
+        self.workspace.create()
+        self.optimizer = create_optimizer(self.config.optimize.search_algorithm)(self.config)
+        self.storage = Storage(self.workspace.storage_file_path)
 
     @property
     def trial_number(self) -> int:
@@ -71,39 +60,25 @@ class Study:
         return self.config.resource.num_workers
 
     @property
-    def best_value(self) -> float | int:
-        self.optimizer.get_best_value()
-
-    def load_config(self, config_path: str | Path) -> None:
-        self.config = load_config(self.config_path)
-        self.workspace = Workspace(self.config.generic.workspace)
-        # if clean:
-        #     self.workspace.clean()
-        #     print(f"Workspace directory {str(self.workspace.path)} is cleaned.")
-        self.workspace.create()
-
-    def load_optimizer(self) -> None:
-        if self.config is None:
-            raise ValueError("config is None")
-        if self.optimizer is not None:
-            return
-        self.optimizer = create_optimizer(self.config.optimize.search_algorithm)(self.config)
-        self.storage = Storage(self.workspace.storage_file_path)
+    def best_value(self) -> float | int | None:
+        if self.optimizer is None:
+            raise ValueError("optimizer is None")
+        return self.optimizer.get_best_value()
 
     def get_resume_trial_id(self) -> int | None:
         resume_trial_id: int | None = self.storage.state.get_first_trial_id_for_resume()
         num_ready, num_running, num_finished = self.storage.get_num_running_ready_finished()
         if num_finished == 0 or resume_trial_id is None:
-            return
+            return None
         if resume_trial_id == self.trial_number or num_finished == self.trial_number:
             raise ValueError(
-                f"Trial number {resune_trial_id} is already finished. \
-                Please remove work irectory: {self.self.workspace.path}."
+                f"Trial number {resume_trial_id} is already finished. \
+                Please remove work irectory: {self.workspace.path}."
             )
         if resume_trial_id == 0:
             return num_finished - 1
         else:
-            return resune_trial_id
+            return resume_trial_id
 
     def resume(self, trial_id: int) -> None:
         self.storage.rollback_to_ready(trial_id)
@@ -115,11 +90,6 @@ class Study:
         func: Callable[[dict[str, float | int | str]], float],
         n_trials: int | None = None,
     ) -> None:
-        if self.storage is None:
-            self.storage = Storage(self.workspace.storage_file_path)
-        if self.optimizer is None:
-            self.load_optimizer()
-
         n_count = 0
         while True:
             trial_id = self.optimizer.get_trial_id()
@@ -147,7 +117,7 @@ class Study:
     def execute(
         self,
         func: Callable[[dict[str, float | int | str]], float],
-        xs: "dict[str, float | int | str]",
+        xs: dict[str, float | int | str],
         y_data_type: "str | None",
     ) -> Any:
         """Executes the target function.
@@ -200,6 +170,9 @@ class Study:
     ) -> None:
         start_time = datetime.now().strftime(datetime_format)
         xs = self.storage.hp.get_any_trial_params_dict(trial_id)
+        if xs is None:
+            logging.error(f"Failed to get parameters of trial ID {trial_id}.")
+            return
         y: Any = None
         self.storage.state.set_any_trial_state(trial_id=trial_id, state="running")
         _, y, err = self.execute(func, xs, y_data_type)

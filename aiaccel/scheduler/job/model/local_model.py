@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 
 class LocalModel(AbstractModel):
-    def runner_create(self, obj: Job) -> None:
+    def runner_create(self, obj: Job) -> None:  # noqa: U100
         pass
 
     def job_submitted(self, obj: Job) -> None:
@@ -150,8 +150,8 @@ class LocalModel(AbstractModel):
         if len(error) == 0:
             del args["error"]
 
-        # commands = ["aiaccel-set-result"]
-        commands = ["python", "-m", "aiaccel.cli.set_result"]
+        commands = ["aiaccel-set-result"]
+        # commands = ["python", "-m", "aiaccel.cli.set_result"]
         for key in args.keys():
             commands.append(f"--{key}={str(args[key])}")
 
