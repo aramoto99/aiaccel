@@ -26,6 +26,7 @@ if TYPE_CHECKING:
 mpi_enable = True
 try:
     import mpi4py as m4p
+    from mpi4py.futures import MPIPoolExecutor
 except ImportError:
     mpi_enable = False
 
