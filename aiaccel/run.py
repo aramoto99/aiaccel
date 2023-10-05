@@ -1,10 +1,7 @@
 from __future__ import annotations
 
 import logging
-import os
-import shutil
 import sys
-import threading
 import traceback
 from argparse import ArgumentParser
 from collections.abc import Callable
@@ -12,7 +9,6 @@ from pathlib import Path
 from typing import Any
 
 from aiaccel.config import load_config
-from aiaccel.optimizer import create_optimizer
 from aiaccel.parameter import (
     CategoricalParameter,
     FloatParameter,
@@ -20,18 +16,8 @@ from aiaccel.parameter import (
     IntParameter,
     OrdinalParameter,
 )
-from aiaccel.storage import Storage
-from aiaccel.util import cast_y, create_yaml
+from aiaccel.util import cast_y
 from aiaccel.util.data_type import str_or_float_or_int
-from aiaccel.workspace import Workspace
-
-
-def set_logging_file_for_trial_id(workspace: Path, trial_id: int) -> None:
-    log_dir = workspace / "log"
-    log_path = log_dir / f"job_{trial_id}.log"
-    if not log_dir.exists():
-        log_dir.mkdir(parents=True)
-    logging.basicConfig(filename=log_path, level=logging.DEBUG, force=True)
 
 
 def set_logging_file_for_trial_id(workspace: Path, trial_id: int) -> None:
