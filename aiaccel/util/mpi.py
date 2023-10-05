@@ -26,6 +26,7 @@ if TYPE_CHECKING:
 mpi_enable = True
 try:
     import mpi4py as m4p
+    from mpi4py.futures import MPIPoolExecutor
 except ImportError:
     mpi_enable = False
 
@@ -33,7 +34,7 @@ except ImportError:
 class Mpi:
     func_end_id = "MpiFuncEnd"
     return_code_str = "return_code="
-    executor: m4p.futures.MPIPoolExecutor | None = None
+    executor: MPIPoolExecutor | None = None
     lock: InterProcessLock | None = None
     rank_log_path = None
     error_file_path = None

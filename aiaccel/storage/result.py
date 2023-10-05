@@ -113,9 +113,9 @@ class Result(Abstract):
 
         for i in range(len(goals)):
             if goals[i].lower() == "maximize":
-                bests[i, :] = np.max(objectives[:, i], axis=0)  # type: ignore
+                bests[i, :] = np.max(objectives[:, i], axis=0)
             elif goals[i].lower() == "minimize":
-                bests[i, :] = np.min(objectives[:, i], axis=0)  # type: ignore
+                bests[i, :] = np.min(objectives[:, i], axis=0)
             else:
                 raise ValueError("Invalid goal value.")
 
