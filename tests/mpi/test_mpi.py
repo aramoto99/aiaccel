@@ -31,6 +31,10 @@ def test_rank_log_1_csv():
 class TestMpi(unittest.TestCase):
     def test_make_hostfile(self):
         config = omegaconf.OmegaConf.create({
+            "generic":{
+                "aiaccel_dir": "aiaccel",
+                "venv_dir": "venv",
+            }
             "resource": {
                 "mpi_bat_root_dir": "/path/to/root",
                 "mpi_bat_config_dir": "config",
@@ -44,7 +48,9 @@ class TestMpi(unittest.TestCase):
         with patch("pathlib.Path.read_text", return_value="g0073"):
             logger = MagicMock()
             with tempfile.TemporaryDirectory() as tmpdir:
-                config.resource.mpi_bat_root_dir = tmpdir
+                # config.resource.mpi_bat_root_dir = tmpdir
+                config.generic.aiaccel_dir = Path(tmpdir) / "aiaccel"
+                config.generic.venv_dir = Path(tmpdir) / "venv"
                 Path(f"{tmpdir}/config").mkdir(parents=True, exist_ok=True)
                 Mpi._make_hostfile(config, logger)
                 expected_output = "g0073 slots=3\n"
@@ -71,11 +77,15 @@ class TestMpi(unittest.TestCase):
 
     def test_make_bat_file(self):
         config = omegaconf.OmegaConf.create({
+            "generic":{
+                "aiaccel_dir": "aiaccel",
+                "venv_dir": "venv",
+            }
             "resource": {
                 "mpi_bat_root_dir": "/path/to/root",
-                "mpi_bat_venv_dir": "venv",
-                "mpi_bat_aiaccel_dir": "aiaccel",
-                "mpi_bat_config_dir": "config",
+                # "mpi_bat_venv_dir": "venv",
+                # "mpi_bat_aiaccel_dir": "aiaccel",
+                # "mpi_bat_config_dir": "config",
                 "mpi_bat_file": "mpi.bat",
                 "mpi_hostfile": "hostfile",
                 "mpi_bat_rt_type": "F",
@@ -86,7 +96,9 @@ class TestMpi(unittest.TestCase):
         })
         logger = MagicMock()
         with tempfile.TemporaryDirectory() as tmpdir:
-            config.resource.mpi_bat_root_dir = tmpdir
+            # config.resource.mpi_bat_root_dir = tmpdir
+            config.generic.aiaccel_dir = Path(tmpdir) / "aiaccel"
+            config.generic.venv_dir = Path(tmpdir) / "venv"
             os.makedirs(os.path.join(tmpdir, "config")) # create the directory
             Mpi._make_bat_file(config, logger)
             expected_output = """#!/bin/bash
