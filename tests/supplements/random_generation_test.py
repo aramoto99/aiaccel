@@ -25,7 +25,7 @@ class RandomGenerationTest(BaseTest):
                 storage = Storage(workspace.storage_file_path)
 
                 with self.create_main(python_file):
-                        ubprocess.Popen(["aiaccel-start", "--config", str(config_file), "--clean"]).wait()
+                        subprocess.Popen(["aiaccel-start", "--config", str(config_file), "--clean"]).wait()
                 final_result_random = self.get_final_result(storage)
                 print("random", final_result_random)
 
