@@ -13,6 +13,7 @@ from aiaccel.converted_parameter import ConvertedParameterConfiguration
 from aiaccel.optimizer import AbstractOptimizer
 from aiaccel.optimizer._nelder_mead import NelderMead, Vertex
 from aiaccel.optimizer.value import Value
+from aiaccel.parameter import OrdinalParameter
 
 
 class NelderMeadOptimizer(AbstractOptimizer):
@@ -64,18 +65,13 @@ class NelderMeadOptimizer(AbstractOptimizer):
 
     def _generate_initial_parameter(self, initial_parameters: Any, dim: int, num_of_initials: int) -> Any:
         params = self.params.get_parameter_list()
-        val = params[dim].sample(rng=self._rng)["value"]
         if initial_parameters is None:
-            val = params[dim].sample(rng=self._rng)["value"]
-            return val
-
-        val = initial_parameters[dim]["value"]
-        if not isinstance(val, (list, ListConfig)):
-            initial_parameters[dim]["value"] = [val]
-
-        vals = initial_parameters[dim]["value"]
-        assert isinstance(vals, (list, ListConfig))
-        if num_of_initials < len(vals):
+            if isinstance(params[dim], OrdinalParameter):
+                return self._rng.randint(len(params[dim].sequence))
+            return params[dim].sample(rng=self._rng)["value"]
+        if not isinstance(initial_parameters[dim]["value"], (list, ListConfig)):
+            initial_parameters[dim]["value"] = [initial_parameters[dim]["value"]]
+        if num_of_initials < len(initial_parameters[dim]["value"]):
             val = initial_parameters[dim]["value"][num_of_initials]
             return val
         else:
