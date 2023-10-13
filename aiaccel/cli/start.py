@@ -85,8 +85,8 @@ def main() -> None:  # pragma: no cover
 
     # optimizer
     optimizer = create_optimizer(config.optimize.search_algorithm)(config)
-    if config.resume is not None:
-        optimizer.resume()
+    # if config.resume is not None:
+    #     optimizer.resume()
 
     # scheduler
     scheduler = create_scheduler(config.resource.type.value)(config, optimizer)

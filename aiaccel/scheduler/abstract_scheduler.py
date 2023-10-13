@@ -45,9 +45,8 @@ class AbstractScheduler(AbstractModule):
         self.job_status: dict[Any, Any] = {}
         self.start_trial_id = self.config.resume if self.config.resume is not None else 0
         self.buff = Buffer([trial_id for trial_id in range(self.start_trial_id, self.trial_number)])
-        for trial_id in range(self.start_trial_id, self.config.optimize.trial_number):
+        for trial_id in range(self.start_trial_id, self.trial_number):
             self.buff.d[trial_id].set_max_len(2)
-        self.all_parameters_generated = False
         self.job_completed_count = 0
 
     def start_job(self, trial_id: int) -> Any:
@@ -109,14 +108,7 @@ class AbstractScheduler(AbstractModule):
             return
 
         sum_status = num_ready + num_running + num_finished
-        if sum_status >= self.trial_number and not self.all_parameters_generated:
-            self.all_parameters_generated = True
-            self.logger.info(
-                f"trial_number: {self.trial_number}, \
-                    ready: {num_ready}, running: {num_running}, finished: {num_finished} \
-                    available pool size: {available_pool_size}"
-            )
-            self.logger.info("All parameters are generated.")
+        if sum_status >= self.trial_number or self.optimizer.is_all_parameters_generated():
             return
 
         if not self.all_parameters_processed(num_ready, num_running) and not self.all_parameters_registered(
@@ -124,6 +116,15 @@ class AbstractScheduler(AbstractModule):
         ):
             for _ in range(available_pool_size):
                 self.optimizer.run_optimizer()
+                if self.optimizer.is_all_parameters_generated():
+                    self.logger.info("All parameters are generated.")
+                    if self.optimizer.trial_id.integer < self.trial_number:
+                        self.logger.info("But the number of generated parameters is less than the number of trials.")
+                        self.logger.info(
+                            f"So, the number of trials is updated. new trial number: {self.optimizer.trial_id.integer}"
+                        )
+                        self.update_trial_number(self.optimizer.trial_id.integer)
+                    break
 
     def run_in_main_loop(self) -> bool:
         """A main loop process. This process is repeated every main loop.
@@ -131,11 +132,15 @@ class AbstractScheduler(AbstractModule):
         Returns:
             bool: The process succeeds or not. The main loop exits if failed.
         """
-
         num_ready, num_running, num_finished = self.storage.get_num_running_ready_finished()
         self.search_hyperparameters(num_ready, num_running, num_finished)
-        if num_finished >= self.config.optimize.trial_number:
+        if num_finished >= self.trial_number:
             return False
+
+        # num_ready, num_running, _ = self.storage.get_num_running_ready_finished()
+        # if self.all_parameters_processed(num_ready, num_running):
+        #     self.logger.info("All parameters are processed.")
+        #     return False
 
         readies = self.storage.state.get_ready()
         # find a new hp
@@ -174,6 +179,7 @@ class AbstractScheduler(AbstractModule):
         if self.config.resume is not None and self.config.resume > 0:
             self.deserialize(self.config.resume)
             self.trial_number = self.config.optimize.trial_number
+            self.optimizer.resume()
 
     def __getstate__(self) -> dict[str, Any]:
         obj = super().__getstate__()
@@ -229,7 +235,7 @@ class AbstractScheduler(AbstractModule):
         Returns:
             bool: True if all parameters are generated and are processed.
         """
-        return num_ready == 0 and num_running == 0 and self.all_parameters_generated
+        return num_ready == 0 and num_running == 0 and self.optimizer.is_all_parameters_generated()
 
     def all_parameters_registered(self, num_ready: int, num_running: int, num_finished: int) -> bool:
         """Checks whether all parameters that can be generated with the given
@@ -242,3 +248,14 @@ class AbstractScheduler(AbstractModule):
             bool: True if all parameters are registerd.
         """
         return self.trial_number - num_finished - num_ready - num_running == 0
+
+    def update_trial_number(self, trial_number: int) -> None:
+        """Updates the maximum number of trials.
+
+        Args:
+            trial_number (int): The maximum number of trials.
+
+        Returns:
+            None
+        """
+        self.trial_number = trial_number

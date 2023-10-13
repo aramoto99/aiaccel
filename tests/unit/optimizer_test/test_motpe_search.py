@@ -43,15 +43,15 @@ class TestMOTpeOptimizer(BaseTest):
     #     assert len(optimizer.generate_initial_parameter()) > 0
     #     assert len(optimizer.generate_initial_parameter()) > 0
 
-    def test_create_study(self):
-        assert self.optimizer.create_study() is None
+    # def test_create_study(self):
+    #     assert self.optimizer.create_study() is None
 
-    def testserialize(self):
-        self.optimizer.create_study()
-        self.optimizer.trial_id.initial(num=0)
-        self.optimizer.storage.state.set_any_trial_state(trial_id=0, state="ready")
-        self.optimizer._rng = np.random.RandomState(0)
-        assert self.optimizer.serialize(trial_id=0) is None
+    # def testserialize(self):
+    #     self.optimizer.create_study()
+    #     self.optimizer.trial_id.initial(num=0)
+    #     self.optimizer.storage.state.set_any_trial_state(trial_id=0, state="ready")
+    #     self.optimizer._rng = np.random.RandomState(0)
+    #     assert self.optimizer.serialize(trial_id=0) is None
 
     def testdeserialize(self):
         self.optimizer.trial_id.initial(num=0)

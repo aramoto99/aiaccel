@@ -14,9 +14,9 @@ ABCI:
   job_script_preamble: ./job_script_preamble.sh
   job_execution_options: ''
 job_setting:
-    job_timeout_seconds: 600
-    max_failure_retries: 0
-    trial_id_digits: 7
+  job_timeout_seconds: 600
+  max_failure_retries: 0
+  trial_id_digits: 7
 optimize:
   search_algorithm: aiaccel.optimizer.BudgetSpecifiedGridOptimizer
   goal: minimize

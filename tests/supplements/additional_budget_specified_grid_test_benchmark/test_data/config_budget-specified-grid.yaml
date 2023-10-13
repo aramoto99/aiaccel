@@ -3,7 +3,8 @@ generic:
   job_command: python original_main.py
   python_file: original_main.py
   function: main
-  job_timeout_seconds: 600
+  main_loop_sleep_seconds: 0.01
+  logging_level: INFO
 
 resource:
   type: python_local
@@ -13,6 +14,11 @@ abci:
   group: '[group]'
   job_script_preamble: ./job_script_preamble.sh
   job_execution_options": ''
+
+job_setting:
+    job_timeout_seconds: 600
+    max_failure_retries: 0
+    trial_id_digits: 7
 
 optimize:
   search_algorithm: aiaccel.optimizer.BudgetSpecifiedGridOptimizer
@@ -54,43 +60,3 @@ optimize:
       name: x6
       type: ordinal
       sequence: [-5, 0, 5]
-
-
-job_setting:
-  trial_id_digits: 6
-  init_fail_count: 100
-  cancel_retry: 3
-  cancel_timeout: 60
-  expire_retry: 3
-  expire_timeout: 60
-  finished_retry: 3
-  finished_timeout: 60
-  job_loop_duration: 0.5
-  job_retry: 2
-  job_timeout: 60
-  kill_retry: 3
-  kill_timeout: 60
-  result_retry: 1
-  runner_retry: 3
-  runner_timeout: 60
-  running_retry: 3
-  running_timeout: 60
-
-# sleep_time:
-#   master: 1
-#   optimizer: 1
-#   scheduler: 1
-
-logger:
-  file:
-    master: "master.log"
-    optimizer: "optimizer.log"
-    scheduler: "scheduler.log"
-  log_level:
-    master: "DEBUG"
-    optimizer: "DEBUG"
-    scheduler: "DEBUG"
-  stream_level:
-    master: "DEBUG"
-    optimizer: "CRITICAL"
-    scheduler: "CRITICAL"
