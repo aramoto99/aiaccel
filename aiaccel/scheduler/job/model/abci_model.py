@@ -99,8 +99,8 @@ class AbciModel(AbstractModel):
         commands.append("$error_file_path")
 
         set_retult = self.generate_command_line(
-            command="aiaccel-set-result",
-            # command="python -m aiaccel.cli.set_result",
+            # command="aiaccel-set-result",
+            command="python -m aiaccel.cli.set_result",
             args=[
                 "--storage_file_path=$storage_file_path",
                 "--trial_id=$trial_id",
@@ -113,8 +113,8 @@ class AbciModel(AbstractModel):
         )
 
         set_retult_no_error = self.generate_command_line(
-            command="aiaccel-set-result",
-            # command="python -m aiaccel.cli.set_result",
+            # command="aiaccel-set-result",
+            command="python -m aiaccel.cli.set_result",
             args=[
                 "--storage_file_path=$storage_file_path",
                 "--trial_id=$trial_id",

@@ -1,4 +1,5 @@
 import aiaccel
+import numpy as np
 
 def main(p):
     x = np.array([p["x1"], p["x2"], p["x3"], p["x4"], p["x5"]])

@@ -1,11 +1,14 @@
 from __future__ import annotations
 
 import copy
+import warnings
 from argparse import ArgumentParser
 from pathlib import Path
 
 from aiaccel.storage.storage import Storage
 from aiaccel.util.data_type import str_or_float_or_int
+
+warnings.filterwarnings("ignore", category=RuntimeWarning)
 
 
 def write_results_to_database(

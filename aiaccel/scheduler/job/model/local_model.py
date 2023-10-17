@@ -38,29 +38,6 @@ class LocalModel(AbstractModel):
             return False
         else:
             self.write_results_to_database(obj)
-            # stdouts: list[str] = obj.th_oh.get_stdouts()
-            # stderrs: list[str] = obj.th_oh.get_stderrs()
-            # start_time: str = str(obj.th_oh.get_start_time())
-            # end_time: str = str(obj.th_oh.get_end_time())
-            # returncode: int = obj.th_oh.get_returncode()
-            # params: list[dict[str, Any]] = obj.content["parameters"]
-            # objective: str = "nan"
-            # objectives: list[str] = []
-            # if len(stdouts) > 0:
-            #     objective = stdouts[-1]  # TODO: fix
-            #     objective = objective.strip("[]")
-            #     objective = objective.replace(" ", "")
-            #     objectives = objective.split(",")
-            # error = "\n".join(stderrs)
-            # write_results_to_database(
-            #     storage_file_path=obj.workspace.storage_file_path,
-            #     trial_id=obj.trial_id,
-            #     objective=objectives,
-            #     start_time=start_time,
-            #     end_time=end_time,
-            #     error=error,
-            #     returncode=returncode,
-            # )
             self.is_firsttime_called = True
             return False
 
@@ -149,8 +126,8 @@ class LocalModel(AbstractModel):
         if len(error) == 0:
             del args["error"]
 
-        commands = ["aiaccel-set-result"]
-        # commands = ["python", "-m", "aiaccel.cli.set_result"]
+        # commands = ["aiaccel-set-result"]
+        commands = ["python", "-m", "aiaccel.cli.set_result"]
         for key in args.keys():
             commands.append(f"--{key}={str(args[key])}")
 
