@@ -92,6 +92,7 @@ class Job:
         self.trial_id = trial_id
         self.content = self.storage.get_hp_dict(self.trial_id)
         self.scheduler = scheduler
+        self.goals: list[str] = self.config.optimize.goal
         self.model = model
         if self.model is None:
             raise ValueError(

@@ -25,7 +25,7 @@ class LocalModel(AbstractModel):
             obj.config.generic.enabled_variable_name_argumentation,
         )
         obj.logger.info(f'runner command: {" ".join(runner_command)}')
-        obj.proc = Popen(runner_command, stdout=PIPE, stderr=PIPE)
+        obj.proc = Popen(runner_command, stdout=PIPE, stderr=PIPE, bufsize=0)
 
         obj.th_oh = OutputHandler(obj.proc)
         obj.th_oh.start()
@@ -106,11 +106,28 @@ class LocalModel(AbstractModel):
         objective: str = "nan"
         objectives: list[str] = []
 
+        # if len(stdouts) > 0:
+        #     objective = stdouts[-1]  # TODO: fix
+        #     objective = objective.strip("[]")
+        #     objective = objective.replace(" ", "")
+        #     objectives = objective.split(",")
         if len(stdouts) > 0:
-            objective = stdouts[-1]  # TODO: fix
-            objective = objective.strip("[]")
-            objective = objective.replace(" ", "")
-            objectives = objective.split(",")
+            if len(stdouts) >= len(obj.goals):
+                objectives = stdouts[-len(obj.goals) :]
+            elif len(stdouts) == 1:
+                objectives.append(stdouts[0])
+            elif len(stdouts) > 1:
+                for i in range(len(obj.goals)):
+                    o_index = len(stdouts) - len(obj.goals) + i
+                    objectives.append(stdouts[o_index])
+            else:
+                raise NotImplementedError("Not Readched")
+            if len(stdouts) < len(obj.goals):
+                obj.logger.warning(
+                    f"Number of objectives is less than the number of goals. "
+                    f"Number of objectives: {len(stdouts)}, "
+                    f"Number of goals: {len(obj.goals)}"
+                )
 
         error = "\n".join(stderrs)
 
