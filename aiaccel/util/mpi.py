@@ -130,7 +130,7 @@ class Mpi:
             gpu_num = comm.recv(source=0)
             cls.log.write(f"start: recv: gpu_num={gpu_num}")
             cls._set_gpu(str(gpu_num))
-        proc = Popen(command, stdout=PIPE, stderr=STDOUT)
+        proc = Popen(command, stdout=PIPE, stderr=STDOUT, bufsize=0)
         while True:
             if proc.stdout is None:
                 cls.log.write(f"_func_sub(): end: tag={tag} error.", stdout=True)
