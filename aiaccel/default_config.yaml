@@ -7,6 +7,7 @@ generic:
     function: ''
     enabled_variable_name_argumentation: True
     main_loop_sleep_seconds: 0.01
+    is_ignore_warning: True
     logging_level: ERROR
 
 resource:

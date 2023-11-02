@@ -60,6 +60,7 @@ class GenericConfig:
     logging_level: str
     venv_dir: Optional[str]
     aiaccel_dir: Optional[str]
+    is_ignore_warning: bool
 
 
 @dataclass
