@@ -2,7 +2,7 @@
 
 Example: ::
 
-    from aiaccel.common import alive_master
+    from aiaccel.common import alive_optimizer
 
 """
 

@@ -1,12 +1,12 @@
 {
   "generic": {
-    "workspace": /tmp/work,
-    "job_command": "python original_main.py",
+    "workspace": "/tmp/work",
+    "job_command": "python wrapper.py",
     "python_file": "original_main.py",
     "function": "main"
   },
   "resource": {
-    "type": "local",
+    "type": "abci",
     "num_workers": 10
   },
   "ABCI": {
@@ -21,6 +21,7 @@
       {
         "name": "x1",
         "type": "uniform_float",
+        "log": false,
         "lower": -5.0,
         "upper": 5.0,
         "initial": [
@@ -37,6 +38,7 @@
       {
         "name": "x2",
         "type": "uniform_float",
+        "log": false,
         "lower": -5.0,
         "upper": 5.0,
         "initial": [
@@ -56,6 +58,7 @@
       {
         "name": "x3",
         "type": "uniform_float",
+        "log": false,
         "lower": -5.0,
         "upper": 5.0,
         "initial": [
@@ -75,6 +78,7 @@
       {
         "name": "x4",
         "type": "uniform_float",
+        "log": false,
         "lower": -5.0,
         "upper": 5.0,
         "initial": [
@@ -94,6 +98,7 @@
       {
         "name": "x5",
         "type": "uniform_float",
+        "log": false,
         "lower": -5.0,
         "upper": 5.0,
         "initial": [
@@ -113,6 +118,7 @@
       {
         "name": "x6",
         "type": "uniform_float",
+        "log": false,
         "lower": -5.0,
         "upper": 5.0,
         "initial": [
@@ -132,6 +138,7 @@
       {
         "name": "x7",
         "type": "uniform_float",
+        "log": false,
         "lower": -5.0,
         "upper": 5.0,
         "initial": [
@@ -151,6 +158,7 @@
       {
         "name": "x8",
         "type": "uniform_float",
+        "log": false,
         "lower": -5.0,
         "upper": 5.0,
         "initial": [
@@ -170,6 +178,7 @@
       {
         "name": "x9",
         "type": "uniform_float",
+        "log": false,
         "lower": -5.0,
         "upper": 5.0,
         "initial": [
@@ -189,6 +198,7 @@
       {
         "name": "x10",
         "type": "uniform_float",
+        "log": false,
         "lower": -5.0,
         "upper": 5.0,
         "initial": [
@@ -208,7 +218,8 @@
     ]
   },
   "job_setting": {
-    "trial_id_digits": 6,
+    "name_length": 6,
+    "init_fail_count": 100,
     "cancel_retry": 3,
     "cancel_timeout": 60,
     "expire_retry": 3,

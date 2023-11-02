@@ -85,12 +85,8 @@ def main() -> None:  # pragma: no cover
 
     # optimizer
     optimizer = create_optimizer(config.optimize.search_algorithm)(config)
-    # if config.resume is not None:
-    #     optimizer.resume()
-
     # scheduler
     scheduler = create_scheduler(config.resource.type.value)(config, optimizer)
-
     # tensorboard
     tensorboard = TensorBoard(config)
 
@@ -173,8 +169,8 @@ def main() -> None:  # pragma: no cover
     config_name = Path(args.config).name
     shutil.copy(Path(args.config), dst / config_name)
 
-    if os.path.exists(workspace.final_result_file):
-        with open(workspace.final_result_file, "r") as f:
+    if os.path.exists(workspace.best_result_file):
+        with open(workspace.best_result_file, "r") as f:
             final_results: list[dict[str, Any]] = yaml.load(f, Loader=yaml.UnsafeLoader)
 
         for i, final_result in enumerate(final_results):
