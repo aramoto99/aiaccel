@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 
 
 class MpiModel(LocalModel):
-    def before_job_submitted(self, obj: Job) -> None:
+    def job_submitted(self, obj: Job) -> None:
         runner_command = self.create_runner_command(
             obj.config.generic.job_command,
             obj.content,
