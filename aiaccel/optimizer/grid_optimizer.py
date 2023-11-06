@@ -166,9 +166,7 @@ class GridOptimizer(AbstractOptimizer):
 
         new_params: list[Any] = []
         for param, index in zip(self.ready_params, parameter_index):
-            new_params.append(
-                {"name": param["name"], "type": param["type"], "value": param["parameters"][index]}
-            )
+            new_params.append({"name": param["name"], "type": param["type"], "value": param["parameters"][index]})
         return new_params
 
     def generate_initial_parameter(self) -> list[dict[str, float | int | str]]:
