@@ -52,7 +52,7 @@ jobs:
           ls -l
           cat hostfile
           # PYTHONPATH=$GITHUB_WORKSPACE mpiexec -n 2 -hostfile hostfile python -m mpi4py.futures -m aiaccel.cli.start --config config.yaml --clean --from_mpi_bat 2>&1 | tee logf
-          aiaccel-start --config config.yaml --clean --from_mpi_bat 2>&1 | tee logf
+          PYTHONPATH=$GITHUB_WORKSPACE aiaccel-start --config config.yaml --clean --from_mpi_bat 2>&1 | tee logf
 
       - name: Mpi Test
         run: |
