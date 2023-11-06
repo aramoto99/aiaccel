@@ -47,7 +47,7 @@
     "$num_workers": 4
   },
   "ABCI": {
-    "job_script_preamble": "wrapper_abci.sh",
+    "job_script_preamble_path": "wrapper_abci.sh",
     "group": "gaa",
     "job_execution_options": ""
   },

@@ -23,7 +23,7 @@
         "user_option_resource": "option"
     },
     "ABCI": {
-        "job_script_preamble": "wrapper_abci.sh",
+        "job_script_preamble_path": "wrapper_abci.sh",
         "group": "gaa",
         "user_option_ABCI": "option"
     },
