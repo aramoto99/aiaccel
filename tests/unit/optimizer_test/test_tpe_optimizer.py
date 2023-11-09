@@ -46,29 +46,47 @@ class TestTpeOptimizer(BaseTest):
         assert self.optimizer.generate_parameter() is None
         self.optimizer.config.resource.num_workers = _tmp_num_workers
 
-    # def test_generate_initial_parameter(self):
-    #     optimizer = TpeOptimizer(self.load_config_for_test(self.configs['config_tpe_2.yaml']))
-    #     (optimizer.workspace.storage / 'storage.db').unlink()
+    def test_generate_initial_parameter(self):
+        config = self.load_config_for_test(self.configs['config_tpe_2.yaml'])
+        self.workspace.clean()
+        self.workspace.create()
+        optimizer = TpeOptimizer(config)
 
-    #     optimizer.__init__(self.load_config_for_test(self.configs['config_tpe_2.yaml']))
-    #     assert len(optimizer.generate_initial_parameter()) > 0
-    #     assert len(optimizer.generate_initial_parameter()) > 0
+        self.workspace.clean()
+        self.workspace.create()
+        optimizer.__init__(config)
 
-    # def test_create_study(self):
-    #     assert self.optimizer.create_study() is None
+        assert len(optimizer.generate_initial_parameter()) > 0
+        assert len(optimizer.generate_initial_parameter()) > 0
 
-    # def testserialize(self):
-    #     self.optimizer.create_study()
-    #     self.optimizer.trial_id.initial(num=0)
-    #     self.optimizer.storage.state.set_any_trial_state(trial_id=0, state="ready")
-    #     self.optimizer._rng = np.random.RandomState(0)
-    #     assert self.optimizer.serialize(trial_id=0) is None
+    def test_create_study(self):
+        self.workspace.clean()
+        self.workspace.create()
+        config = self.load_config_for_test(self.configs['config_tpe.yaml'])
+        optimizer = TpeOptimizer(config)
+        self.workspace.clean()
+        self.workspace.create()
+        assert optimizer.create_study() is None
 
-    # def testdeserialize(self):
-    #     self.optimizer.trial_id.initial(num=0)
-    #     self.optimizer.storage.state.set_any_trial_state(trial_id=0, state="finished")
-    #     self.optimizer.serialize(trial_id=0)
-    #     assert self.optimizer.deserialize(trial_id=0) is None
+    def test_serialize(self):
+        self.workspace.clean()
+        self.workspace.create()
+        config = self.load_config_for_test(self.configs['config_tpe.yaml'])
+        optimizer = TpeOptimizer(config)
+        optimizer.trial_id.initial(num=0)
+        optimizer.storage.state.set_any_trial_state(trial_id=0, state="ready")
+        optimizer._rng = np.random.RandomState(0)
+        assert optimizer.serialize(trial_id=0) is None
+
+    def test_deserialize(self):
+        self.workspace.clean()
+        self.workspace.create()
+        config = self.load_config_for_test(self.configs['config_tpe.yaml'])
+        optimizer = TpeOptimizer(config)
+        optimizer.trial_id.initial(num=0)
+        optimizer.storage.state.set_any_trial_state(trial_id=0, state="finished")
+        optimizer.serialize(trial_id=0)
+        assert optimizer.deserialize(trial_id=0) is None
 
 
 def test_create_distributions(data_dir):
