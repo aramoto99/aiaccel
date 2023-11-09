@@ -174,7 +174,6 @@ def test_simplex():
     assert np.array_equal(shrunk_vertices[2].xs, np.array([4., 5.]))
 
 
-
 @pytest.fixture
 def nelder_mead():
     initial_parameters = np.array([[1, 2], [3, 4], [5, 6]])
