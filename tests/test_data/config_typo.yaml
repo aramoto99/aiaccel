@@ -10,7 +10,7 @@ resource:
   type: local
   num_workers: 10
 ABCI:
-  job_script_preamble: wrapper_abci.sh
+  job_script_preamble_path: wrapper_abci.sh
   group: "[group]"
 job_setting:
     job_timeout_seconds: 600

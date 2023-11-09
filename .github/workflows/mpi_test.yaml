@@ -51,16 +51,16 @@ jobs:
           pwd
           ls -l
           cat hostfile
-          # PYTHONPATH=$GITHUB_WORKSPACE mpiexec -n 2 -hostfile hostfile python -m mpi4py.futures -m aiaccel.cli.start --config config.yaml --clean --from_mpi_bat 2>&1 | tee logf
-          aiaccel-start --config config.yaml --clean --from_mpi_bat 2>&1 | tee logf
+          PYTHONPATH=$GITHUB_WORKSPACE mpiexec -n 2 -hostfile hostfile python -m mpi4py.futures -m aiaccel.cli.start --config config.yaml --clean --from_mpi_bat 2>&1 | tee logf
+          # PYTHONPATH=$GITHUB_WORKSPACE aiaccel-start --config config.yaml --clean --from_mpi_bat 2>&1 | tee logf
 
       - name: Mpi Test
         run: |
           cd $GITHUB_WORKSPACE/mpi_work
           pwd
-          ls -l ./work/mpi/rank_log
-          cat ./work/mpi/rank_log/0.csv
-          # cat ./work/mpi/rank_log/1.csv
+          ls -l work/mpi/rank_log
+          cat work/mpi/rank_log/0.csv
+          cat work/mpi/rank_log/1.csv
 
       - name: Mpi Unit Test
         run: |

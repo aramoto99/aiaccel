@@ -12,7 +12,6 @@ from typing import Any
 import yaml
 from omegaconf.dictconfig import DictConfig
 
-import aiaccel
 from aiaccel.cli import CsvWriter
 from aiaccel.common import datetime_format, resource_type_mpi
 from aiaccel.config import load_config
@@ -21,13 +20,14 @@ from aiaccel.scheduler import create_scheduler
 from aiaccel.storage import Storage
 from aiaccel.tensorboard import TensorBoard
 from aiaccel.util.buffer import Buffer
+from aiaccel.util.mpi import mpi_enable
 from aiaccel.workspace import Workspace
 
 logger = getLogger(__name__)
 logger.setLevel(os.getenv("LOG_LEVEL", "INFO"))
 logger.addHandler(StreamHandler())
 
-mpi_enable = aiaccel.util.mpi.mpi_enable
+
 if mpi_enable:
     from aiaccel.util.mpi import Mpi
 
@@ -77,24 +77,10 @@ def main() -> None:  # pragma: no cover
 
     logger.info(f"config: {config.config_path}")
 
-    # storage
-    storage = Storage(workspace.storage_file_path)
-    if config.resume is not None:
-        storage.rollback_to_ready(config.resume)
-        storage.delete_trial_data_after_this(config.resume)
-
-    # optimizer
     optimizer = create_optimizer(config.optimize.search_algorithm)(config)
-    # if config.resume is not None:
-    #     optimizer.resume()
-
-    # scheduler
     scheduler = create_scheduler(config.resource.type.value)(config, optimizer)
-
-    # tensorboard
     tensorboard = TensorBoard(config)
-
-    modules = [scheduler]
+    storage = Storage(workspace.storage_file_path)
 
     time_s = time.time()
     max_trial_number = config.optimize.trial_number
@@ -104,61 +90,53 @@ def main() -> None:  # pragma: no cover
     buff.d["num_finished"].set_max_len(2)
     buff.d["available_pool_size"].set_max_len(2)
 
-    # main process
-    for module in modules:
-        module.pre_process()
+    scheduler.pre_process()
 
-    if config.resource.type.value.lower() == resource_type_mpi and mpi_enable:  # MPI
+    if config.resource.type.value.lower() == resource_type_mpi:  # MPI
         Mpi.prepare(workspace.path)
 
     while True:
         try:
-            for module in modules:
-                if not module.run_in_main_loop():
-                    break
-                if not module.is_error_free():
-                    break
-            else:
-                if int((time.time() - time_s)) % 10 == 0:
-                    num_ready, num_running, num_finished = storage.get_num_running_ready_finished()
-                    available_pool_size = scheduler.get_available_pool_size(num_ready, num_running, num_finished)
-                    now = datetime.now()
-                    looping_time = now - loop_start_time
+            if not scheduler.run_in_main_loop():
+                break
+            if not scheduler.is_error_free():
+                break
 
-                    if num_finished > 0:
-                        one_loop_time = looping_time / num_finished
-                        finishing_time = now + (max_trial_number - num_finished) * one_loop_time
-                        end_estimated_time = finishing_time.strftime(datetime_format)
+            if int((time.time() - time_s)) % 10 == 0:
+                num_ready, num_running, num_finished = storage.get_num_running_ready_finished()
+                available_pool_size = scheduler.get_available_pool_size(num_ready, num_running, num_finished)
+                now = datetime.now()
+                looping_time = now - loop_start_time
 
-                    buff.d["num_finished"].add(num_finished)
-                    if buff.d["num_finished"].length == 1 or buff.d["num_finished"].has_difference():
-                        scheduler.logger.info(
-                            f"{num_finished}/{max_trial_number} finished, "
-                            f"max trial number: {max_trial_number}, "
-                            f"ready: {num_ready} ,"
-                            f"running: {num_running}, "
-                            f"end estimated time: {end_estimated_time}"
-                        )
-                        # TensorBoard
-                        tensorboard.update()
+                if num_finished > 0:
+                    one_loop_time = looping_time / num_finished
+                    finishing_time = now + (max_trial_number - num_finished) * one_loop_time
+                    end_estimated_time = finishing_time.strftime(datetime_format)
 
-                    buff.d["available_pool_size"].add(available_pool_size)
-                    if buff.d["available_pool_size"].length == 1 or buff.d["available_pool_size"].has_difference():
-                        scheduler.logger.info(f"pool_size: {available_pool_size}")
-                else:
-                    buff.d["num_finished"].clear()
-                    buff.d["available_pool_size"].clear()
-                time.sleep(config.generic.main_loop_sleep_seconds)
-                continue
-            break
+                buff.d["num_finished"].add(num_finished)
+                if buff.d["num_finished"].length == 1 or buff.d["num_finished"].has_difference():
+                    scheduler.logger.info(
+                        f"{num_finished}/{max_trial_number} finished, "
+                        f"max trial number: {max_trial_number}, "
+                        f"ready: {num_ready} ,"
+                        f"running: {num_running}, "
+                        f"end estimated time: {end_estimated_time}"
+                    )
+                    # TensorBoard
+                    tensorboard.update()
+
+                buff.d["available_pool_size"].add(available_pool_size)
+                if buff.d["available_pool_size"].length == 1 or buff.d["available_pool_size"].has_difference():
+                    scheduler.logger.info(f"pool_size: {available_pool_size}")
+
+            time.sleep(config.generic.main_loop_sleep_seconds)
+
         except Exception as e:
             logger.exception("Unexpected error occurred.")
             logger.exception(e)
             break
 
-    for module in modules:
-        module.post_process()
-
+    scheduler.post_process()
     scheduler.evaluate()
 
     csv_writer = CsvWriter(config)
@@ -173,8 +151,8 @@ def main() -> None:  # pragma: no cover
     config_name = Path(args.config).name
     shutil.copy(Path(args.config), dst / config_name)
 
-    if os.path.exists(workspace.final_result_file):
-        with open(workspace.final_result_file, "r") as f:
+    if os.path.exists(workspace.best_result_file):
+        with open(workspace.best_result_file, "r") as f:
             final_results: list[dict[str, Any]] = yaml.load(f, Loader=yaml.UnsafeLoader)
 
         for i, final_result in enumerate(final_results):

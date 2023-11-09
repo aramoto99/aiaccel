@@ -22,19 +22,19 @@ if TYPE_CHECKING:
     from aiaccel.scheduler import AbstractScheduler
     from aiaccel.storage import Storage
 
-
-mpi_enable = True
+mpi_enable = False
 try:
     import mpi4py as m4p
-    from mpi4py.futures import MPIPoolExecutor
+
+    mpi_enable = True
 except ImportError:
-    mpi_enable = False
+    pass
 
 
 class Mpi:
     func_end_id = "MpiFuncEnd"
     return_code_str = "return_code="
-    executor: MPIPoolExecutor | None = None
+    executor: m4p.futures.MPIPoolExecutor | None = None
     lock: InterProcessLock | None = None
     rank_log_path = None
     error_file_path = None
@@ -266,8 +266,8 @@ class Mpi:
 
     @classmethod
     def _run_bat_file(cls, config: DictConfig, logger: Logger) -> None:
+        logger.info("run bat file")
         qsub_file = config.resource.mpi_bat_file
-        # abci_group = config.ABCI.group[1:-1]
         abci_group = config.ABCI.group
         qsub_cmd = f"qsub -g {abci_group} {qsub_file}"
         proc = run(qsub_cmd.split(" "), stdout=PIPE, stderr=STDOUT)
@@ -290,47 +290,28 @@ class Mpi:
         num_workers = config.resource.num_workers
         qsub_file_path = config.resource.mpi_bat_file
         hostfile = config.resource.mpi_hostfile
-
         qsub_str = create_job_script_preamble(config.ABCI.job_script_preamble_path, config.ABCI.job_script_preamble)
-        qsub_str += "\n"
 
-        # aiaccel
-        if aiaccel_dir != "":
-            qsub_str += f"export PYTHONPATH={aiaccel_dir}:$PYTHONPATH" + "\n"
+        if qsub_str != "":
+            qsub_str += "\n"
+        else:
+            qsub_str += "#!/bin/bash" + "\n"
+
         # venv
         if venv_dir != "":
             qsub_str += f"source {venv_dir}/bin/activate" + "\n"
-        qsub_str += "\n"
+        # aiaccel
+        if aiaccel_dir != "":
+            qsub_str += f"export PYTHONPATH={aiaccel_dir}:$PYTHONPATH" + "\n"
 
         qsub_str += f"""
 python -m aiaccel.cli.start --config config.yaml --make_hostfile
 
 mpiexec -n {num_workers+1} -hostfile {hostfile} \
-python -m mpi4py.futures -m aiaccel.cli.start --config config.yaml --clean --from_mpi_bat
+python -m mpi4py.futures -m aiaccel.cli.start --config config.yaml --clean --from_mpi_bat 2>&1 | tee logf
 
 deactivate
 """
-
-        # #$ -l rt_{rt_type}={rt_num}
-        # #$ -l h_rt={h_rt}
-        # #$ -j y
-        # #$ -cwd
-
-        # source /etc/profile.d/modules.sh
-        # module load python/3.11
-        # module load hpcx-mt/2.12
-        # source {venv_dir}/bin/activate
-        # export PYTHONPATH={aiaccel_dir}/:$PYTHONPATH
-
-        # python -m aiaccel.cli.start --config config.yaml --make_hostfile
-
-        # mpiexec -n {num_workers+1} -hostfile {hostfile} \
-        # python -m mpi4py.futures -m aiaccel.cli.start --config config.yaml --clean --from_mpi_bat
-
-        # deactivate
-        # """
-
-        # 'mpiexec -n {num_workers+1} -npernode {mpi_npernode}'
         qsub_file_path = Path(os_path.expanduser(str(qsub_file_path)))
         qsub_file_path.write_text(qsub_str)
 

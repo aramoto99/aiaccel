@@ -1,7 +1,7 @@
 ABCI:
   group: '[group]'
   job_execution_options: ''
-  job_script_preamble: ./job_script_preamble.sh
+  job_script_preamble_path: ./job_script_preamble.sh
 generic:
   aiaccel_dir: ''
   enabled_variable_name_argumentation: true

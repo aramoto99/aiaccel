@@ -295,7 +295,6 @@ class NelderMead:
     def search(self) -> list[Vertex]:
         if self.state == "initialize":
             xs = self.initialize()
-            # print(f"initialize: {[v.coordinates for v in xs]}")
             self.change_state("initialize_pending")
             return xs
 
@@ -305,7 +304,6 @@ class NelderMead:
         elif self.state == "reflect":
             x = self.reflect()
             self.change_state("reflect_pending")
-            # print(f"reflect: {x.coordinates}")
             return [x]
 
         elif self.state == "reflect_pending":
@@ -314,7 +312,6 @@ class NelderMead:
         elif self.state == "expand":
             x = self.expand()
             self.change_state("expand_pending")
-            # print(f"expand: {x.coordinates}")
             return [x]
 
         elif self.state == "expand_pending":
@@ -323,7 +320,6 @@ class NelderMead:
         elif self.state == "inside_contract":
             x = self.inside_contract()
             self.change_state("inside_contract_pending")
-            # print(f"inside_contract: {x.coordinates}")
             return [x]
 
         elif self.state == "inside_contract_pending":
@@ -332,7 +328,6 @@ class NelderMead:
         elif self.state == "outside_contract":
             x = self.outside_contract()
             self.change_state("outside_contract_pending")
-            # print(f"outside_contract: {x.coordinates}")
             return [x]
 
         elif self.state == "outside_contract_pending":
@@ -341,7 +336,6 @@ class NelderMead:
         elif self.state == "shrink":
             xs = self.shrink()
             self.change_state("shrink_pending")
-            # print(f"shrink: {[v.coordinates for v in xs]}")
             return xs
 
         elif self.state == "shrink_pending":

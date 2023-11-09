@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import copy
 import datetime
+import select
 import subprocess
+import sys
 import threading
 
 from aiaccel.common import datetime_format
@@ -12,16 +14,21 @@ class OutputHandler(threading.Thread):
     """A class to print subprocess outputs.
 
     Args:
-        proc (subprocess.Popen): A reference to subprocess.Popen.
+        proc (Popen): A reference for subprocess.Popen.
             For example, 'Optimizer'.
+    Attributes:
+        _proc (Popen): A reference for subprocess.Popen.
+            For example, 'Optimizer'.
+        _sleep_time (int): A sleep time each loop.
     """
 
     def __init__(self, proc: subprocess.Popen[bytes]) -> None:
-        super().__init__()
+        super(OutputHandler, self).__init__()
         self._proc = proc
         self._sleep_time = 1
         self._abort = False
 
+        self._returncode = None
         self._stdouts: list[str] = []
         self._stderrs: list[str] = []
         self._start_time: datetime.datetime | None = None
@@ -31,41 +38,29 @@ class OutputHandler(threading.Thread):
         self._abort = True
 
     def run(self) -> None:
-        """Main thread.
-
-        Returns:
-            None
-        """
         self._start_time = datetime.datetime.now()
-        self._stdouts = []
-        self._stderrs = []
-
         while True:
-            if self._proc.stdout is None:
+            inputs = [self._proc.stdout, self._proc.stderr]
+            readable, _, _ = select.select(inputs, [], [], self._sleep_time)
+            for s in readable:
+                line = s.readline()
+                if s is self._proc.stdout and line:
+                    self._stdouts.append(line.decode().strip())
+                elif s is self._proc.stderr and line:
+                    self._stderrs.append(line.decode().strip())
+            if self.get_returncode() is not None:
+                # After the process has finished, read the remaining output.
+                for stream, storage in [(self._proc.stdout, self._stdouts), (self._proc.stderr, self._stderrs)]:
+                    if stream is None:
+                        continue
+                    for line in stream:
+                        storage.append(line.decode().strip())
                 break
-
-            stdout = self._proc.stdout.readline()
-            if stdout:
-                stdout_str = stdout.decode().strip()
-                print(stdout_str)
-                self._stdouts.append(stdout_str)
-
-            if self._proc.stderr is not None:
-                stderr = self._proc.stderr.readline()
-                if stderr:
-                    stderr_str = stderr.decode().strip()
-                    print(stderr_str)
-                    self._stderrs.append(stderr_str)
-            else:
-                stderr = None
-
-            if not (stdout or stderr) and self.get_returncode() is not None:
-                break
-
             if self._abort:
                 break
-
         self._end_time = datetime.datetime.now()
+        sys.stdout.flush()
+        sys.stderr.flush()
 
     def get_stdouts(self) -> list[str]:
         return copy.deepcopy(self._stdouts)
@@ -74,10 +69,14 @@ class OutputHandler(threading.Thread):
         return copy.deepcopy(self._stderrs)
 
     def get_start_time(self) -> str | None:
-        return self._start_time.strftime(datetime_format) if self._start_time else ""
+        if self._start_time is None:
+            return ""
+        return self._start_time.strftime(datetime_format)
 
     def get_end_time(self) -> str | None:
-        return self._end_time.strftime(datetime_format) if self._end_time else ""
+        if self._end_time is None:
+            return ""
+        return self._end_time.strftime(datetime_format)
 
     def get_returncode(self) -> int | None:
         return self._proc.poll()

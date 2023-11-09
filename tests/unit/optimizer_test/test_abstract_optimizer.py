@@ -70,7 +70,7 @@ class TestAbstractOptimizer(BaseTest):
         assert self.optimizer.is_error_free() is True
 
         self.optimizer.storage.error.set_any_trial_error(trial_id=0, error_message="test warning")
-        assert self.optimizer.is_error_free() is False
+        assert self.optimizer.is_error_free() is True
 
         self.optimizer.storage.error.set_any_trial_exitcode(trial_id=0, exitcode=1)
         assert self.optimizer.is_error_free() is False

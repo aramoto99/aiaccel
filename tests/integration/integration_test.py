@@ -11,11 +11,6 @@ from aiaccel.workspace import Workspace
 from tests.base_test import BaseTest
 
 
-async def start_master(master):
-    loop = asyncio.get_event_loop()
-    await loop.run_in_executor(None, master.start)
-
-
 class IntegrationTest(BaseTest):
     search_algorithm = None
 

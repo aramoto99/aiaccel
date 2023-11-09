@@ -13,7 +13,42 @@ from aiaccel.util import ColoredHandler, TrialId, str_to_logging_level
 from aiaccel.workspace import Workspace
 
 
-class AiaccelCore(object):
+class AbstractModule(object):
+    """An abstract class for Optimizer and Scheduler.
+
+    The procedure of this class is as follows:
+
+    1. At first, deserialize() is called.
+    2. start() is called.
+    3. pre_process() is called.
+    4. loop() is called.
+
+        | 4-1. in while loop, inner_loop_main_process() is called.
+        | 4-2. in while loop, loop_count is incremented.
+
+    5. call post_process()
+
+     Args:
+        options (dict[str, str | int | bool]): A dictionary containing
+            command line options.
+
+    Attributes:
+        options (dict[str, str | int | bool]): A dictionary containing
+            command line options.
+        config_path (Path): Path to the configuration file.
+        config (Config): A config object.
+        ws (Path): A path to a current workspace.
+        dict_hp (Path): A path to hp directory.
+        dict_lock (Path): A path to lock directory.
+        dict_output (Path): A path to output directory.
+        dict_runner (Path): A path to runner directory.
+        hp_finished (int): A number of files in hp/finished directory.
+        hp_ready (int): A number of files in hp/ready directory.
+        hp_running (int): A number of files in hp/running directory.
+        logger (logging.Logger): A logger object.
+        loop_count (int): A loop count that is incremented in loop method.
+    """
+
     def __init__(self, config: DictConfig, module_name: str) -> None:
         self.config = config
         self.workspace = Workspace(self.config.generic.workspace)
@@ -22,6 +57,10 @@ class AiaccelCore(object):
         self.fh: Any = None
         self.ch: Any = None
         self.ch_formatter: Any = None
+        self.loop_count = 0
+        self.hp_ready = 0
+        self.hp_running = 0
+        self.hp_finished = 0
         self.seed = self.config.optimize.rand_seed
         self.storage = Storage(self.workspace.storage_file_path)
         self.trial_id = TrialId(self.config)
@@ -123,47 +162,6 @@ class AiaccelCore(object):
                 representing the internal state of the generator.
         """
         self._rng.set_state(state)
-
-    def __getstate__(self) -> dict[str, Any]:
-        obj = self.__dict__.copy()
-        del obj["storage"]
-        del obj["config"]
-        return obj
-
-
-class AbstractModule(AiaccelCore):
-    def pre_process(self) -> None:
-        """Perform setup or initialization tasks before the main loop starts.
-
-        This method should be implemented by subclasses to perform any necessary setup operations.
-
-        Raises:
-            NotImplementedError: If the subclass does not implement this method.
-        """
-        raise NotImplementedError
-
-    def run_in_main_loop(self) -> bool:
-        """Perform tasks that should be executed in every cycle of the main loop.
-
-        This method should be implemented by subclasses to define the operations executed in each cycle.
-
-        Returns:
-            bool: True if the main process has been completed, False otherwise.
-
-        Raises:
-            NotImplementedError: If the subclass does not implement this method.
-        """
-        raise NotImplementedError
-
-    def post_process(self) -> None:
-        """Perform cleanup tasks after the main loop ends.
-
-        This method should be implemented by subclasses to perform any necessary cleanup operations.
-
-        Raises:
-            NotImplementedError: If the subclass does not implement this method.
-        """
-        raise NotImplementedError
 
     def is_error_free(self) -> bool:
         """Check if there has been an error.

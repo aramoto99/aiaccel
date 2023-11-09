@@ -5,7 +5,6 @@ from functools import reduce
 from operator import mul
 from typing import Any
 
-from numpy import nan as np_nan
 from omegaconf.dictconfig import DictConfig
 
 from aiaccel.optimizer import AbstractOptimizer
@@ -162,6 +161,7 @@ class GridOptimizer(AbstractOptimizer):
 
         if parameter_index is None:
             self.logger.info("Generated all of parameters.")
+            self.all_parameters_generated = True
             return None
 
         new_params: list[Any] = []
@@ -193,24 +193,3 @@ class GridOptimizer(AbstractOptimizer):
             raise ValueError("Initial parameter not generated.")
         else:
             return generated_parameter
-
-    def nan_parameter(self) -> list[dict[str, float | int | str]]:
-        """Returns a parameter with nan values.
-
-        Returns:
-            list[dict[str, float | int | str]]: A list of new parameters.
-        """
-        return [{"name": param.name, "type": param.type, "value": np_nan} for param in self.params.get_parameter_list()]
-
-    def run_optimizer(self) -> None:
-        if new_params := self.generate_new_parameter():
-            self.register_new_parameters(self.convert_type_by_config(new_params))
-            self.trial_id.increment()
-            self.serialize(self.trial_id.integer)
-        else:
-            self.all_parameters_generated = True
-            self.logger.info("Generated all of parameters.")
-            # self.register_new_parameters(self.convert_type_by_config(self.nan_parameter()), state="finished")
-            # self.storage.result.set_any_trial_objective(trial_id=self.trial_id.integer, objective=[np_nan])
-            # self.trial_id.increment()
-            # self.serialize(self.trial_id.integer)

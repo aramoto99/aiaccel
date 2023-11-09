@@ -8,11 +8,11 @@ from omegaconf.dictconfig import DictConfig
 
 from aiaccel.config import is_multi_objective
 from aiaccel.converted_parameter import ConvertedIntParameter
-from aiaccel.module import AiaccelCore
+from aiaccel.module import AbstractModule
 from aiaccel.parameter import HyperParameterConfiguration, IntParameter, Parameter
 
 
-class AbstractOptimizer(AiaccelCore):
+class AbstractOptimizer(AbstractModule):
     """An abstract class for Optimizer classes.
 
     Args:
@@ -149,15 +149,6 @@ class AbstractOptimizer(AiaccelCore):
             self.trial_id.increment()
             self.serialize(self.trial_id.integer)
 
-    # def run_optimizer_multiple_times(self, available_pool_size: int) -> None:
-    #     if available_pool_size <= 0:
-    #         return
-    #     for _ in range(available_pool_size):
-    #         if new_params := self.generate_new_parameter():
-    #             self.register_new_parameters(self.convert_type_by_config(new_params))
-    #             self.trial_id.increment()
-    #             self.serialize(self.trial_id.integer)
-
     def get_trial_id(self) -> int:
         """Get the current trial ID.
 
@@ -201,17 +192,6 @@ class AbstractOptimizer(AiaccelCore):
         else:
             return objective[0]
 
-    # def get_any_trial_params(self, trial_id: int) -> list[dict[str, dict[str, int | float | str]]] | None:
-    #     """Get any trial parameters.
-
-    #     Args:
-    #         trial_id (int): Trial ID.
-
-    #     Returns:
-    #         list[dict[str, float | int | str]]: Any trial parameters.
-    #     """
-    #     return self.storage.hp.get_any_trial_params_dict(trial_id)
-
     def is_error_free(self) -> bool:
         """Check if all trials are error free.
 
@@ -219,11 +199,17 @@ class AbstractOptimizer(AiaccelCore):
             bool: True if all trials are error free.
         """
         error_trial_ids = self.storage.error.get_error_trial_id()
+        failed_trial_ids = self.storage.error.get_failed_exitcode_trial_id()
+        if self.config.generic.is_ignore_warning:
+            if len(failed_trial_ids) == 0:
+                return True
+        else:
+            if len(failed_trial_ids) == 0 and len(error_trial_ids) == 0:
+                return True
         for trial_id in error_trial_ids:
             error_message = self.storage.error.get_any_trial_error(trial_id=trial_id)
             self.logger.error(error_message)
-            return False
-        return True
+        return False
 
     def finalize_operation(self) -> None:
         """Finalize the operation.
