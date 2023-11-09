@@ -56,8 +56,12 @@ class SobolOptimizer(AbstractOptimizer):
         for hyperparameter in self.params.get_parameter_list():
             if hyperparameter.initial is not None:
                 self.logger.warning(
+<<<<<<< HEAD
                     "Initial values cannot be specified for sobol search. "
                     "The set initial value has been invalidated."
+=======
+                    "Initial values cannot be specified for sobol search. " "The set initial value has been invalidated."
+>>>>>>> e381d45 (Fix typo)
                 )
                 break
 
