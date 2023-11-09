@@ -29,8 +29,8 @@ class Particle:
         self.position = np.array(initial_position)
         self.velocity = np.zeros(num_dimensions)
         self.best_position = self.position.copy()
-        self.best_value = np.inf
-        self.value = None
+        self.best_value: Any = np.inf
+        self.value: float | None = None
 
         self.inertia_weight = inertia_weight
         self.cognitive_weight = cognitive_weight
@@ -50,17 +50,19 @@ class Particle:
         rands = [name_rng.choice(list(string.ascii_letters + string.digits))[0] for _ in range(length)]
         return "".join(rands)
 
-    def update_velocity(self, global_best_position: np.ndarray):
+    def update_velocity(self, global_best_position: np.ndarray[Any, Any]) -> None:
         self.velocity = (
             self.inertia_weight * self.velocity
             + self.cognitive_weight * np.random.rand() * (self.best_position - self.position)
             + self.social_weight * np.random.rand() * (global_best_position - self.position)
         )
 
-    def update_position(self):
+    def update_position(self) -> None:
         self.position += self.velocity
 
-    def update_best_position(self, goal: str):
+    def update_best_position(self, goal: str) -> None:
+        if self.best_value is None:
+            raise ValueError("best_value is None.")
         if goal == goal_minimize:
             if self.value < self.best_value:
                 self.best_position = self.position
@@ -70,7 +72,7 @@ class Particle:
                 self.best_position = self.position
                 self.best_value = self.value
 
-    def initial_best_value(self, value):
+    def initial_best_value(self, value: float) -> None:
         self.best_value = value
 
     def set_value(self, value: Any) -> None:
@@ -100,7 +102,7 @@ class Swarm:
     ) -> None:
         self.n_dim = partical_coordinates.shape[1]
         self.goals = goals
-        self.global_best_position: np.ndarray | None = None
+        self.global_best_position: np.ndarray[Any, Any] | None = None
         self.global_best_value = None
         if self.goals[0] == "minimize":
             self.global_best_value = np.inf
@@ -118,7 +120,7 @@ class Swarm:
         self.update_global_best_position()
 
     def get_particle_coordinates(self) -> np.ndarray[Any, Any]:
-        return np.array([p.xs for p in self.particles])
+        return np.array([p.position for p in self.particles])
 
     def set_value(self, particle_id: str, value: Any) -> bool:
         for p in self.particles:
@@ -155,8 +157,10 @@ class Swarm:
                     self.global_best_value = particle.best_value
                     self.global_best_position = particle.best_position
 
-    def move(self) -> None:
+    def move(self) -> list[Particle]:
         for p in self.particles:
+            if self.global_best_position is None:
+                raise ValueError("global_best_position is None.")
             p.update_velocity(self.global_best_position)
             p.update_position()
             p.update_best_position(self.goals[0])
@@ -171,7 +175,7 @@ class ParticleSwarm:
         inertia_weight: float,
         cognitive_weight: float,
         social_weight: float,
-        goals: list,
+        goals: list[str],
     ) -> None:
         self.swarm = Swarm(initial_parameters, inertia_weight, cognitive_weight, social_weight, goals)
         self.state = "initialize"
@@ -193,7 +197,7 @@ class ParticleSwarm:
                 raise ValueError(f"{y.id} Unknown particle id.")
         self.change_state("move")
 
-    def move(self) -> list[Particle]:
+    def move(self) -> np.ndarray[Any, Any]:
         self.swarm.move()
         return self.swarm.get_particle_coordinates()
 
@@ -283,28 +287,30 @@ class ParticleSwarmOptimizer(AbstractOptimizer):
             return val
 
     def generate_initial_parameter(self) -> list[Any]:
-        initial_parameters = super().generate_initial_parameter()
+        _initial_parameters = super().generate_initial_parameter()
         initial_parameters = np.array(
             [
                 [
-                    self._generate_initial_parameter(initial_parameters, dim, num_of_initials)
+                    self._generate_initial_parameter(_initial_parameters, dim, num_of_initials)
                     for dim in range(self.n_params)
                 ]
                 for num_of_initials in range(self.num_particle)
             ]
         )
-        if self.particle_swarm is not None:
-            return None
-        self.particle_swarm = ParticleSwarm(
-            initial_parameters=initial_parameters,
-            inertia_weight=self.inertia_weight,
-            cognitive_weight=self.cognitive_weight,
-            social_weight=self.social_weight,
-            goals=self.goals,
-        )
-        return self.generate_parameter()
+        if self.particle_swarm is None:
+            self.particle_swarm = ParticleSwarm(
+                initial_parameters=initial_parameters,
+                inertia_weight=self.inertia_weight,
+                cognitive_weight=self.cognitive_weight,
+                social_weight=self.social_weight,
+                goals=self.goals,
+            )
+        params = self.generate_parameter()
+        if params is None:
+            raise ValueError("params is None.")
+        return params
 
-    def generate_parameter(self) -> list[dict[str, float | int | str]]:
+    def generate_parameter(self) -> list[dict[str, float | int | str]] | None:
         searched_params: list[Particle] = self.particle_swarm_main()
         for searched_param in searched_params:
             self.single_or_multiple_trial_params.append(searched_param)
@@ -325,7 +331,7 @@ class ParticleSwarmOptimizer(AbstractOptimizer):
                 return True
         return False
 
-    def particle_swarm_main(self):
+    def particle_swarm_main(self) -> list[Particle]:
         ps_state = self.particle_swarm.get_state()
         if ps_state in {"initialize_pending", "evaluate_pending"}:
             new_finished = self.new_finished()

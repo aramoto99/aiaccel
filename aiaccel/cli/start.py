@@ -15,7 +15,7 @@ from omegaconf.dictconfig import DictConfig
 import aiaccel
 from aiaccel.cli import CsvWriter
 from aiaccel.common import datetime_format, resource_type_mpi
-from aiaccel.config import Config, load_config
+from aiaccel.config import load_config
 from aiaccel.optimizer import create_optimizer
 from aiaccel.scheduler import create_scheduler
 from aiaccel.storage import Storage
@@ -49,20 +49,6 @@ def main() -> None:  # pragma: no cover
     args = parser.parse_args()
 
     config: DictConfig = load_config(args.config)
-    if config.resource.type.value.lower() == resource_type_mpi:  # MPI
-        if not mpi_enable:
-            raise Exception("MPI is not enabled.")
-        if args.make_hostfile:
-            Mpi.make_hostfile(config, logger)
-            return
-        if not args.from_mpi_bat:
-            Mpi.run_bat(config, logger)
-            return
-        logger.info("MPI is enabled.")
-        if Mpi.gpu_max == 0:
-            Mpi.gpu_max = config.resource.mpi_npernode
-        Mpi.run_main()
-
     if config.resource.type.value.lower() == resource_type_mpi:  # MPI
         if not mpi_enable:
             raise Exception("MPI is not enabled.")

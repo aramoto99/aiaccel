@@ -89,7 +89,7 @@ class AbstractScheduler(AbstractModule):
         self.optimizer.finalize_operation()
         self.logger.info("scheduler finished.")
 
-    def get_available_pool_size(self, num_ready: int, num_running: int, num_finished: int) -> None:
+    def get_available_pool_size(self, num_ready: int, num_running: int, num_finished: int) -> int:
         sum_status = num_ready + num_running + num_finished
         if sum_status >= self.trial_number:
             return 0

@@ -90,7 +90,6 @@ class Study:
         func: Callable[[dict[str, float | int | str]], float],
         n_trials: int | None = None,
     ) -> None:
-
         n_count = 0
         while True:
             trial_id = self.optimizer.get_trial_id()
@@ -118,8 +117,8 @@ class Study:
     def execute(
         self,
         func: Callable[[dict[str, float | int | str]], float],
-        xs: "dict[str, float | int | str]",
-        y_data_type: "str | None",
+        xs: dict[str, float | int | str],
+        y_data_type: str | None,
     ) -> Any:
         """Executes the target function.
 

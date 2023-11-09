@@ -29,7 +29,7 @@ class PylocalScheduler(AbstractScheduler):
         super().__init__(config, optimizer)
         self.processes: list[Any] = []
 
-        Pool_: Pool | ThreadPool = Pool if self.num_workers > 1 else ThreadPool  # noqa: N806
+        Pool_ = Pool if self.num_workers > 1 else ThreadPool  # noqa: N806
         self.pool = Pool_(self.num_workers, initializer=initializer, initargs=(self.config.config_path,))
 
     def run_in_main_loop(self) -> bool:
