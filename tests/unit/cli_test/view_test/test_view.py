@@ -1,4 +1,3 @@
-
 from pathlib import Path
 
 from aiaccel.cli.view import Viewer
@@ -14,7 +13,7 @@ def test_view(clean_work_dir, work_dir, create_tmp_config):
         workspace.clean()
     workspace.create()
 
-    config_path = Path('tests/test_data/config.json')
+    config_path = Path("tests/test_data/config.yaml")
     config_path = create_tmp_config(config_path)
     config = load_config(config_path)
 
@@ -28,7 +27,7 @@ def test_view(clean_work_dir, work_dir, create_tmp_config):
     jobstate = "test_state"
     state = "ready"
 
-    storage.trial.set_any_trial_state(trial_id=trial_id, state=state)
+    storage.state.set_any_trial_state(trial_id=trial_id, state=state)
     storage.timestamp.set_any_trial_start_time(trial_id=trial_id, start_time=start_time)
     storage.timestamp.set_any_trial_end_time(trial_id=trial_id, end_time=end_time)
     storage.jobstate.set_any_trial_jobstate(trial_id=trial_id, state=jobstate)
@@ -42,7 +41,7 @@ def test_view(clean_work_dir, work_dir, create_tmp_config):
     state = "ready"
     error = "hogehoge"
 
-    storage.trial.set_any_trial_state(trial_id=trial_id, state=state)
+    storage.state.set_any_trial_state(trial_id=trial_id, state=state)
     storage.timestamp.set_any_trial_start_time(trial_id=trial_id, start_time=start_time)
     storage.timestamp.set_any_trial_end_time(trial_id=trial_id, end_time=end_time)
     storage.jobstate.set_any_trial_jobstate(trial_id=trial_id, state=jobstate)
@@ -57,7 +56,7 @@ def test_view(clean_work_dir, work_dir, create_tmp_config):
     state = "ready"
     error = "foo"
 
-    storage.trial.set_any_trial_state(trial_id=trial_id, state=state)
+    storage.state.set_any_trial_state(trial_id=trial_id, state=state)
     storage.timestamp.set_any_trial_start_time(trial_id=trial_id, start_time=start_time)
     storage.timestamp.set_any_trial_end_time(trial_id=trial_id, end_time=end_time)
     storage.jobstate.set_any_trial_jobstate(trial_id=trial_id, state=jobstate)

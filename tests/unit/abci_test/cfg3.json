@@ -22,7 +22,7 @@
     "sleep_time_optimizer": 1
   },
   "scheduler": {
-    "name_length": 6,
+    "trial_id_digits": 6,
     "cancel_retry": 3,
     "cancel_timeout": 10,
     "expire_retry": 3,

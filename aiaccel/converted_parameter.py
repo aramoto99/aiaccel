@@ -7,15 +7,8 @@ from typing import Any
 import numpy as np
 from numpy.random import RandomState
 
-from aiaccel.parameter import (
-    AbstractParameter,
-    CategoricalParameter,
-    FloatParameter,
-    HyperParameterConfiguration,
-    IntParameter,
-    OrdinalParameter,
-    Parameter,
-)
+from aiaccel.parameter import (AbstractParameter, CategoricalParameter, FloatParameter, HyperParameterConfiguration,
+                               IntParameter, OrdinalParameter, Parameter)
 
 
 class ConvertedParameter(AbstractParameter):
@@ -254,7 +247,7 @@ class ConvertedParameterConfiguration(HyperParameterConfiguration):
         params_in_original_repr: list[dict[str, Any]] = []
         weights: dict[str, dict[str, Any]] = {}
         for param in params_in_internal_repr:
-            converted_param = self.get_hyperparameter(param["parameter_name"])
+            converted_param = self.get_hyperparameter(param["name"])
             if isinstance(converted_param, ConvertedFloatParameter):
                 value = _restore_float(converted_param, param["value"])
                 params_in_original_repr.append(_make_structured_value(converted_param, value))
@@ -326,7 +319,7 @@ class ConvertedParameterConfiguration(HyperParameterConfiguration):
     def get_empty_parameter_dict(self) -> list[dict[str, Any]]:
         base_params = []
         for param in self.get_parameter_list():
-            base_params.append({"parameter_name": param.name, "type": param.type, "value": None})
+            base_params.append({"name": param.name, "type": param.type, "value": None})
         return base_params
 
 
@@ -397,7 +390,7 @@ def _decode_weight_distribution(param: WeightOfChoice, weight_distribution: list
 
 def _make_structured_value(param: ConvertedParameter, value: Any) -> dict[str, Any]:
     return {
-        "parameter_name": param.original_name if isinstance(param, WeightOfChoice) else param.name,
+        "name": param.original_name if isinstance(param, WeightOfChoice) else param.name,
         "type": param.type,
         "value": value,
     }

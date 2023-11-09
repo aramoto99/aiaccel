@@ -74,7 +74,7 @@ class Plotter:
 def main() -> None:  # pragma: no cover
     """Parses command line options and plots a graph on the terminal."""
     parser = ArgumentParser()
-    parser.add_argument("--config", "-c", type=str, default="config.yml")
+    parser.add_argument("--config", "-c", type=str, default="config.yaml")
     args = parser.parse_args()
 
     config = load_config(args.config)

@@ -24,7 +24,7 @@ class _buffer:
     def Add(self, value: Any) -> None:
         """Append any data."""
         if self.Len == self._max_size:
-            self.arr = [self.arr[-1]]
+            self.arr.pop(0)
         self.arr.append(value)
 
     @property

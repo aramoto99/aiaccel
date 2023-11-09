@@ -1,5 +1,6 @@
 import numpy as np
-from aiaccel.util.aiaccel import Run
+
+from aiaccel.aiaccel_run import Run
 
 
 def main(p):

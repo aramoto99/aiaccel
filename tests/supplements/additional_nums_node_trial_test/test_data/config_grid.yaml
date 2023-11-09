@@ -3,7 +3,7 @@ ABCI:
   job_execution_options: ''
   job_script_preamble: ./job_script_preamble.sh
 generic:
-  batch_job_timeout: 600
+  job_timeout_seconds: 600
   function: main
   job_command: python original_main.py
   python_file: original_main.py
@@ -22,7 +22,7 @@ job_setting:
   job_timeout: 60
   kill_retry: 3
   kill_timeout: 60
-  name_length: 6
+  trial_id_digits: 6
   result_retry: 1
   runner_retry: 3
   runner_timeout: 60

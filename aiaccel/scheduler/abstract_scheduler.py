@@ -5,10 +5,10 @@ from typing import Any
 from omegaconf.dictconfig import DictConfig
 
 from aiaccel.module import AbstractModule
-from aiaccel.scheduler.algorithm import RandomSampling
+from aiaccel.optimizer import AbstractOptimizer
 from aiaccel.scheduler.job.job import Job
 from aiaccel.scheduler.job.model.local_model import LocalModel
-from aiaccel.util import create_yaml, str_to_logging_level
+from aiaccel.util import Buffer, create_yaml
 
 
 class AbstractScheduler(AbstractModule):
@@ -21,57 +21,50 @@ class AbstractScheduler(AbstractModule):
     Attributes:
         options (dict[str, str | int | bool]): A dictionary containing
             command line options.
-        algorithm (RandomSamplingSchedulingAlgorithm): A scheduling algorithm
             to select hyper parameters from a parameter pool.
-        available_resource (int): An available current resource number.
         jobs (list[dict]): A list to store job dictionaries.
-        max_resource (int): A max resource number.
+        num_workers (int): A max resource number.
         stats (list[dict]): A list of current status which is updated using ps
             command or qstat command.
     """
 
-    def __init__(self, config: DictConfig) -> None:
+    def __init__(self, config: DictConfig, optimizer: AbstractOptimizer) -> None:
         super().__init__(config, "scheduler")
         self.set_logger(
-            "root.scheduler",
-            self.workspace.log / self.config.logger.file.scheduler,
-            str_to_logging_level(self.config.logger.log_level.scheduler),
-            str_to_logging_level(self.config.logger.stream_level.scheduler),
-            "Scheduler",
+            logger_name="root.scheduler",
+            logfile=self.workspace.log / "scheduler.log",
+            file_level=self.config.generic.logging_level,
+            stream_level=self.config.generic.logging_level,
+            module_type="Scheduler",
         )
-
-        self.max_resource = self.config.resource.num_workers
-        self.available_resource = self.max_resource
+        self.optimizer = optimizer
+        self.num_workers = self.config.resource.num_workers
+        self.trial_number = self.config.optimize.trial_number
+        self.num_ready = 0
+        self.num_running = 0
+        self.num_finished = 0
+        self.available_pool_size = 0
         self.stats: list[Any] = []
         self.jobs: list[Any] = []
         self.job_status: dict[Any, Any] = {}
-        self.algorithm: Any = None
-        self.num_workers = self.config.resource.num_workers
+        self.start_trial_id = self.config.resume if self.config.resume is not None else 0
+        self.buff = Buffer([trial_id for trial_id in range(self.start_trial_id, self.trial_number)])
+        for trial_id in range(self.start_trial_id, self.config.optimize.trial_number):
+            self.buff.d[trial_id].set_max_len(2)
+        self.all_parameters_generated = False
+        self.job_completed_count = 0
 
-    def change_state_finished_trials(self) -> None:
-        """Create finished hyper parameter files if result files can be found
-        and running files are in running directory.
+    def get_num_ready(self) -> int:
+        return self.num_ready
 
-        Returns:
-            None
-        """
-        runnings = self.storage.trial.get_running()
-        result_names = self.storage.result.get_result_trial_id_list()
+    def get_num_running(self) -> int:
+        return self.num_running
 
-        if result_names is None:
-            return
+    def get_num_finished(self) -> int:
+        return self.num_finished
 
-        for running in runnings:
-            if running in result_names:
-                self.storage.trial.set_any_trial_state(trial_id=running, state="finished")
-
-    def get_stats(self) -> None:
-        """Updates the number of files in hp(hyper parameter) directories.
-
-        Returns:
-            None
-        """
-        self.update_each_state_count()
+    def get_available_pool_size(self) -> int:
+        return self.available_pool_size
 
     def start_job(self, trial_id: int) -> Any:
         """Start a new job.
@@ -87,33 +80,12 @@ class AbstractScheduler(AbstractModule):
         if trial_id not in trial_ids:
             job = Job(self.config, self, self.create_model(), trial_id)
             self.jobs.append(job)
-            self.logger.debug(f"Submit a job: {str(trial_id)}")
+            self.logger.debug(f"submit a job: {str(trial_id)}")
             job.main()
             return job
         else:
             self.logger.error(f"Specified trial {trial_id} is already running ")
             return None
-
-    def update_resource(self) -> None:
-        """Update an available current resource number.
-
-        Returns:
-            None
-        """
-        state_names = [
-            "Init",
-            "RunnerReady",
-            "RunnerChecking",
-            "RunnerConfirmed",
-            "RunnerFailed",
-            "RunnerFailure",
-            "Scheduling",
-        ]
-
-        succeed_jobs = [job for job in self.jobs if job.get_state_name() == "Success"]
-        ready_jobs = [job for job in self.jobs if job.get_state_name() in state_names]
-        num_running_jobs = len(self.jobs) - len(ready_jobs) - len(succeed_jobs)
-        self.available_resource = max(0, self.max_resource - num_running_jobs)
 
     def pre_process(self) -> None:
         """Pre-procedure before executing processes.
@@ -124,126 +96,79 @@ class AbstractScheduler(AbstractModule):
         self.write_random_seed_to_debug_log()
         self.resume()
 
-        self.algorithm = RandomSampling(self.config)
-        self.change_state_finished_trials()
-
-        runnings = self.storage.trial.get_running()
-        for running in runnings:
-            job = self.start_job(running)
-            self.logger.info(f"restart hp files in previous running directory: {running}")
-
-            while job.get_state_name() != "Scheduling":
-                job.main()
-            job.schedule()
-
     def post_process(self) -> None:
         """Post-procedure after executed processes.
 
         Returns:
             None
         """
-        self.logger.info("Scheduler finished.")
+        self.logger.info("scheduler finished.")
 
-    def inner_loop_main_process(self) -> bool:
+    def search_hyperparameters(self, num_ready: int, num_running: int, num_finished: int) -> None:
+        """Start hyper parameter optimization.
+
+        Returns:
+            None
+        """
+        sum_status = num_ready + num_running + num_finished
+        if sum_status >= self.trial_number and not self.all_parameters_generated:
+            self.all_parameters_generated = True
+            self.available_pool_size = 0
+            self.logger.info(
+                f"trial_number: {self.trial_number}, \
+                    ready: {num_ready}, running: {num_running}, finished: {num_finished}"
+            )
+            self.logger.info("All parameters are generated.")
+        elif (self.trial_number - sum_status) < self.num_workers:
+            self.available_pool_size = self.trial_number - sum_status
+        else:
+            self.available_pool_size = self.num_workers - num_running - num_ready
+
+        if self.available_pool_size == 0:
+            return
+
+        if not self.all_parameters_processed(num_ready, num_running) and not self.all_parameters_registered(
+            num_ready, num_running, num_finished
+        ):
+            # self.logger.debug(f"optimizer run {self.available_pool_size} times")
+            self.optimizer.run_optimizer_multiple_times(self.available_pool_size)
+
+    def run_in_main_loop(self) -> bool:
         """A main loop process. This process is repeated every main loop.
 
         Returns:
             bool: The process succeeds or not. The main loop exits if failed.
         """
 
-        if self.check_finished():
+        self.num_ready, self.num_running, self.num_finished = self.storage.get_num_running_ready_finished()
+        self.search_hyperparameters(self.num_ready, self.num_running, self.num_finished)
+        if self.num_finished >= self.config.optimize.trial_number:
             return False
 
-        self.get_stats()
-
-        readies = self.storage.trial.get_ready()
-
+        readies = self.storage.state.get_ready()
         # find a new hp
         for ready in readies:
             if ready not in [job.trial_id for job in self.jobs]:
                 self.start_job(ready)
-
-        scheduled_candidates = []
-        for job in self.jobs:
-            if job.get_state_name() == "Scheduling":
-                scheduled_candidates.append(job)
-
-        selected_jobs = self.algorithm.select_hp(scheduled_candidates, self.available_resource, rng=self._rng)
-
-        if len(selected_jobs) > 0:
-            for job in selected_jobs:
-                if job.get_state_name() == "Scheduling":
-                    self._serialize(job.trial_id)
-                    job.schedule()
-                    self.logger.debug(f"trial id: {job.trial_id} has been scheduled.")
-                    selected_jobs.remove(job)
+                self.serialize(ready)
 
         for job in self.jobs:
             job.main()
-            self.logger.info(f"name: {job.trial_id}, state: {job.get_state_name()}")
+            state_name = job.get_state_name()
+            if state_name in {"success", "failed", "timeout"}:
+                self.job_completed_count += 1
+                self.jobs.remove(job)
+                continue
+            # Only log if the state has changed.
+            if job.trial_id in self.buff.d.keys():
+                self.buff.d[job.trial_id].Add(state_name)
+                if self.buff.d[job.trial_id].has_difference():
+                    self.logger.info(f"name: {job.trial_id}, state: {state_name}")
 
-        self.get_stats()
-        self.update_resource()
-        self.print_dict_state()
-        if self.all_done() is True:
+        if self.trial_number == self.job_completed_count:
+            self.logger.info("All jobs are completed.")
             return False
-
         return True
-
-    def parse_trial_id(self, command: str) -> str | None:
-        """Parse a command string and extract an unique name.
-
-        Args:
-            command (str): A command string from ps command.
-
-        Returns:
-            str: An unique name.
-        """
-        pass
-
-    def check_error(self) -> bool:
-        # Check state machin
-        jobstates = self.storage.jobstate.get_all_trial_jobstate()
-        for trial_id in self.job_status.keys():
-            for jobstate in jobstates:
-                if jobstate["trial_id"] == trial_id and "failure" in jobstate["jobstate"].lower():
-                    self.logger.info(
-                        f"Job: {trial_id} is Failed.({self.job_status[trial_id]})\n"
-                        f"This is a fatal internal error. "
-                        f"Please review the configuration file. "
-                        f"In particular, we recommend that you "
-                        f"review the following items: "
-                        f"{'cancel_timeout'}, "
-                        f"{'expire_timeout'}, "
-                        f"{'finished_timeout'}, "
-                        f"{'job_timeout'}, "
-                        f"{'kill_timeout'}, "
-                        f"{'batch_job_timeout'}, "
-                        f"{'runner_timeout'}, "
-                        f"{'running_timeout'}"
-                    )
-                    return False
-        return True
-
-    def all_done(self) -> bool:
-        done_states = [
-            "Success",
-            "HpCancelFailure",
-            "KillFailure",
-            "HpExpiredFailure",
-            "HpFinishedFailure",
-            "JobFailure",
-            "HpRunningFailure",
-            "RunnerFailure",
-        ]
-
-        jobstates = self.storage.jobstate.get_all_trial_jobstate()
-
-        num_trials = 0
-        for s in done_states:
-            num_trials += jobstates.count(s)
-
-        return num_trials >= self.config.optimize.trial_number
 
     def resume(self) -> None:
         """When in resume mode, load the previous optimization data in advance.
@@ -255,11 +180,13 @@ class AbstractScheduler(AbstractModule):
             None
         """
         if self.config.resume is not None and self.config.resume > 0:
-            self._deserialize(self.config.resume)
+            self.deserialize(self.config.resume)
+            self.trial_number = self.config.optimize.trial_number
 
     def __getstate__(self) -> dict[str, Any]:
         obj = super().__getstate__()
         del obj["jobs"]
+        del obj["optimizer"]
         return obj
 
     def create_model(self) -> Any:
@@ -294,10 +221,40 @@ class AbstractScheduler(AbstractModule):
         hp_results = []
         for best_trial_id in best_trial_ids:
             hp_results.append(self.storage.get_hp_dict(best_trial_id))
+        create_yaml(self.workspace.final_result_file, hp_results, self.workspace.lock)
+        self.logger.info("Best hyperparameter is followings:")
+        self.logger.info(hp_results)
 
-        create_yaml(self.workspace.best_result_file, hp_results, self.workspace.lock)
+    def all_parameters_processed(self, num_ready: int, num_running: int) -> bool:
+        """Checks whether any unprocessed parameters are left.
 
-        finished = self.storage.get_num_finished()
-        if self.config.optimize.trial_number >= finished:
-            self.logger.info("Best hyperparameter is followings:")
-            self.logger.info(hp_results)
+        This method is beneficial for the case that the maximum number of
+        parameter generation is limited by algorithm (e.g. grid search).
+        To make this method effective, the algorithm with the parameter
+        generation limit should turn `all_parameters_generated` True when all
+        of available parameters are generated.
+
+        Returns:
+            bool: True if all parameters are generated and are processed.
+        """
+        return num_ready == 0 and num_running == 0 and self.all_parameters_generated
+
+    def all_parameters_registered(self, num_ready: int, num_running: int, num_finished: int) -> bool:
+        """Checks whether all parameters that can be generated with the given
+        number of trials are registered.
+
+        This method does not check whether the registered parameters have been
+        processed.
+
+        Returns:
+            bool: True if all parameters are registerd.
+        """
+        return self.trial_number - num_finished - num_ready - num_running == 0
+
+    def check_finished(self) -> bool:
+        """Checks whether all trials are finished.
+
+        Returns:
+            bool: True if all trials are finished.
+        """
+        return self.num_finished >= self.config.optimize.trial_number

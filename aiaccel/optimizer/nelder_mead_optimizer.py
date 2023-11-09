@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import copy
-from typing import Any
+from typing import Any, Dict, List
 
 import numpy as np
 from omegaconf.dictconfig import DictConfig
@@ -51,7 +51,7 @@ class NelderMeadOptimizer(AbstractOptimizer):
         new_params = copy.deepcopy(self.base_params)
         for name, value, b in zip(self.param_names, ndarray, self.bdrys):
             for new_param in new_params:
-                if new_param["parameter_name"] == name:
+                if new_param["name"] == name:
                     new_param["value"] = value
                 if b[0] <= value <= b[1]:
                     new_param["out_of_boundary"] = False
@@ -125,47 +125,24 @@ class NelderMeadOptimizer(AbstractOptimizer):
         new_param = self.convert_ndarray_to_parameter(new_params.coordinates)
         return new_param
 
-    def inner_loop_main_process(self) -> bool:
-        """A main loop process. This process is repeated every main loop.
-
-        Returns:
-            bool: The process succeeds or not. The main loop exits if failed.
-        """
-        self.update_each_state_count()
-        if self.check_finished():
-            return False
-        if self.all_parameters_processed():
-            return False
-        if self.all_parameters_registered():
-            return True
-        pool_size = self.get_pool_size()
-        if pool_size == 0:
-            return True
-        self.logger.info(
-            f"hp_ready: {self.hp_ready}, "
-            f"hp_running: {self.hp_running}, "
-            f"hp_finished: {self.hp_finished}, "
-            f"total: {self.config.optimize.trial_number}, "
-            f"pool_size: {pool_size}"
-        )
-        if new_params := self.generate_new_parameter():
-            if self.out_of_boundary(new_params):
-                self.logger.debug(f"out of boundary: {new_params}")
-                self.register_new_parameters(self.convert_type_by_config(new_params), state="finished")
-                objective = np.inf
-                if self.goals[0] == goal_maximize:
-                    objective = -np.inf
-                self.storage.result.set_any_trial_objective(trial_id=self.trial_id.integer, objective=[objective])
+    def run_optimizer_multiple_times(self, available_pool_size: int) -> None:
+        if available_pool_size <= 0:
+            return
+        for _ in range(available_pool_size):
+            if new_params := self.generate_new_parameter():
+                if self.out_of_boundary(new_params):
+                    self.logger.debug(f"out of boundary: {new_params}")
+                    self.register_new_parameters(self.convert_type_by_config(new_params), state="finished")
+                    objective = np.inf
+                    if self.goals[0] == "maximize":
+                        objective = -np.inf
+                    self.storage.result.set_any_trial_objective(trial_id=self.trial_id.integer, objective=[objective])
+                    self.trial_id.increment()
+                    self.serialize(self.trial_id.integer)
+                    continue
+                self.register_new_parameters(self.convert_type_by_config(new_params))
                 self.trial_id.increment()
-                self._serialize(self.trial_id.integer)
-                return True
-            self.register_new_parameters(self.convert_type_by_config(new_params))
-            self.trial_id.increment()
-            self._serialize(self.trial_id.integer)
-            return True
-        self.print_dict_state()
-
-        return True
+                self.serialize(self.trial_id.integer)
 
     def out_of_boundary(self, params: list[dict[str, float | int | str]]) -> bool:
         for param in params:

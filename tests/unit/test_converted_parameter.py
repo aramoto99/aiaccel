@@ -271,7 +271,10 @@ class TestConvertedHyperparameterConfiguraion:
     @pytest.fixture(autouse=True)
     def setup(self) -> Generator[None, None, None]:
         self.list_config = [
-            float_parameter_dict, int_parameter_dict, categorical_parameter_dict, ordinal_parameter_dict
+            float_parameter_dict,
+            int_parameter_dict,
+            categorical_parameter_dict,
+            ordinal_parameter_dict,
         ]
         self.params = HyperParameterConfiguration(self.list_config)
         self.converted_params = ConvertedParameterConfiguration(self.params)
@@ -302,9 +305,8 @@ class TestConvertedHyperparameterConfiguraion:
         assert len(caplog.records) == 2
         assert "converted" in caplog.records[-1].message
 
-        assert (
-            len(params._converted_params)
-            == 1 + 1 + len(categorical_parameter_dict["choices"]) + len(ordinal_parameter_dict["sequence"])
+        assert len(params._converted_params) == 1 + 1 + len(categorical_parameter_dict["choices"]) + len(
+            ordinal_parameter_dict["sequence"]
         )
 
         for param in params._converted_params.values():
@@ -325,42 +327,42 @@ class TestConvertedHyperparameterConfiguraion:
     def test_to_original_repr(self) -> None:
         params_in_internal_repr = [
             {
-                "parameter_name": float_parameter_dict["name"],
+                "name": float_parameter_dict["name"],
                 "type": float_parameter_dict["type"],
                 "value": float_parameter_dict["lower"],
             },
             {
-                "parameter_name": int_parameter_dict["name"],
+                "name": int_parameter_dict["name"],
                 "type": int_parameter_dict["type"],
                 "value": int_parameter_dict["lower"],
             },
             {
-                "parameter_name": f"{categorical_parameter_dict['name']}_0",
+                "name": f"{categorical_parameter_dict['name']}_0",
                 "type": categorical_parameter_dict["type"],
                 "value": 0.0,
             },
             {
-                "parameter_name": f"{categorical_parameter_dict['name']}_1",
+                "name": f"{categorical_parameter_dict['name']}_1",
                 "type": categorical_parameter_dict["type"],
                 "value": 0.0,
             },
             {
-                "parameter_name": f"{categorical_parameter_dict['name']}_2",
+                "name": f"{categorical_parameter_dict['name']}_2",
                 "type": categorical_parameter_dict["type"],
                 "value": 1.0,
             },
             {
-                "parameter_name": f"{ordinal_parameter_dict['name']}_0",
+                "name": f"{ordinal_parameter_dict['name']}_0",
                 "type": ordinal_parameter_dict["type"],
                 "value": 0.0,
             },
             {
-                "parameter_name": f"{ordinal_parameter_dict['name']}_1",
+                "name": f"{ordinal_parameter_dict['name']}_1",
                 "type": ordinal_parameter_dict["type"],
                 "value": 1.0,
             },
             {
-                "parameter_name": f"{ordinal_parameter_dict['name']}_2",
+                "name": f"{ordinal_parameter_dict['name']}_2",
                 "type": ordinal_parameter_dict["type"],
                 "value": 0.0,
             },
@@ -383,22 +385,22 @@ class TestConvertedHyperparameterConfiguraion:
 
         params_in_internal_repr = [
             {
-                "parameter_name": float_parameter_dict["name"],
+                "name": float_parameter_dict["name"],
                 "type": float_parameter_dict["type"],
                 "value": float_parameter_dict["lower"],
             },
             {
-                "parameter_name": int_parameter_dict["name"],
+                "name": int_parameter_dict["name"],
                 "type": int_parameter_dict["type"],
                 "value": int_parameter_dict["lower"],
             },
             {
-                "parameter_name": f"{categorical_parameter_dict['name']}",
+                "name": f"{categorical_parameter_dict['name']}",
                 "type": categorical_parameter_dict["type"],
                 "value": categorical_parameter_dict["choices"][2],
             },
             {
-                "parameter_name": f"{ordinal_parameter_dict['name']}",
+                "name": f"{ordinal_parameter_dict['name']}",
                 "type": ordinal_parameter_dict["type"],
                 "value": ordinal_parameter_dict["sequence"][1],
             },
@@ -409,9 +411,8 @@ class TestConvertedHyperparameterConfiguraion:
 
     def test_sample(self) -> None:
         sampled_values = self.converted_params.sample(self._rng)
-        assert (
-            len(sampled_values)
-            == 1 + 1 + len(categorical_parameter_dict["choices"]) + len(ordinal_parameter_dict["sequence"])
+        assert len(sampled_values) == 1 + 1 + len(categorical_parameter_dict["choices"]) + len(
+            ordinal_parameter_dict["sequence"]
         )
 
     def test_get_hyperparameter(self) -> None:
@@ -425,17 +426,15 @@ class TestConvertedHyperparameterConfiguraion:
     def test_get_parameter_list(self) -> None:
         parameter_list = self.converted_params.get_parameter_list()
         assert isinstance(parameter_list, list)
-        assert (
-            len(parameter_list)
-            == 1 + 1 + len(categorical_parameter_dict["choices"]) + len(ordinal_parameter_dict["sequence"])
+        assert len(parameter_list) == 1 + 1 + len(categorical_parameter_dict["choices"]) + len(
+            ordinal_parameter_dict["sequence"]
         )
 
     def test_get_parameter_dict(self) -> None:
         parameter_dict = self.converted_params.get_parameter_dict()
         assert isinstance(parameter_dict, dict)
-        assert (
-            len(parameter_dict)
-            == 1 + 1 + len(categorical_parameter_dict["choices"]) + len(ordinal_parameter_dict["sequence"])
+        assert len(parameter_dict) == 1 + 1 + len(categorical_parameter_dict["choices"]) + len(
+            ordinal_parameter_dict["sequence"]
         )
 
 
@@ -521,21 +520,15 @@ def test_restore_int(monkeypatch: pytest.MonkeyPatch) -> None:
 
 def test_is_weight_collected() -> None:
     param = WeightOfChoice(Parameter(categorical_parameter_dict), 0)
-    weights = {
-        param.original_name: {f"{param.name}_{i}": i * 0.1 for i in range(len(param.choices))}
-    }
+    weights = {param.original_name: {f"{param.name}_{i}": i * 0.1 for i in range(len(param.choices))}}
     assert _is_weight_collected(param, weights) is True
-    weights = {
-        param.original_name: {f"{param.name}_{i}": i * 0.1 for i in range(len(param.choices) - 1)}
-    }
+    weights = {param.original_name: {f"{param.name}_{i}": i * 0.1 for i in range(len(param.choices) - 1)}}
     assert _is_weight_collected(param, weights) is False
 
 
 def test_make_weight_distribution() -> None:
     param = WeightOfChoice(Parameter(categorical_parameter_dict), 0)
-    weights = {
-        param.original_name: {f"{param.original_name}_{i}": i * 0.1 for i in range(len(param.choices))}
-    }
+    weights = {param.original_name: {f"{param.original_name}_{i}": i * 0.1 for i in range(len(param.choices))}}
     weight_distribution = _make_weight_distribution(param, weights)
     assert weight_distribution == [i * 0.1 for i in range(len(param.choices))]
 
@@ -551,6 +544,6 @@ def test_make_structured_value() -> None:
     param = ConvertedFloatParameter(Parameter(float_parameter_dict))
     value = param.lower
     structured_value = _make_structured_value(param, value)
-    assert structured_value.get("parameter_name") == param.name
+    assert structured_value.get("name") == param.name
     assert structured_value.get("type") == param.type
     assert structured_value.get("value") == value

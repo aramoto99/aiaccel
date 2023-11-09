@@ -65,7 +65,7 @@ def generate_grid_points(p: Parameter, config: DictConfig) -> dict[str, Any]:
     Raises:
         TypeError: Causes when an invalid parameter type is set.
     """
-    new_param = {"parameter_name": p.name, "type": p.type}
+    new_param = {"name": p.name, "type": p.type}
 
     if isinstance(p, FloatParameter) or isinstance(p, IntParameter):
         base, log, step = get_grid_options(p.name, config)
@@ -73,9 +73,9 @@ def generate_grid_points(p: Parameter, config: DictConfig) -> dict[str, Any]:
         upper = p.upper
 
         if log:
-            lower_x = base**lower
-            upper_x = base**upper
-            step_x = base**step
+            lower_x = base ** lower
+            upper_x = base ** upper
+            step_x = base ** step
             x = lower_x
             new_param["parameters"] = []
             while x < upper_x or math.isclose(x, upper_x, abs_tol=1e-10):
@@ -116,15 +116,6 @@ class GridOptimizer(AbstractOptimizer):
         self.ready_params = []
         for param in self.params.get_parameter_list():
             self.ready_params.append(generate_grid_points(param, self.config))
-        self.num_generated_params = 0
-
-    def pre_process(self) -> None:
-        """Pre-procedure before executing processes.
-
-        Returns:
-            None
-        """
-        super().pre_process()
 
         self.num_generated_params = (
             self.storage.get_num_ready() + self.storage.get_num_running() + self.storage.get_num_finished()
@@ -169,14 +160,11 @@ class GridOptimizer(AbstractOptimizer):
 
         if parameter_index is None:
             self.logger.info("Generated all of parameters.")
-            self.all_parameters_generated = True
             return None
 
         new_params: list[Any] = []
         for param, index in zip(self.ready_params, parameter_index):
-            new_params.append(
-                {"parameter_name": param["parameter_name"], "type": param["type"], "value": param["parameters"][index]}
-            )
+            new_params.append({"name": param["name"], "type": param["type"], "value": param["parameters"][index]})
         return new_params
 
     def generate_initial_parameter(self) -> list[dict[str, float | int | str]]:

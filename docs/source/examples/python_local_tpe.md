@@ -31,13 +31,13 @@ generic:
   job_command: "python user.py"
   python_file: "./user.py"
   function: "main"
-batch_job_timeout: 600
+job_timeout_seconds: 600
 ```
 - **workspace** - aiaccel の実行に必要な一時ファイルを保存するディレクトリを設定します．
 - **job_command** - ユーザープログラムを実行するためのコマンドです．`python_local` モードでは使用されませんが，実行時に読み込むため，記述します．
 - **python_file** - python で実装された最適化対象の関数のファイルパスを設定します．
 - **function** - 最適化対象の関数名を設定します．
-- **batch_job_timeout** - ジョブのタイムアウト時間を設定します．[単位: 秒]
+- **job_timeout_seconds** - ジョブのタイムアウト時間を設定します．[単位: 秒]
 
 #### resource
 ```yaml
