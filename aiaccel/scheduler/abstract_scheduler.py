@@ -40,10 +40,6 @@ class AbstractScheduler(AbstractModule):
         self.optimizer = optimizer
         self.num_workers = self.config.resource.num_workers
         self.trial_number = self.config.optimize.trial_number
-        self.num_ready = 0
-        self.num_running = 0
-        self.num_finished = 0
-        self.available_pool_size = 0
         self.stats: list[Any] = []
         self.jobs: list[Any] = []
         self.job_status: dict[Any, Any] = {}
@@ -53,18 +49,6 @@ class AbstractScheduler(AbstractModule):
             self.buff.d[trial_id].set_max_len(2)
         self.all_parameters_generated = False
         self.job_completed_count = 0
-
-    def get_num_ready(self) -> int:
-        return self.num_ready
-
-    def get_num_running(self) -> int:
-        return self.num_running
-
-    def get_num_finished(self) -> int:
-        return self.num_finished
-
-    def get_available_pool_size(self) -> int:
-        return self.available_pool_size
 
     def start_job(self, trial_id: int) -> Any:
         """Start a new job.
@@ -104,34 +88,41 @@ class AbstractScheduler(AbstractModule):
         """
         self.logger.info("scheduler finished.")
 
+    def get_available_pool_size(self, num_ready: int, num_running: int, num_finished: int) -> None:
+        sum_status = num_ready + num_running + num_finished
+        if sum_status >= self.trial_number:
+            return 0
+        elif (self.trial_number - sum_status) < self.num_workers:
+            return self.trial_number - sum_status
+        else:
+            return self.num_workers - num_running - num_ready
+
     def search_hyperparameters(self, num_ready: int, num_running: int, num_finished: int) -> None:
         """Start hyper parameter optimization.
 
         Returns:
             None
         """
+        available_pool_size = self.get_available_pool_size(num_ready, num_running, num_finished)
+        if available_pool_size == 0:
+            return
+
         sum_status = num_ready + num_running + num_finished
         if sum_status >= self.trial_number and not self.all_parameters_generated:
             self.all_parameters_generated = True
-            self.available_pool_size = 0
             self.logger.info(
                 f"trial_number: {self.trial_number}, \
-                    ready: {num_ready}, running: {num_running}, finished: {num_finished}"
+                    ready: {num_ready}, running: {num_running}, finished: {num_finished} \
+                    available pool size: {available_pool_size}"
             )
             self.logger.info("All parameters are generated.")
-        elif (self.trial_number - sum_status) < self.num_workers:
-            self.available_pool_size = self.trial_number - sum_status
-        else:
-            self.available_pool_size = self.num_workers - num_running - num_ready
-
-        if self.available_pool_size == 0:
             return
 
         if not self.all_parameters_processed(num_ready, num_running) and not self.all_parameters_registered(
             num_ready, num_running, num_finished
         ):
-            # self.logger.debug(f"optimizer run {self.available_pool_size} times")
-            self.optimizer.run_optimizer_multiple_times(self.available_pool_size)
+            for _ in range(available_pool_size):
+                self.optimizer.run_optimizer()
 
     def run_in_main_loop(self) -> bool:
         """A main loop process. This process is repeated every main loop.
@@ -140,9 +131,9 @@ class AbstractScheduler(AbstractModule):
             bool: The process succeeds or not. The main loop exits if failed.
         """
 
-        self.num_ready, self.num_running, self.num_finished = self.storage.get_num_running_ready_finished()
-        self.search_hyperparameters(self.num_ready, self.num_running, self.num_finished)
-        if self.num_finished >= self.config.optimize.trial_number:
+        num_ready, num_running, num_finished = self.storage.get_num_running_ready_finished()
+        self.search_hyperparameters(num_ready, num_running, num_finished)
+        if num_finished >= self.config.optimize.trial_number:
             return False
 
         readies = self.storage.state.get_ready()
@@ -155,7 +146,7 @@ class AbstractScheduler(AbstractModule):
         for job in self.jobs:
             job.main()
             state_name = job.get_state_name()
-            if state_name in {"success", "failed", "timeout"}:
+            if state_name in {"success", "failure", "timeout"}:
                 self.job_completed_count += 1
                 self.jobs.remove(job)
                 continue
@@ -250,11 +241,3 @@ class AbstractScheduler(AbstractModule):
             bool: True if all parameters are registerd.
         """
         return self.trial_number - num_finished - num_ready - num_running == 0
-
-    def check_finished(self) -> bool:
-        """Checks whether all trials are finished.
-
-        Returns:
-            bool: True if all trials are finished.
-        """
-        return self.num_finished >= self.config.optimize.trial_number
