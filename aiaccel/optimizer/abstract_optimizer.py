@@ -41,6 +41,7 @@ class AbstractOptimizer(AiaccelCore):
         self.trial_number = self.config.optimize.trial_number
         self.num_of_generated_parameter = 0
         self.params = HyperParameterConfiguration(self.config.optimize.parameters)
+        self.n_dim = len(self.params.get_parameter_list())
         self.write_random_seed_to_debug_log()
 
     def register_new_parameters(self, params: list[dict[str, float | int | str]], state: str = "ready") -> None:
@@ -68,7 +69,7 @@ class AbstractOptimizer(AiaccelCore):
         self.num_of_generated_parameter += 1
         self.logger.debug(f"generated parameters: {params}")
 
-    def generate_initial_parameter(self) -> Any:
+    def generate_initial_parameter(self) -> list[Any]:
         """Generate a list of initial parameters.
 
         Returns:
@@ -84,7 +85,7 @@ class AbstractOptimizer(AiaccelCore):
 
         return new_params
 
-    def generate_parameter(self) -> Any:
+    def generate_parameter(self) -> list[Any] | None:
         """Generate a list of parameters.
 
         Raises:
