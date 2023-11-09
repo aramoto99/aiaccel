@@ -14,7 +14,6 @@ JobState: Database table for jobstate
     Kind of jobstate: success, failure, timeout, etc.
 """
 
-
 class JobState(Abstract):
     def __init__(self, file_name: Path) -> None:
         super().__init__(file_name)
