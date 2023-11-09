@@ -24,13 +24,13 @@ from aiaccel.parameter import (CategoricalParameter, FloatParameter, HyperParame
 from aiaccel.util.data_type import str_or_float_or_int
 from aiaccel.workspace import Workspace
 
-
 def set_logging_file_for_trial_id(workspace: Path, trial_id: int) -> None:
     log_dir = workspace / "log"
     log_path = log_dir / f"job_{trial_id}.log"
     if not log_dir.exists():
         log_dir.mkdir(parents=True)
     logging.basicConfig(filename=log_path, level=logging.DEBUG, force=True)
+>>>>>>> fea3192 (ユーザープログラムからoptimizerを実行するモードを追加(HPC未対応))
 
 
 def set_logging_file_for_trial_id(workspace: Path, trial_id: int) -> None:
