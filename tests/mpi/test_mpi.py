@@ -12,7 +12,7 @@ from pathlib import Path
 
 
 def get_root():
-    return Path(os.environ['GITHUB_WORKSPACE'])/'mpi_work'
+    return Path(os.environ["GITHUB_WORKSPACE"]) / "mpi_work"
 
 
 def get_rank_log():
@@ -43,24 +43,23 @@ def test_rank_log_1_csv():
 class TestMpi(unittest.TestCase):
     def test_make_hostfile(self):
         config = omegaconf.OmegaConf.create({
-            "generic":{
+            "generic": {
                 "aiaccel_dir": "aiaccel",
                 "venv_dir": "venv",
-            }
+                "workdir" : "config",
+            },
             "resource": {
-                "mpi_bat_root_dir": "/path/to/root",
-                "mpi_bat_config_dir": "config",
                 "mpi_hostfile": "hostfile",
                 "mpi_bat_rt_num": 1,
                 "mpi_npernode": 2,
                 "mpi_gpu_mode": True
-            }
+            },
+            "ABCI": {"group": "test_group"}
         })
         os.environ["SGE_JOB_HOSTLIST"] = "hoge"
         with patch("pathlib.Path.read_text", return_value="g0073"):
             logger = MagicMock()
             with tempfile.TemporaryDirectory() as tmpdir:
-                # config.resource.mpi_bat_root_dir = tmpdir
                 config.generic.aiaccel_dir = Path(tmpdir) / "aiaccel"
                 config.generic.venv_dir = Path(tmpdir) / "venv"
                 Path(f"{tmpdir}/config").mkdir(parents=True, exist_ok=True)
@@ -89,26 +88,22 @@ class TestMpi(unittest.TestCase):
 
     def test_make_bat_file(self):
         config = omegaconf.OmegaConf.create({
-            "generic":{
+            "generic": {
                 "aiaccel_dir": "aiaccel",
                 "venv_dir": "venv",
-            }
+            },
             "resource": {
-                "mpi_bat_root_dir": "/path/to/root",
-                # "mpi_bat_venv_dir": "venv",
-                # "mpi_bat_aiaccel_dir": "aiaccel",
-                # "mpi_bat_config_dir": "config",
                 "mpi_bat_file": "mpi.bat",
                 "mpi_hostfile": "hostfile",
                 "mpi_bat_rt_type": "F",
                 "mpi_bat_rt_num": 4,
                 "mpi_bat_h_rt": "01:00:00",
                 "num_workers": 8
-            }
+            },
+            "ABCI": {"group": "test_group"}
         })
         logger = MagicMock()
         with tempfile.TemporaryDirectory() as tmpdir:
-            # config.resource.mpi_bat_root_dir = tmpdir
             config.generic.aiaccel_dir = Path(tmpdir) / "aiaccel"
             config.generic.venv_dir = Path(tmpdir) / "venv"
             os.makedirs(os.path.join(tmpdir, "config")) # create the directory

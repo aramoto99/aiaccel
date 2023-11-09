@@ -1,6 +1,7 @@
 # from time import sleep
 import numpy as np
 import aiaccel
+import numpy as np
 
 from aiaccel.experimental.mpi.util import aiaccel
 
