@@ -58,16 +58,11 @@ exit
 `mpi` を使用する場合は、コンフィグファイルの `resource.type` を `mpi` に設定します。
 また、`resource` には、以下のパラメータを設定します。
 - `mpi_npernode` - ノード数を指定します。
-- `mpi_enviroment` - mpi環境のvenvのパスを指定します。
 - `mpi_bat_rt_type` - qsubのリクエストのタイプを指定します。
 - `mpi_bat_rt_num` - qsubのリクエストの数を指定します。
 - `mpi_bat_h_rt` - qsubのリクエストの時間を指定します。
-- `mpi_bat_root_dir` - mpi環境のrootフォルダのパスを指定します。
-- `mpi_bat_venv_dir` - mpi環境のvenvのパスを指定します。ただし、mpi_bat_root_dirからの相対指定です。
-- `mpi_bat_aiaccel_dir` - aiaccelのパスを指定します。ただし、mpi_bat_root_dirからの相対指定です。
-- `mpi_bat_config_dir` - config.yamlのパスを指定します。ただし、mpi_bat_root_dirからの相対指定です。
-- `mpi_bat_file` - qsubのバッチファイルのパスを指定します。ただし、mpi_bat_config_dirからの相対指定です。
-- `mpi_hostfile` - mpiのhostfileのパスを指定します。ただし、mpi_bat_config_dirからの相対指定です。
+- `mpi_bat_file` - qsubのバッチファイルのパスを指定します。
+- `mpi_hostfile` - mpiのhostfileのパスを指定します。
 - `mpi_gpu_mode` - gpuを使用する場合はTrue、cpuのみの場合はFalseを指定します。
 - `mpi_bat_make_file` - qsubのバッチファイルを作成する場合はTrue、作成しない場合はFalseを指定します。
 
@@ -80,14 +75,9 @@ resource:
     type: local
     num_workers: 1
     mpi_npernode: 4
-    mpi_enviroment: "ABCI"
     mpi_bat_rt_type: "F"
     mpi_bat_rt_num: 1
     mpi_bat_h_rt: "72:00:00"
-    mpi_bat_root_dir: "~/mpi_work"
-    mpi_bat_venv_dir: "./mpienv"
-    mpi_bat_aiaccel_dir: "./aiaccel"
-    mpi_bat_config_dir: "./sphere_cpu_1node_1try"
     mpi_bat_file: "./qsub.sh"
     mpi_hostfile: "./hostfile"
     mpi_gpu_mode: True

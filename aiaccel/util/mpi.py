@@ -24,6 +24,7 @@ from aiaccel.common import (
 from aiaccel.util import create_job_script_preamble
 from aiaccel.util.error import MpiError
 from aiaccel.util.mpi_log import MpiLog
+from aiaccel.util import create_job_script_preamble
 
 if TYPE_CHECKING:
     from aiaccel.scheduler import AbstractScheduler
