@@ -67,19 +67,19 @@ class TpeOptimizer(AbstractOptimizer):
     def __init__(self, config: DictConfig) -> None:
         super().__init__(config)
         self.parameter_pool: dict[str, Any] = {}
-        self.parameter_list: list[Any] = []
         self.study_name = "distributed-tpe"
         self.study: Any = None
         self.distributions: Any = None
         self.trial_pool: dict[str, Any] = {}
         self.randseed = self.config.optimize.rand_seed
 
-        self.parameter_list = self.params.get_parameter_list()
-        if self.distributions is None:
-            self.distributions = create_distributions(self.params)
-        self.create_study()
+        # if self.distributions is None:
+        # self.distributions = create_distributions(self.params)
         # if self.config.resume is not None and self.config.resume > 0:
         #     self.resume_trial()
+        # self.create_study()
+        self.distributions = create_distributions(self.params)
+        self.create_study()
 
     # def pre_process(self) -> None:
     #     """Pre-Procedure before executing optimize processes."""
@@ -234,26 +234,14 @@ class TpeOptimizer(AbstractOptimizer):
 
     def resume(self) -> None:
         super().resume()
-
-        optuna_trials = self.study.get_trials()
-        storage_path = f"sqlite:///{self.workspace.path}/optuna-{self.study_name}.db"
-        engine = sqlalchemy.create_engine(storage_path, echo=False)
-        session = sqlalchemy_orm.sessionmaker(bind=engine)()
-        for optuna_trial in optuna_trials:
-            if optuna_trial.number >= self.config.resume:
-                resumed_trial = session.query(models.TrialModel).filter_by(number=optuna_trial.number).first()
-                session.delete(resumed_trial)
-        session.commit()
-        for trial_id in list(self.parameter_pool.keys()):
-            objective = self.get_any_trial_objective(int(trial_id))
-            if objective is not None:
-                del self.parameter_pool[trial_id]
-                self.logger.info(f"resume_trial trial_id {trial_id} is deleted from parameter_pool")
+        if self.distributions is None:
+            self.distributions = create_distributions(self.params)
+        if self.config.resume is not None and self.config.resume > 0:
+            self.resume_trial()
+        self.create_study()
 
 
-def create_distributions(
-    parameters: HyperParameterConfiguration,
-) -> dict[str, Any]:
+def create_distributions(parameters: HyperParameterConfiguration) -> dict[str, Any]:
     """Create an optuna.distributions dictionary for the parameters.
 
     Args:
