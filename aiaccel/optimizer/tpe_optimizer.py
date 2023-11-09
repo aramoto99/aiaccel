@@ -12,8 +12,13 @@ from optuna.samplers._random import RandomSampler
 from optuna.storages._rdb import models
 
 from aiaccel.optimizer import AbstractOptimizer
-from aiaccel.parameter import (CategoricalParameter, FloatParameter, HyperParameterConfiguration, IntParameter,
-                               OrdinalParameter)
+from aiaccel.parameter import (
+    CategoricalParameter,
+    FloatParameter,
+    HyperParameterConfiguration,
+    IntParameter,
+    OrdinalParameter,
+)
 
 
 class LazyRandomStateWrapper(LazyRandomState):

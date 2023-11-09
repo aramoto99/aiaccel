@@ -167,7 +167,6 @@ class AbstractModule(object):
 
 
 class AbstractModule(AiaccelCore):
-
     def pre_process(self) -> None:
         """Perform setup or initialization tasks before the main loop starts.
 

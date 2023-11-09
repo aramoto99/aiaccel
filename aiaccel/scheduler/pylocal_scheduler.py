@@ -9,12 +9,12 @@ from typing import Any
 
 from omegaconf.dictconfig import DictConfig
 
-from aiaccel.run import set_logging_file_for_trial_id
+from aiaccel.cli.set_result import write_results_to_database
 from aiaccel.common import datetime_format
 from aiaccel.config import load_config
 from aiaccel.optimizer import AbstractOptimizer
+from aiaccel.run import set_logging_file_for_trial_id
 from aiaccel.scheduler.abstract_scheduler import AbstractScheduler
-from aiaccel.cli.set_result import write_results_to_database
 
 # These are for avoiding mypy-errors from initializer().
 # `global` does not work well.
@@ -64,7 +64,7 @@ class PylocalScheduler(AbstractScheduler):
                 start_time=start_time,
                 end_time=end_time,
                 error=err,
-                returncode=None
+                returncode=None,
             )
             self.storage.state.set_any_trial_state(trial_id=trial_id, state="finished")
         return True

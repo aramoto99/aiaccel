@@ -4,9 +4,9 @@ import re
 from subprocess import PIPE, Popen
 from typing import TYPE_CHECKING, Any
 
+from aiaccel.cli.set_result import write_results_to_database
 from aiaccel.scheduler.job.model.abstract_model import AbstractModel
 from aiaccel.util import OutputHandler
-from aiaccel.cli.set_result import write_results_to_database
 
 if TYPE_CHECKING:
     from aiaccel.scheduler import Job

@@ -1,8 +1,8 @@
 from __future__ import annotations
 
+import logging
 import os
 import shutil
-import logging
 import sys
 import threading
 import traceback
@@ -15,15 +15,14 @@ from typing import Any
 
 import yaml
 
+from aiaccel.cli import CsvWriter
+from aiaccel.cli.set_result import write_results_to_database
 from aiaccel.common import datetime_format
 from aiaccel.config import load_config
 from aiaccel.optimizer import create_optimizer
 from aiaccel.storage import Storage
-from aiaccel.workspace import Workspace
-from aiaccel.cli.set_result import write_results_to_database
-from aiaccel.cli import CsvWriter
 from aiaccel.util import cast_y, create_yaml
-
+from aiaccel.workspace import Workspace
 
 # parser = ArgumentParser()
 # parser.add_argument("--clean", nargs="?", const=True, default=False)
@@ -32,7 +31,7 @@ from aiaccel.util import cast_y, create_yaml
 # clean: bool = args.clean
 
 
-class Study():
+class Study:
     """An Interface between user program or python function object.
 
     Example:
@@ -49,6 +48,7 @@ class Study():
             study.evaluate()
             study.show_result()
     """
+
     def __init__(self, config_path: str | Path) -> None:
         self.config = None
         self.workspace = None
@@ -93,8 +93,9 @@ class Study():
     def get_resume_trial_id(self) -> int | None:
         resume_trial_id: int | None = self.storage.state.get_first_trial_id_for_resume()
         num_ready, num_running, num_finished = self.storage.get_num_running_ready_finished()
-        if num_finished == 0 or resume_trial_id is None: return
-        if (resume_trial_id == self.trial_number or num_finished == self.trial_number):
+        if num_finished == 0 or resume_trial_id is None:
+            return
+        if resume_trial_id == self.trial_number or num_finished == self.trial_number:
             raise ValueError(
                 f"Trial number {resune_trial_id} is already finished. \
                 Please remove work irectory: {self.self.workspace.path}."
@@ -162,7 +163,8 @@ class Study():
                 A dictionary of parameters, a casted objective value, and error
                 string.
         """
-        y = None; err = ""
+        y = None
+        err = ""
         try:
             y = cast_y(func(xs), y_data_type)
         except BaseException:
@@ -190,14 +192,11 @@ class Study():
             start_time=start_time,
             end_time=end_time,
             error=err,
-            returncode=None
+            returncode=None,
         )
 
     def execute_and_report(
-        self,
-        trial_id: int,
-        func: Callable[[dict[str, float | int | str]], float],
-        y_data_type: str | None = None
+        self, trial_id: int, func: Callable[[dict[str, float | int | str]], float], y_data_type: str | None = None
     ) -> None:
         start_time = datetime.now().strftime(datetime_format)
         xs = self.storage.hp.get_any_trial_params_dict(trial_id)
@@ -213,8 +212,7 @@ class Study():
         self.report(trial_id, ys, err, start_time, end_time)
 
     def get_total_seconds(self) -> float | None:
-        """Get the total seconds of optimization.
-        """
+        """Get the total seconds of optimization."""
         time_format = "%m/%d/%Y %H:%M:%S"
         start_time = self.storage.timestamp.get_any_trial_start_time(trial_id=0)
         if start_time is not None:
@@ -228,8 +226,7 @@ class Study():
         return total_seconds
 
     def evaluate(self) -> None:
-        """Evaluate the result of optimization.
-        """
+        """Evaluate the result of optimization."""
         goals = [item.value for item in self.config.optimize.goal]
         best_trial_ids, _ = self.storage.get_best_trial(goals)
         if best_trial_ids is None:
