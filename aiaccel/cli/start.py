@@ -12,7 +12,6 @@ from typing import Any
 import yaml
 from omegaconf.dictconfig import DictConfig
 
-import aiaccel
 from aiaccel.cli import CsvWriter
 from aiaccel.common import datetime_format, resource_type_mpi
 from aiaccel.config import load_config
@@ -28,7 +27,7 @@ logger = getLogger(__name__)
 logger.setLevel(os.getenv("LOG_LEVEL", "INFO"))
 logger.addHandler(StreamHandler())
 
-mpi_enable = aiaccel.util.mpi.mpi_enable
+
 if mpi_enable:
     from aiaccel.util.mpi import Mpi
 
@@ -97,7 +96,7 @@ def main() -> None:  # pragma: no cover
 
     scheduler.pre_process()
 
-    if config.resource.type.value.lower() == resource_type_mpi and mpi_enable:  # MPI
+    if config.resource.type.value.lower() == resource_type_mpi:  # MPI
         Mpi.prepare(workspace.path)
 
     while True:
