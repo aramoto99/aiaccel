@@ -139,6 +139,8 @@ def main() -> None:  # pragma: no cover
     scheduler.post_process()
     scheduler.evaluate()
 
+    scheduler.evaluate()
+
     csv_writer = CsvWriter(config)
     csv_writer.create()
 

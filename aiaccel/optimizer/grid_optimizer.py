@@ -73,9 +73,9 @@ def generate_grid_points(p: Parameter, config: DictConfig) -> dict[str, Any]:
         upper = p.upper
 
         if log:
-            lower_x = base**lower
-            upper_x = base**upper
-            step_x = base**step
+            lower_x = base ** lower
+            upper_x = base ** upper
+            step_x = base ** step
             x = lower_x
             new_param["parameters"] = []
             while x < upper_x or math.isclose(x, upper_x, abs_tol=1e-10):

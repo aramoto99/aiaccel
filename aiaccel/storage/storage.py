@@ -13,6 +13,7 @@ from aiaccel.storage.state import State
 from aiaccel.storage.timestamp import TimeStamp
 from aiaccel.storage.variable import Serializer
 
+from aiaccel.common import goal_maximize, goal_minimize
 
 class Storage:
     """Database"""
