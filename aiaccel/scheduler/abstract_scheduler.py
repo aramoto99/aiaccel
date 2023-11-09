@@ -86,6 +86,7 @@ class AbstractScheduler(AbstractModule):
         Returns:
             None
         """
+        self.optimizer.finalize_operation()
         self.logger.info("scheduler finished.")
 
     def get_available_pool_size(self, num_ready: int, num_running: int, num_finished: int) -> None:

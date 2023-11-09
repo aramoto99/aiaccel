@@ -43,11 +43,6 @@ msgstr ""
 msgid "aiaccel.converted\\_parameter module"
 msgstr ""
 
-#: ../../source/api_reference/aiaccel.rst:48
-msgid "aiaccel.module module"
-msgstr ""
-
-#: ../../source/api_reference/aiaccel.rst:56
 #: aiaccel.config.BaseConfig:1 of
 msgid "An interface for all config classes."
 msgstr ""
