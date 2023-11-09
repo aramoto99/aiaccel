@@ -1,8 +1,8 @@
 from __future__ import annotations
 
 import re
-from pathlib import Path
 
+from pathlib import Path
 from aiaccel.config import Config
 
 
@@ -39,6 +39,10 @@ class JobScriptPreambleCreator:
             return job_script_preamble
 
     def replace_variables(self, input_text: str, variables: dict[str, str]) -> str:
-        pattern = r"\{([^}]+)\}"
-        output_text = re.sub(pattern, lambda match: variables.get(match.group(1), match.group(0)), input_text)
+        pattern = r'\{([^}]+)\}'
+        output_text = re.sub(
+            pattern,
+            lambda match: variables.get(match.group(1), match.group(0)),
+            input_text
+        )
         return output_text
