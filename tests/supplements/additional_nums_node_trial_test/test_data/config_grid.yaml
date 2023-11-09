@@ -3,41 +3,19 @@ ABCI:
   job_execution_options: ''
   job_script_preamble: ./job_script_preamble.sh
 generic:
-  job_timeout_seconds: 600
+  aiaccel_dir: ''
+  enabled_variable_name_argumentation: true
   function: main
   job_command: python original_main.py
+  logging_level: debug
+  main_loop_sleep_seconds: 0.01
   python_file: original_main.py
-  sleep_time: 0
+  venv_dir: ''
   workspace: /tmp/work
 job_setting:
-  cancel_retry: 3
-  cancel_timeout: 60
-  expire_retry: 3
-  expire_timeout: 60
-  finished_retry: 3
-  finished_timeout: 60
-  init_fail_count: 100
-  job_loop_duration: 0.5
-  job_retry: 2
-  job_timeout: 60
-  kill_retry: 3
-  kill_timeout: 60
-  trial_id_digits: 6
-  result_retry: 1
-  runner_retry: 3
-  runner_timeout: 60
-  running_retry: 3
-  running_timeout: 60
-logger:
-  file:
-    optimizer: optimizer.log
-    scheduler: scheduler.log
-  log_level:
-    optimizer: DEBUG
-    scheduler: DEBUG
-  stream_level:
-    optimizer: CRITICAL
-    scheduler: CRITICAL
+  job_timeout_seconds: 600
+  max_failure_retries: 0
+  rial_id_digits: 6
 optimize:
   goal: minimize
   parameters:
