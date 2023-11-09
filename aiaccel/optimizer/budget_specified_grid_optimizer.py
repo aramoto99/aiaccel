@@ -92,8 +92,9 @@ class BudgetSpecifiedGridOptimizer(AbstractOptimizer):
             self.trial_id.increment()
             self.serialize(self.trial_id.integer)
         else:
+            self.all_parameters_generated = True
             self.logger.info("Generated all of parameters.")
-            self.register_new_parameters(self.convert_type_by_config(self.nan_parameter()), state="finished")
-            self.storage.result.set_any_trial_objective(trial_id=self.trial_id.integer, objective=[np_nan])
-            self.trial_id.increment()
-            self.serialize(self.trial_id.integer)
+            # self.register_new_parameters(self.convert_type_by_config(self.nan_parameter()), state="finished")
+            # self.storage.result.set_any_trial_objective(trial_id=self.trial_id.integer, objective=[np_nan])
+            # self.trial_id.increment()
+            # self.serialize(self.trial_id.integer)

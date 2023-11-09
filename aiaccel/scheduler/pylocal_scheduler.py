@@ -41,6 +41,8 @@ class PylocalScheduler(AbstractScheduler):
 
         num_ready, num_running, num_finished = self.storage.get_num_running_ready_finished()
         self.search_hyperparameters(num_ready, num_running, num_finished)
+        if num_finished >= self.trial_number:
+            return False
 
         if num_finished >= self.config.optimize.trial_number:
             return False

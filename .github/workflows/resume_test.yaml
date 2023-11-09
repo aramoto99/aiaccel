@@ -28,10 +28,10 @@ jobs:
 
       - name: Resume Test
         run: |
-          pytest -s -v tests/resumption/sphere/test_sphere_random_resumption.py
-          pytest -s -v tests/resumption/sphere/test_sphere_grid_resumption.py
-          pytest -s -v tests/resumption/sphere/test_sphere_budget_specified_grid_resumption.py
-          pytest -s -v tests/resumption/sphere/test_sphere_sobol_resumption.py
-          pytest -s -v tests/resumption/sphere/test_sphere_tpe_resumption.py
-          pytest -s -v tests/resumption/sphere/test_sphere_nelder_mead_resumption.py
-          pytest -s -v tests/resumption/sphere/test_sphere_motpe_resumption.py
+          pytest -s -vv tests/resumption/sphere/test_sphere_random_resumption.py
+          pytest -s -vv tests/resumption/sphere/test_sphere_grid_resumption.py
+          pytest -s -vv tests/resumption/sphere/test_sphere_budget_specified_grid_resumption.py
+          pytest -s -vv tests/resumption/sphere/test_sphere_sobol_resumption.py
+          pytest -s -vv tests/resumption/sphere/test_sphere_tpe_resumption.py
+          pytest -s -vv tests/resumption/sphere/test_sphere_nelder_mead_resumption.py
+          pytest -s -vv tests/resumption/sphere/test_sphere_motpe_resumption.py

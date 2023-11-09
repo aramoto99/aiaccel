@@ -39,11 +39,20 @@ class AbstractOptimizer(AiaccelCore):
             module_type="Optimizer",
         )
 
+        self.all_parameters_generated = False
         self.trial_number = self.config.optimize.trial_number
         self.num_of_generated_parameter = 0
         self.params = HyperParameterConfiguration(self.config.optimize.parameters)
         self.n_dim = len(self.params.get_parameter_list())
         self.write_random_seed_to_debug_log()
+
+    def is_all_parameters_generated(self) -> bool:
+        """Check if all parameters are generated.
+
+        Returns:
+            bool: True if all parameters are generated.
+        """
+        return (self.num_of_generated_parameter >= self.trial_number) or self.all_parameters_generated
 
     def register_new_parameters(self, params: list[dict[str, float | int | str]], state: str = "ready") -> None:
         """Create hyper parameter files.

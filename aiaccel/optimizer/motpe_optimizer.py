@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Any
+
 import optuna
 from omegaconf.dictconfig import DictConfig
 
@@ -19,13 +21,15 @@ class MOTpeOptimizer(TpeOptimizer):
     """
 
     def __init__(self, config: DictConfig) -> None:
-        """Initial method of MOTpeOptimizer.
-
-        Args:
-            options (dict): A file name of a configuration.
-        """
         super().__init__(config)
+        self.parameter_pool: dict[str, Any] = {}
         self.study_name = "multi-objective-tpe"
+        self.study: Any = None
+        self.distributions: Any = None
+        self.trial_pool: dict[str, Any] = {}
+        self.randseed = self.config.optimize.rand_seed
+        self.distributions = create_distributions(self.params)
+        self.create_study()
 
     def create_study(self) -> None:
         """Create the optuna.study object.

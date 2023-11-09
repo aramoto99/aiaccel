@@ -97,7 +97,7 @@ class Result(Abstract):
         """Get all results in list.
 
         Returns:
-           list: result values
+            list: result values
         """
         data = self.get_all_result()
 
