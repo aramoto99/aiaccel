@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 import sys
+import traceback
 from argparse import ArgumentParser
 from collections.abc import Callable
 from datetime import datetime
@@ -9,72 +10,18 @@ from pathlib import Path
 from typing import Any
 
 from aiaccel.common import datetime_format
-from aiaccel.experimental.mpi.config import load_config
-<<<<<<< HEAD
-<<<<<<< HEAD
-from aiaccel.parameter import (
-    CategoricalParameter,
-    FloatParameter,
-    HyperParameterConfiguration,
-    IntParameter,
-    OrdinalParameter,
-)
-=======
+from aiaccel.config import load_config
 from aiaccel.parameter import (CategoricalParameter, FloatParameter, HyperParameterConfiguration, IntParameter,
                                OrdinalParameter)
->>>>>>> d4c097c (Merge changes from the original fork)
-=======
-from aiaccel.parameter import (CategoricalParameter, FloatParameter, HyperParameterConfiguration, IntParameter,
-                               OrdinalParameter)
->>>>>>> 6638a24 (Merge changes from the original fork)
 from aiaccel.util.data_type import str_or_float_or_int
 
 
-class CommandLineArgs:
-    def __init__(self) -> None:
-        self.parser = ArgumentParser()
-        self.parser.add_argument("--trial_id", type=int, required=False)
-        self.parser.add_argument("--config", type=str, required=False)
-        self.args = self.parser.parse_known_args()[0]
-        self.trial_id = None
-        self.config_path = None
-        self.config = None
-
-        if self.args.trial_id is not None:
-            self.trial_id = self.args.trial_id
-        if self.args.config is not None:
-            self.config_path = Path(self.args.config).resolve()
-            self.config = load_config(self.config_path)
-            self.parameters_config = HyperParameterConfiguration(self.config.optimize.parameters)
-
-            for p in self.parameters_config.get_parameter_list():
-                if isinstance(p, FloatParameter):
-                    self.parser.add_argument(f"--{p.name}", type=float)
-                elif isinstance(p, IntParameter):
-                    self.parser.add_argument(f"--{p.name}", type=int)
-                elif isinstance(p, CategoricalParameter):
-                    self.parser.add_argument(f"--{p.name}", type=str_or_float_or_int)
-                elif isinstance(p, OrdinalParameter):
-                    self.parser.add_argument(f"--{p.name}", type=str_or_float_or_int)
-                else:
-                    raise ValueError(f"Unknown parameter type: {p.type}")
-            self.args = self.parser.parse_known_args()[0]
-        else:
-            unknown_args_list = self.parser.parse_known_args()[1]
-            for unknown_arg in unknown_args_list:
-                if unknown_arg.startswith("--"):
-                    name = unknown_arg.replace("--", "")
-                    self.parser.add_argument(f"--{name}", type=str_or_float_or_int)
-            self.args = self.parser.parse_known_args()[0]
-
-    def get_xs_from_args(self) -> dict[str, Any]:
-        xs = vars(self.args)
-        delete_keys = ["trial_id", "config"]
-        for key in delete_keys:
-            if key in xs.keys():
-                del xs[key]
-
-        return xs
+def set_logging_file_for_trial_id(workspace: Path, trial_id: int) -> None:
+    log_dir = workspace / "log"
+    log_path = log_dir / f"job_{trial_id}.log"
+    if not log_dir.exists():
+        log_dir.mkdir(parents=True)
+    logging.basicConfig(filename=log_path, level=logging.DEBUG, force=True)
 
 
 def cast_y(y_value: Any, y_data_type: str | None) -> float | int | str:
@@ -103,6 +50,50 @@ def cast_y(y_value: Any, y_data_type: str | None) -> float | int | str:
         TypeError(f"{y_data_type} cannot be specified")
 
     return y
+
+
+class CommandLineArgs:
+    def __init__(self) -> None:
+        self.parser = ArgumentParser()
+        self.parser.add_argument("--trial_id", type=int, required=False)
+        self.parser.add_argument("--config", type=str, required=False)
+        self.args = self.parser.parse_known_args()[0]
+        self.trial_id = None
+        self.config_path = None
+        self.config = None
+        if self.args.trial_id is not None:
+            self.trial_id = self.args.trial_id
+        if self.args.config is not None:
+            self.config_path = Path(self.args.config).resolve()
+            self.config = load_config(self.config_path)
+            self.parameters_config = HyperParameterConfiguration(self.config.optimize.parameters)
+            for p in self.parameters_config.get_parameter_list():
+                if isinstance(p, FloatParameter):
+                    self.parser.add_argument(f"--{p.name}", type=float)
+                elif isinstance(p, IntParameter):
+                    self.parser.add_argument(f"--{p.name}", type=int)
+                elif isinstance(p, CategoricalParameter):
+                    self.parser.add_argument(f"--{p.name}", type=str_or_float_or_int)
+                elif isinstance(p, OrdinalParameter):
+                    self.parser.add_argument(f"--{p.name}", type=str_or_float_or_int)
+                else:
+                    raise ValueError(f"Unknown parameter type: {p.type}")
+            self.args = self.parser.parse_known_args()[0]
+        else:
+            unknown_args_list = self.parser.parse_known_args()[1]
+            for unknown_arg in unknown_args_list:
+                if unknown_arg.startswith("--"):
+                    name = unknown_arg.replace("--", "")
+                    self.parser.add_argument(f"--{name}", type=str_or_float_or_int)
+            self.args = self.parser.parse_known_args()[0]
+
+    def get_xs_from_args(self) -> dict[str, Any]:
+        xs = vars(self.args)
+        delete_keys = ["trial_id", "config"]
+        for key in delete_keys:
+            if key in xs.keys():
+                del xs[key]
+        return xs
 
 
 class Run:
@@ -184,19 +175,14 @@ class Run:
         y = None
         err = ""
 
-        start_time = datetime.now().strftime(datetime_format)
-
         try:
             y = cast_y(func(xs), y_data_type)
-        except BaseException as e:
-            err = str(e)
+        except BaseException:
+            err = str(traceback.format_exc())
             y = None
         else:
             err = ""
-
-        end_time = datetime.now().strftime(datetime_format)
-
-        return xs, y, err, start_time, end_time
+        return xs, y, err
 
     def execute_and_report(
         self, func: Callable[[dict[str, float | int | str]], float], y_data_type: str | None = None
@@ -226,7 +212,7 @@ class Run:
 
         xs = self.args.get_xs_from_args()
         y: Any = None
-        _, y, err, _, _ = self.execute(func, xs, y_data_type)
+        _, y, err = self.execute(func, xs, y_data_type)
 
         self.report(y, err)
 
@@ -238,15 +224,8 @@ class Run:
             err (str): Error string.
         """
 
-        sys.stdout.write(f"{y}\n")
+        if y is not None:
+            sys.stdout.write(f"\n{y}\n")
         if err != "":
             sys.stderr.write(f"{err}\n")
             exit(1)
-
-
-def set_logging_file_for_trial_id(workspace: Path, trial_id: int) -> None:
-    log_dir = workspace / "log"
-    log_path = log_dir / f"job_{trial_id}.log"
-    if not log_dir.exists():
-        log_dir.mkdir(parents=True)
-    logging.basicConfig(filename=log_path, level=logging.DEBUG, force=True)
