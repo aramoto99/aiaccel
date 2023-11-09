@@ -13,7 +13,7 @@ from aiaccel.converted_parameter import ConvertedParameterConfiguration
 from aiaccel.optimizer import AbstractOptimizer
 from aiaccel.optimizer._nelder_mead import NelderMead, Vertex
 from aiaccel.optimizer.value import Value
-from aiaccel.common import goal_maximize
+from aiaccel.parameter import OrdinalParameter
 
 
 class NelderMeadOptimizer(AbstractOptimizer):
@@ -69,10 +69,8 @@ class NelderMeadOptimizer(AbstractOptimizer):
             if isinstance(params[dim], OrdinalParameter):
                 return self._rng.randint(len(params[dim].sequence))
             return params[dim].sample(rng=self._rng)["value"]
-
         if not isinstance(initial_parameters[dim]["value"], (list, ListConfig)):
             initial_parameters[dim]["value"] = [initial_parameters[dim]["value"]]
-
         if num_of_initials < len(initial_parameters[dim]["value"]):
             val = initial_parameters[dim]["value"][num_of_initials]
             return val
