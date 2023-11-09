@@ -92,11 +92,10 @@
 
     while True:
         for module in modules:
-            if not module.inner_loop_main_process():
+            if not module.run_in_main_loop():
                 break
-            if not module.check_error():
+            if not module.is_error_free():
                 break
-            module.loop_count += 1
         else:
             time.sleep(sleep_time)
             continue
