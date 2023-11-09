@@ -10,9 +10,12 @@ def create_job_script_preamble(job_script_preamble_path: Path | str | None, job_
     if job_script_preamble_path is None or job_script_preamble_path == "":
         return job_script_preamble_str
     else:
-        with open(job_script_preamble_path, "r") as f:
-            job_script_preamble = f.read()
-        return job_script_preamble
+        if Path(job_script_preamble_path).exists():
+            with open(job_script_preamble_path, "r") as f:
+                job_script_preamble = f.read()
+            return job_script_preamble
+        else:
+            raise FileNotFoundError(f"File not found: {job_script_preamble_path}")
 
 
 # WIP
