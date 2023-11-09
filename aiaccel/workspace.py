@@ -10,6 +10,7 @@ from aiaccel.common import (
     dict_hp,
     dict_lock,
     dict_log,
+    dict_mpi,
     dict_output,
     dict_runner,
     dict_storage,

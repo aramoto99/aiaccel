@@ -12,6 +12,7 @@ from typing import Any
 import yaml
 from omegaconf.dictconfig import DictConfig
 
+import aiaccel
 from aiaccel.cli import CsvWriter
 from aiaccel.common import datetime_format, dict_result, extension_hp, resource_type_mpi
 from aiaccel.config import Config, load_config
@@ -26,6 +27,10 @@ from aiaccel.workspace import Workspace
 logger = getLogger(__name__)
 logger.setLevel(os.getenv("LOG_LEVEL", "INFO"))
 logger.addHandler(StreamHandler())
+
+mpi_enable = aiaccel.util.mpi.mpi_enable
+if mpi_enable:
+    from aiaccel.util.mpi import Mpi
 
 
 if mpi_enable:
@@ -44,6 +49,20 @@ def main() -> None:  # pragma: no cover
     args = parser.parse_args()
 
     config: DictConfig = load_config(args.config)
+    if config.resource.type.value.lower() == resource_type_mpi:  # MPI
+        if not mpi_enable:
+            raise Exception("MPI is not enabled.")
+        if args.make_hostfile:
+            Mpi.make_hostfile(config, logger)
+            return
+        if not args.from_mpi_bat:
+            Mpi.run_bat(config, logger)
+            return
+        logger.info("MPI is enabled.")
+        if Mpi.gpu_max == 0:
+            Mpi.gpu_max = config.resource.mpi_npernode
+        Mpi.run_main()
+
     if config.resource.type.value.lower() == resource_type_mpi:  # MPI
         if not mpi_enable:
             raise Exception("MPI is not enabled.")
@@ -93,6 +112,9 @@ def main() -> None:  # pragma: no cover
     scheduler.pre_process()
 
     if config.resource.type.value.lower() == resource_type_mpi:  # MPI
+        Mpi.prepare(workspace.path)
+
+    if config.resource.type.value.lower() == resource_type_mpi and mpi_enable:  # MPI
         Mpi.prepare(workspace.path)
 
     while True:
