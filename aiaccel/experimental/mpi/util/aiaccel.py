@@ -10,6 +10,7 @@ from typing import Any
 
 from aiaccel.common import datetime_format
 from aiaccel.experimental.mpi.config import load_config
+<<<<<<< HEAD
 from aiaccel.parameter import (
     CategoricalParameter,
     FloatParameter,
@@ -17,6 +18,10 @@ from aiaccel.parameter import (
     IntParameter,
     OrdinalParameter,
 )
+=======
+from aiaccel.parameter import (CategoricalParameter, FloatParameter, HyperParameterConfiguration, IntParameter,
+                               OrdinalParameter)
+>>>>>>> d4c097c (Merge changes from the original fork)
 from aiaccel.util.data_type import str_or_float_or_int
 
 
