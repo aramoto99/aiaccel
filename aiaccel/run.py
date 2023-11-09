@@ -30,7 +30,6 @@ def set_logging_file_for_trial_id(workspace: Path, trial_id: int) -> None:
     if not log_dir.exists():
         log_dir.mkdir(parents=True)
     logging.basicConfig(filename=log_path, level=logging.DEBUG, force=True)
->>>>>>> fea3192 (ユーザープログラムからoptimizerを実行するモードを追加(HPC未対応))
 
 
 def set_logging_file_for_trial_id(workspace: Path, trial_id: int) -> None:
