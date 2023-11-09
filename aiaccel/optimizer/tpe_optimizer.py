@@ -72,29 +72,8 @@ class TpeOptimizer(AbstractOptimizer):
         self.distributions: Any = None
         self.trial_pool: dict[str, Any] = {}
         self.randseed = self.config.optimize.rand_seed
-
-        # if self.distributions is None:
-        # self.distributions = create_distributions(self.params)
-        # if self.config.resume is not None and self.config.resume > 0:
-        #     self.resume_trial()
-        # self.create_study()
         self.distributions = create_distributions(self.params)
         self.create_study()
-
-    # def pre_process(self) -> None:
-    #     """Pre-Procedure before executing optimize processes."""
-
-    #     super().pre_process()
-
-    #     self.parameter_list = self.params.get_parameter_list()
-
-    #     if self.distributions is None:
-    #         self.distributions = create_distributions(self.params)
-
-    #     if self.config.resume is not None and self.config.resume > 0:
-    #         self.resume_trial()
-
-    #     self.create_study()
 
     def check_result(self) -> None:
         """Check the result files and add it to sampler object.

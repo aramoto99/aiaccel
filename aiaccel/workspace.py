@@ -108,6 +108,7 @@ class Workspace:
             self.log,
             self.mpi,
             self.output,
+            self.rank_log,
             self.runner,
             self.storage,
             self.tensorboard,

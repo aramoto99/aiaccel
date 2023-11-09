@@ -2,13 +2,14 @@ from __future__ import annotations
 
 import logging
 import sys
-import traceback
 from argparse import ArgumentParser
 from collections.abc import Callable
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-from aiaccel.config import load_config
+from aiaccel.common import datetime_format
+from aiaccel.experimental.mpi.config import load_config
 from aiaccel.parameter import (
     CategoricalParameter,
     FloatParameter,
@@ -16,16 +17,7 @@ from aiaccel.parameter import (
     IntParameter,
     OrdinalParameter,
 )
-from aiaccel.util import cast_y
 from aiaccel.util.data_type import str_or_float_or_int
-
-
-def set_logging_file_for_trial_id(workspace: Path, trial_id: int) -> None:
-    log_dir = workspace / "log"
-    log_path = log_dir / f"job_{trial_id}.log"
-    if not log_dir.exists():
-        log_dir.mkdir(parents=True)
-    logging.basicConfig(filename=log_path, level=logging.DEBUG, force=True)
 
 
 class CommandLineArgs:
@@ -37,12 +29,14 @@ class CommandLineArgs:
         self.trial_id = None
         self.config_path = None
         self.config = None
+
         if self.args.trial_id is not None:
             self.trial_id = self.args.trial_id
         if self.args.config is not None:
             self.config_path = Path(self.args.config).resolve()
             self.config = load_config(self.config_path)
             self.parameters_config = HyperParameterConfiguration(self.config.optimize.parameters)
+
             for p in self.parameters_config.get_parameter_list():
                 if isinstance(p, FloatParameter):
                     self.parser.add_argument(f"--{p.name}", type=float)
@@ -69,6 +63,7 @@ class CommandLineArgs:
         for key in delete_keys:
             if key in xs.keys():
                 del xs[key]
+
         return xs
 
 
@@ -87,6 +82,7 @@ class Run:
             configuration file.
         config (Config): A Config object.
         workspace (Path): A Path object which points to the workspace.
+        logger (Logger): A Logger object.
 
     Examples:
         *User program* ::
@@ -147,17 +143,22 @@ class Run:
         if self.workspace is not None and self.args.trial_id is not None:
             set_logging_file_for_trial_id(self.workspace, self.args.trial_id)
 
-        ys = None
+        y = None
         err = ""
 
+        start_time = datetime.now().strftime(datetime_format)
+
         try:
-            ys = cast_y(func(xs), y_data_type)
-        except BaseException:
-            err = str(traceback.format_exc())
-            ys = None
+            y = cast_y(func(xs), y_data_type)
+        except BaseException as e:
+            err = str(e)
+            y = None
         else:
             err = ""
-        return xs, ys, err
+
+        end_time = datetime.now().strftime(datetime_format)
+
+        return xs, y, err, start_time, end_time
 
     def execute_and_report(
         self, func: Callable[[dict[str, float | int | str]], float], y_data_type: str | None = None
@@ -171,6 +172,8 @@ class Run:
                 objective value. Defaults to None.
 
         Examples:
+         ::
+
             from aiaccel.util import aiaccel
 
             def func(p: dict[str, Any]) -> float:
@@ -184,12 +187,12 @@ class Run:
         """
 
         xs = self.args.get_xs_from_args()
-        ys: Any = None
-        _, ys, err = self.execute(func, xs, y_data_type)
+        y: Any = None
+        _, y, err, _, _ = self.execute(func, xs, y_data_type)
 
-        self.report(ys, err)
+        self.report(y, err)
 
-    def report(self, ys: Any, err: str) -> None:
+    def report(self, y: Any, err: str) -> None:
         """Save the results to a text file.
 
         Args:
@@ -197,19 +200,15 @@ class Run:
             err (str): Error string.
         """
 
-        if ys is not None:
-            if isinstance(ys, str):
-                ys = ys.replace(" ", "")
-                ys = ys.split(",")
-                for y in ys:
-                    sys.stdout.write(f"{y}\n")
-            elif isinstance(ys, (list, tuple)):
-                for y in ys:
-                    sys.stdout.write(f"{y}\n")
-            else:
-                sys.stdout.write(f"{ys}\n")
-            sys.stdout.flush()
+        sys.stdout.write(f"{y}\n")
         if err != "":
             sys.stderr.write(f"{err}\n")
-            sys.stderr.flush()
             exit(1)
+
+
+def set_logging_file_for_trial_id(workspace: Path, trial_id: int) -> None:
+    log_dir = workspace / "log"
+    log_path = log_dir / f"job_{trial_id}.log"
+    if not log_dir.exists():
+        log_dir.mkdir(parents=True)
+    logging.basicConfig(filename=log_path, level=logging.DEBUG, force=True)
