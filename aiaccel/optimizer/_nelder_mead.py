@@ -8,6 +8,8 @@ from numpy.random import RandomState
 
 from aiaccel.optimizer.value import Value
 
+from aiaccel.optimizer.value import Value
+
 # constants for Nelder-Mead
 # r: reflect
 # e: expand

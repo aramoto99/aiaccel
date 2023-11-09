@@ -1,5 +1,6 @@
 from aiaccel.parameter import CategoricalParameter, FloatParameter, IntParameter, OrdinalParameter, Parameter
 from aiaccel.util.buffer import Buffer
+from aiaccel.util.cast import cast_y
 from aiaccel.util.easy_visualizer import EasyVisualizer
 from aiaccel.util.file import create_yaml
 from aiaccel.util.job_script_preamble import create_job_script_preamble
@@ -9,8 +10,6 @@ from aiaccel.util.retry import retry
 from aiaccel.util.suffix import Suffix
 from aiaccel.util.time import get_now_str, get_timestamp
 from aiaccel.util.trialid import TrialId
-from aiaccel.util.cast import cast_y
-from aiaccel.util.job_script_preamble import create_job_script_preamble
 
 # from aiaccel.util.aiaccel import Run
 

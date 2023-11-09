@@ -13,18 +13,10 @@ from typing import TYPE_CHECKING
 from fasteners import InterProcessLock
 from omegaconf.dictconfig import DictConfig
 
-from aiaccel.common import (
-    datetime_format,
-    dict_mpi,
-    dict_rank_log,
-    file_mpi_lock,
-    file_mpi_lock_timeout,
-    resource_type_abci,
-)
+from aiaccel.common import datetime_format, dict_mpi, dict_rank_log, file_mpi_lock, file_mpi_lock_timeout
 from aiaccel.util import create_job_script_preamble
 from aiaccel.util.error import MpiError
 from aiaccel.util.mpi_log import MpiLog
-from aiaccel.util import create_job_script_preamble
 
 if TYPE_CHECKING:
     from aiaccel.scheduler import AbstractScheduler
@@ -34,14 +26,16 @@ if TYPE_CHECKING:
 mpi_enable = True
 try:
     import mpi4py as m4p
+    from mpi4py.futures import MPIPoolExecutor
 except ImportError:
     mpi_enable = False
+    MPIPoolExecutor: None = None
 
 
 class Mpi:
     func_end_id = "MpiFuncEnd"
     return_code_str = "return_code="
-    executor: m4p.futures.MPIPoolExecutor | None = None
+    executor: MPIPoolExecutor | None = None
     lock: InterProcessLock | None = None
     rank_log_path = None
     error_file_path = None
@@ -291,9 +285,9 @@ class Mpi:
         venv_dir = config.generic.venv_dir
         if venv_dir == "":
             raise (MpiError("venv_dir is empty."))
-        rt_type = config.resource.mpi_bat_rt_type
-        rt_num = config.resource.mpi_bat_rt_num
-        h_rt = config.resource.mpi_bat_h_rt
+        # rt_type = config.resource.mpi_bat_rt_type
+        # rt_num = config.resource.mpi_bat_rt_num
+        # h_rt = config.resource.mpi_bat_h_rt
         num_workers = config.resource.num_workers
         qsub_file_path = config.resource.mpi_bat_file
         hostfile = config.resource.mpi_hostfile

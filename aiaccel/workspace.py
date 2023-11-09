@@ -12,6 +12,7 @@ from aiaccel.common import (
     dict_log,
     dict_mpi,
     dict_output,
+    dict_rank_log,
     dict_runner,
     dict_storage,
     dict_tensorboard,

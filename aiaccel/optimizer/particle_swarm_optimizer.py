@@ -2,16 +2,17 @@ from __future__ import annotations
 
 import copy
 import string
-from typing import Any, Dict, List
+from typing import Any
 
 import numpy as np
 from omegaconf.dictconfig import DictConfig
 from omegaconf.listconfig import ListConfig
 
-from aiaccel.common import goal_maximize
+from aiaccel.common import goal_minimize
 from aiaccel.config import is_multi_objective
 from aiaccel.converted_parameter import ConvertedParameterConfiguration
 from aiaccel.optimizer import AbstractOptimizer
+from aiaccel.optimizer.value import Value
 
 name_rng = np.random.RandomState()
 
@@ -60,7 +61,7 @@ class Particle:
         self.position += self.velocity
 
     def update_best_position(self, goal: str):
-        if goal == "minimize":
+        if goal == goal_minimize:
             if self.value < self.best_value:
                 self.best_position = self.position
                 self.best_value = self.value
@@ -99,7 +100,7 @@ class Swarm:
     ) -> None:
         self.n_dim = partical_coordinates.shape[1]
         self.goals = goals
-        self.global_best_position: ndarray | None = None
+        self.global_best_position: np.ndarray | None = None
         self.global_best_value = None
         if self.goals[0] == "minimize":
             self.global_best_value = np.inf
@@ -219,12 +220,6 @@ class ParticleSwarm:
             return []
         else:
             raise ValueError(f"{self.state} Unknown state.")
-
-
-class Value:
-    def __init__(self, id: str, value: Any) -> None:
-        self.id: str = id
-        self.value: Any = value
 
 
 class ParticleSwarmOptimizer(AbstractOptimizer):
@@ -355,7 +350,7 @@ class ParticleSwarmOptimizer(AbstractOptimizer):
         return searched_params
 
     def finalize_operation(self) -> None:
-        root_path = self.workspace.path / f"particle_swarm_optimizer"
+        root_path = self.workspace.path / "particle_swarm_optimizer"
         if not root_path.exists():
             root_path.mkdir(parents=True)
         for p in self.particle_swarm.swarm.particles:

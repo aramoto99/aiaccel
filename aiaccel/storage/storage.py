@@ -13,7 +13,6 @@ from aiaccel.storage.state import State
 from aiaccel.storage.timestamp import TimeStamp
 from aiaccel.storage.variable import Serializer
 
-from aiaccel.common import goal_maximize, goal_minimize
 
 class Storage:
     """Database"""
@@ -159,10 +158,9 @@ class Storage:
             elif dtype.lower() == "int":
                 value = int(float(d.param_value))
             elif dtype.lower() == "categorical":
-                value == str(d.param_value)
+                value = str(d.param_value)
             else:  # pragma: no cover
                 pass  # not reached
-
             hp.append({"name": param_name, "type": dtype, "value": value})
         result = self.result.get_any_trial_objective(trial_id=trial_id)
         start_time = self.timestamp.get_any_trial_start_time(trial_id=trial_id)

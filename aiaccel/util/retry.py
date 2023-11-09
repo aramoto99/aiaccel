@@ -6,7 +6,7 @@ from functools import wraps
 from typing import Any
 
 
-def retry(_MAX_NUM: int = 60, _DELAY: float = 1.0) -> Callable[[Any], Any]:
+def retry(_MAX_NUM: int = 60, _DELAY: float = 1.0) -> Callable[[Any], Any]:  # noqa: N803
     """Decorator to retry function.
 
     Args:

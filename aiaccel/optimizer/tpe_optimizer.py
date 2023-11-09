@@ -12,8 +12,13 @@ from optuna.samplers._random import RandomSampler
 from optuna.storages._rdb import models
 
 from aiaccel.optimizer import AbstractOptimizer
-from aiaccel.parameter import (CategoricalParameter, FloatParameter, HyperParameterConfiguration, IntParameter,
-                               OrdinalParameter)
+from aiaccel.parameter import (
+    CategoricalParameter,
+    FloatParameter,
+    HyperParameterConfiguration,
+    IntParameter,
+    OrdinalParameter,
+)
 
 
 class LazyRandomStateWrapper(LazyRandomState):
@@ -215,8 +220,7 @@ class TpeOptimizer(AbstractOptimizer):
         optuna_trials = self.study.get_trials()
         storage_path = f"sqlite:///{self.workspace.path}/optuna-{self.study_name}.db"
         engine = sqlalchemy.create_engine(storage_path, echo=False)
-        Session = sqlalchemy_orm.sessionmaker(bind=engine)
-        session = Session()
+        session = sqlalchemy_orm.sessionmaker(bind=engine)()
         for optuna_trial in optuna_trials:
             if optuna_trial.number >= self.config.resume:
                 resumed_trial = session.query(models.TrialModel).filter_by(number=optuna_trial.number).first()
@@ -237,8 +241,7 @@ class TpeOptimizer(AbstractOptimizer):
         optuna_trials = self.study.get_trials()
         storage_path = f"sqlite:///{self.workspace.path}/optuna-{self.study_name}.db"
         engine = sqlalchemy.create_engine(storage_path, echo=False)
-        Session = sqlalchemy_orm.sessionmaker(bind=engine)
-        session = Session()
+        session = sqlalchemy_orm.sessionmaker(bind=engine)()
         for optuna_trial in optuna_trials:
             if optuna_trial.number >= self.config.resume:
                 resumed_trial = session.query(models.TrialModel).filter_by(number=optuna_trial.number).first()

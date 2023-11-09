@@ -26,16 +26,16 @@ class TensorBoard(AiaccelCore):
         self.buff.d["finished"].set_max_len(2)
 
     def update(self) -> None:
-        self.buff.d["finished"].Add(self.storage.get_finished())
+        self.buff.d["finished"].add(self.storage.get_finished())
 
-        if self.buff.d["finished"].Len == 0:
+        if self.buff.d["finished"].length == 0:
             return
-        if self.buff.d["finished"].Len >= 2 and self.buff.d["finished"].has_difference() is False:
+        if self.buff.d["finished"].length >= 2 and self.buff.d["finished"].has_difference() is False:
             return
-        if self.buff.d["finished"].Len == 1:
-            trial_ids = self.buff.d["finished"].Now
+        if self.buff.d["finished"].length == 1:
+            trial_ids = self.buff.d["finished"].now
         else:
-            trial_ids = list(set(self.buff.d["finished"].Now) - set(self.buff.d["finished"].Pre))
+            trial_ids = list(set(self.buff.d["finished"].now) - set(self.buff.d["finished"].pre))
 
         self.writer = SummaryWriter(str(self.workspace.tensorboard))
         for trial_id in trial_ids:

@@ -14,7 +14,7 @@ from omegaconf.dictconfig import DictConfig
 
 import aiaccel
 from aiaccel.cli import CsvWriter
-from aiaccel.common import datetime_format, dict_result, extension_hp, resource_type_mpi
+from aiaccel.common import datetime_format, resource_type_mpi
 from aiaccel.config import Config, load_config
 from aiaccel.optimizer import create_optimizer
 from aiaccel.scheduler import create_scheduler

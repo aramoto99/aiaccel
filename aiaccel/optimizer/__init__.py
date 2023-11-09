@@ -9,7 +9,6 @@ from aiaccel.optimizer.particle_swarm_optimizer import ParticleSwarmOptimizer
 from aiaccel.optimizer.random_optimizer import RandomOptimizer
 from aiaccel.optimizer.sobol_optimizer import SobolOptimizer
 from aiaccel.optimizer.tpe_optimizer import TpeOptimizer, create_distributions
-from aiaccel.optimizer.particle_swarm_optimizer import ParticleSwarmOptimizer
 
 __all__ = [
     "AbstractOptimizer",

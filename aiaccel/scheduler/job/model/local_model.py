@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 
 class LocalModel(AbstractModel):
-    def runner_create(self, obj: Job) -> None:
+    def runner_create(self, obj: Job) -> None:  # noqa: U100
         pass
 
     def job_submitted(self, obj: Job) -> None:

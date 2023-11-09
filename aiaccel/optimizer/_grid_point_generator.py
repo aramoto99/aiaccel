@@ -31,7 +31,7 @@ class GridCondition(ABC):
         self.create_choices(hyperparameter)
 
     @abstractmethod
-    def create_choices(self, hyperparameter: Parameter) -> None:
+    def create_choices(self, hyperparameter: Parameter) -> None:  # noqa U100
         ...
 
     def __contains__(self, value: object) -> bool:
@@ -454,9 +454,9 @@ class GridPointGenerator:
         elif self._sampling_method == "UNIFORM":
             next_grid_point = self._get_grid_point_uniformly(self._num_generated_points)
         elif self._sampling_method == "RANDOM":
-            next_grid_point = self._get_grid_point_randomly(self._num_generated_points)
+            next_grid_point = self._get_grid_point_randomly()
         elif self._sampling_method == "DUPLICATABLE_RANDOM":
-            next_grid_point = self._get_grid_point_duplicatable_randomly(self._num_generated_points)
+            next_grid_point = self._get_grid_point_duplicatable_randomly()
         else:
             raise ValueError(f"Invalid sampling method: {self._sampling_method}")
         self._num_generated_points += 1
@@ -478,12 +478,12 @@ class GridPointGenerator:
         converted_trial_id = int(np.linspace(0, self._grid_space_size - 1, self._num_trials, dtype=int)[trial_id])
         return self._get_grid_point_in_order(converted_trial_id)
 
-    def _get_grid_point_randomly(self, trial_id: int) -> list[GridValueType]:
+    def _get_grid_point_randomly(self) -> list[GridValueType]:
         index = self._rng.randint(0, len(self._grid_point_stack))
         next_grid_point = self._grid_point_stack.pop(index)
         return list(next_grid_point)
 
-    def _get_grid_point_duplicatable_randomly(self, trial_id: int) -> list[GridValueType]:
+    def _get_grid_point_duplicatable_randomly(self) -> list[GridValueType]:
         index = self._rng.randint(0, self._grid_space_size)
         return self._get_grid_point_in_order(index)
 
