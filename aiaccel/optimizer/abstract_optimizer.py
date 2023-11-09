@@ -8,11 +8,11 @@ from omegaconf.dictconfig import DictConfig
 
 from aiaccel.config import is_multi_objective
 from aiaccel.converted_parameter import ConvertedIntParameter
-from aiaccel.module import AiaccelCore
+from aiaccel.module import AbstractModule
 from aiaccel.parameter import HyperParameterConfiguration, IntParameter, Parameter
 
 
-class AbstractOptimizer(AiaccelCore):
+class AbstractOptimizer(AbstractModule):
     """An abstract class for Optimizer classes.
 
     Args:
@@ -199,11 +199,17 @@ class AbstractOptimizer(AiaccelCore):
             bool: True if all trials are error free.
         """
         error_trial_ids = self.storage.error.get_error_trial_id()
+        failed_trial_ids = self.storage.error.get_failed_exitcode_trial_id()
+        if self.config.generic.is_ignore_warning:
+            if len(failed_trial_ids) == 0:
+                return True
+        else:
+            if len(failed_trial_ids) == 0 and len(error_trial_ids) == 0:
+                return True
         for trial_id in error_trial_ids:
             error_message = self.storage.error.get_any_trial_error(trial_id=trial_id)
             self.logger.error(error_message)
-            return False
-        return True
+        return False
 
     def finalize_operation(self) -> None:
         """Finalize the operation.

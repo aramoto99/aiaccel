@@ -57,6 +57,10 @@ class AbstractModule(object):
         self.fh: Any = None
         self.ch: Any = None
         self.ch_formatter: Any = None
+        self.loop_count = 0
+        self.hp_ready = 0
+        self.hp_running = 0
+        self.hp_finished = 0
         self.seed = self.config.optimize.rand_seed
         self.storage = Storage(self.workspace.storage_file_path)
         self.trial_id = TrialId(self.config)
@@ -158,47 +162,6 @@ class AbstractModule(object):
                 representing the internal state of the generator.
         """
         self._rng.set_state(state)
-
-    def __getstate__(self) -> dict[str, Any]:
-        obj = self.__dict__.copy()
-        del obj["storage"]
-        del obj["config"]
-        return obj
-
-
-class AbstractModule(AiaccelCore):
-    def pre_process(self) -> None:
-        """Perform setup or initialization tasks before the main loop starts.
-
-        This method should be implemented by subclasses to perform any necessary setup operations.
-
-        Raises:
-            NotImplementedError: If the subclass does not implement this method.
-        """
-        raise NotImplementedError
-
-    def run_in_main_loop(self) -> bool:
-        """Perform tasks that should be executed in every cycle of the main loop.
-
-        This method should be implemented by subclasses to define the operations executed in each cycle.
-
-        Returns:
-            bool: True if the main process has been completed, False otherwise.
-
-        Raises:
-            NotImplementedError: If the subclass does not implement this method.
-        """
-        raise NotImplementedError
-
-    def post_process(self) -> None:
-        """Perform cleanup tasks after the main loop ends.
-
-        This method should be implemented by subclasses to perform any necessary cleanup operations.
-
-        Raises:
-            NotImplementedError: If the subclass does not implement this method.
-        """
-        raise NotImplementedError
 
     def is_error_free(self) -> bool:
         """Check if there has been an error.

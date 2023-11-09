@@ -47,20 +47,6 @@ class TestAbstractModule(BaseTest):
             is None
         )
 
-    def test_pre_process(self):
-        try:
-            self.module.pre_process()
-            assert False
-        except NotImplementedError:
-            assert True
-
-    def test_post_process(self):
-        try:
-            self.module.post_process()
-            assert False
-        except NotImplementedError:
-            assert True
-
     def testserialize(self):
         self.module._rng = np.random.RandomState(0)
         assert self.module.serialize(0) is None

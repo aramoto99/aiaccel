@@ -97,9 +97,6 @@ def main() -> None:  # pragma: no cover
 
     scheduler.pre_process()
 
-    if config.resource.type.value.lower() == resource_type_mpi:  # MPI
-        Mpi.prepare(workspace.path)
-
     if config.resource.type.value.lower() == resource_type_mpi and mpi_enable:  # MPI
         Mpi.prepare(workspace.path)
 
@@ -145,12 +142,6 @@ def main() -> None:  # pragma: no cover
             break
 
     scheduler.post_process()
-    scheduler.evaluate()
-
-    scheduler.evaluate()
-
-    scheduler.evaluate()
-
     scheduler.evaluate()
 
     csv_writer = CsvWriter(config)

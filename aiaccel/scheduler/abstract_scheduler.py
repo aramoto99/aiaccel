@@ -137,11 +137,6 @@ class AbstractScheduler(AbstractModule):
         if num_finished >= self.trial_number:
             return False
 
-        # num_ready, num_running, _ = self.storage.get_num_running_ready_finished()
-        # if self.all_parameters_processed(num_ready, num_running):
-        #     self.logger.info("All parameters are processed.")
-        #     return False
-
         readies = self.storage.state.get_ready()
         # find a new hp
         for ready in readies:
@@ -177,15 +172,25 @@ class AbstractScheduler(AbstractModule):
             None
         """
         if self.config.resume is not None and self.config.resume > 0:
+            self.storage.rollback_to_ready(self.config.resume)
+            self.storage.delete_trial_data_after_this(self.config.resume)
             self.deserialize(self.config.resume)
             self.trial_number = self.config.optimize.trial_number
             self.optimizer.resume()
 
-    def __getstate__(self) -> dict[str, Any]:
-        obj = super().__getstate__()
-        del obj["jobs"]
-        del obj["optimizer"]
-        return obj
+    def is_error_free(self) -> bool:
+        """Check if all trials are error free.
+
+        Returns:
+            bool: True if all trials are error free.
+        """
+        jobstates = self.storage.jobstate.get_all_trial_jobstate()
+        for trial_id in self.job_status.keys():
+            for jobstate in jobstates:
+                if jobstate["trial_id"] == trial_id and "failure" in jobstate["jobstate"].lower():
+                    self.logger.info(f"Job: {trial_id} is Failed.")
+                    return False
+        return self.optimizer.is_error_free()
 
     def create_model(self) -> Any:
         """Creates model object of state machine.
@@ -204,24 +209,6 @@ class AbstractScheduler(AbstractModule):
             # TODO: Fix TestAbstractScheduler etc to return None.
         """
         return LocalModel()
-
-    def evaluate(self) -> None:
-        """Evaluate the result of optimization.
-
-        Returns:
-            None
-        """
-
-        best_trial_ids, _ = self.storage.get_best_trial(self.goals)
-        if best_trial_ids is None:
-            self.logger.error(f"Failed to output {self.workspace.best_result_file}.")
-            return
-        hp_results = []
-        for best_trial_id in best_trial_ids:
-            hp_results.append(self.storage.get_hp_dict(best_trial_id))
-        create_yaml(self.workspace.final_result_file, hp_results, self.workspace.lock)
-        self.logger.info("Best hyperparameter is followings:")
-        self.logger.info(hp_results)
 
     def all_parameters_processed(self, num_ready: int, num_running: int) -> bool:
         """Checks whether any unprocessed parameters are left.
@@ -259,3 +246,27 @@ class AbstractScheduler(AbstractModule):
             None
         """
         self.trial_number = trial_number
+
+    def evaluate(self) -> None:
+        """Evaluate the result of optimization.
+
+        Returns:
+            None
+        """
+
+        best_trial_ids, _ = self.storage.get_best_trial(self.goals)
+        if best_trial_ids is None:
+            self.logger.error(f"Failed to output {self.workspace.final_result_file}.")
+            return
+        hp_results = []
+        for best_trial_id in best_trial_ids:
+            hp_results.append(self.storage.get_hp_dict(best_trial_id))
+        create_yaml(self.workspace.final_result_file, hp_results, self.workspace.lock)
+        self.logger.info("Best hyperparameter is followings:")
+        self.logger.info(hp_results)
+
+    def __getstate__(self) -> dict[str, Any]:
+        obj = super().__getstate__()
+        del obj["jobs"]
+        del obj["optimizer"]
+        return obj
