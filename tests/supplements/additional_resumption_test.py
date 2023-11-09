@@ -29,13 +29,13 @@ class AdditionalResumptionTest(IntegrationTest):
 
         # normal execution
         with self.create_main(python_file):
-            subprocess.Popen(['aiaccel-start', '--config', str(config_file), '--clean']).wait()
+            subprocess.Popen(["aiaccel-start", "--config", str(config_file), "--clean"]).wait()
             final_result_at_one_time = self.get_final_result(storage)
         print('at one time', final_result_at_one_time)
 
         # resume from initial point
         with self.create_main(python_file):
-            subprocess.Popen(['aiaccel-start', '--config', str(config_file), '--resume', '2']).wait()
+            subprocess.Popen(["aiaccel-start", "--config", str(config_file), "--resume", "2"]).wait()
             final_result_resumption_in_initial = self.get_final_result(storage)
         print('resumption steps in initial point finished', final_result_resumption_in_initial)
 
@@ -43,8 +43,7 @@ class AdditionalResumptionTest(IntegrationTest):
 
         # resume after initial point
         with self.create_main(python_file):
-            subprocess.Popen(['aiaccel-start', '--config', str(config_file),
-                              '--resume', '11']).wait()
+            subprocess.Popen(["aiaccel-start", "--config", str(config_file), "--resume", "11"]).wait()
             final_result_resumption = self.get_final_result(storage)
         print('resumption steps finished', final_result_resumption)
 
