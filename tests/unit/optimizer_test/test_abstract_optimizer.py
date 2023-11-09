@@ -70,15 +70,15 @@ class TestAbstractOptimizer(BaseTest):
         assert self.optimizer.is_error_free() is True
 
         self.optimizer.storage.error.set_any_trial_error(trial_id=0, error_message="test warning")
-        assert self.optimizer.check_error() is True
+        assert self.optimizer.is_error_free() is False
 
         self.optimizer.storage.error.set_any_trial_exitcode(trial_id=0, exitcode=1)
-        assert self.optimizer.check_error() is False
+        assert self.optimizer.is_error_free() is False
 
         self.optimizer.storage.error.all_delete()
         self.optimizer.config.generic.is_ignore_warning = False
         self.optimizer.storage.error.set_any_trial_error(trial_id=0, error_message="test warning")
-        assert self.optimizer.check_error() is False
+        assert self.optimizer.is_error_free() is False
 
     def test_serialize(self):
         self.optimizer._rng = np.random.RandomState(0)
