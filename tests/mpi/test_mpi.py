@@ -20,9 +20,6 @@ def get_rank_log():
     return get_root()/'work/mpi/rank_log'
 
 
-def get_rank_log():
-    return get_root() / "work/experimental/mpi/rank_log"
-
 def test_logf():
     s = (get_root()/'logf').read_text()
     assert len(s) > 0

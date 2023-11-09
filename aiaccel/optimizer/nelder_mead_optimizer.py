@@ -74,7 +74,6 @@ class NelderMeadOptimizer(AbstractOptimizer):
         if num_of_initials < len(initial_parameters[dim]["value"]):
             val = initial_parameters[dim]["value"][num_of_initials]
             return val
-
         else:
             val = params[dim].sample(rng=self._rng)["value"]
             return val

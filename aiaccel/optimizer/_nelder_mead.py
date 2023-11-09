@@ -4,9 +4,6 @@ import string
 from typing import Any
 
 import numpy as np
-from numpy.random import RandomState
-
-from aiaccel.optimizer.value import Value
 
 from aiaccel.optimizer.value import Value
 
@@ -18,7 +15,7 @@ from aiaccel.optimizer.value import Value
 # s: shrink
 coef: dict[str, float] = {"r": 1.0, "ic": -0.5, "oc": 0.5, "e": 2.0, "s": 0.5}
 
-name_rng = RandomState(None)
+name_rng = np.random.RandomState()
 
 
 class Vertex:

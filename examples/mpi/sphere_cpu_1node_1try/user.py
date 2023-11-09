@@ -1,9 +1,6 @@
-# from time import sleep
-import numpy as np
 import aiaccel
 import numpy as np
 
-from aiaccel.experimental.mpi.util import aiaccel
 
 def main(p):
     x = np.array([p["x1"], p["x2"], p["x3"], p["x4"], p["x5"]])

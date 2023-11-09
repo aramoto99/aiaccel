@@ -59,6 +59,6 @@ class RandomGenerationTest(BaseTest):
 
         assert final_result_random == final_result_neldermead
 
-    def get_final_result(self, storage):
-        data = storage.result.get_all_result()
-        return [data[trial_id] for trial_id in data.keys()]
+        def get_final_result(self, storage):
+                data = storage.result.get_all_result()
+                return [data[trial_id] for trial_id in data.keys()]
