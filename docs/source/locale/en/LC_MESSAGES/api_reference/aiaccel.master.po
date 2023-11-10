@@ -234,7 +234,7 @@ msgstr ""
 #: aiaccel.master.abstract_master.AbstractMaster.pre_process:5 of
 msgid ""
 "Causes when expire the count which cannot confirm to     run Optimizer "
-"and Scheduler."
+"and Manager."
 msgstr ""
 
 #: aiaccel.master.abstract_master.AbstractMaster.print_dict_state:1 of

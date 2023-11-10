@@ -16,7 +16,7 @@
 #     goal_minimize,
 # )
 # from aiaccel.config import ResourceType
-# from aiaccel.scheduler import AbciModel, CustomMachine, Job, LocalModel, LocalScheduler, create_scheduler
+# from aiaccel.manager import AbciModel, CustomMachine, Job, LocalModel, LocalManager, create_manager
 # from aiaccel.util.process import OutputHandler
 # from tests.base_test import BaseTest
 
@@ -49,17 +49,17 @@
 #         self.workspace.create()
 
 #         config = self.load_config_for_test(self.configs['config.json'])
-#         scheduler = create_scheduler(config.resource.type.value)(config)
+#         manager = create_manager(config.resource.type.value)(config)
 
 #         setup_hp_ready(1)
 #         trial_id = 0
 #         self.job = Job(
 #             config,
-#             scheduler,
-#             scheduler.create_model(),
+#             manager,
+#             manager.create_model(),
 #             trial_id
 #         )
-#         self.model = scheduler.create_model()
+#         self.model = manager.create_model()
 #         yield
 #         self.job = None
 #         self.model = None
@@ -74,13 +74,13 @@
 #         config = self.load_config_for_test(self.configs['config.json'])
 #         config.resource.type = ResourceType('abci')
 
-#         scheduler = create_scheduler(config.resource.type.value)(config)
+#         manager = create_manager(config.resource.type.value)(config)
 
 #         trial_id = 1
 #         self.abci_job = Job(
 #             config,
-#             scheduler,
-#             scheduler.create_model(),
+#             manager,
+#             manager.create_model(),
 #             trial_id
 #         )
 #         yield
@@ -174,13 +174,13 @@
 #     def test_conditions_job_confirmed(self, database_remove):
 #         assert not self.model.conditions_job_confirmed(self.job)
 
-#         # self.job.scheduler.stats.append({'name': '001'})
-#         # self.job.scheduler.stats.append({'name': 0})
-#         # self.job.scheduler.stats.append(
+#         # self.job.manager.stats.append({'name': '001'})
+#         # self.job.manager.stats.append({'name': 0})
+#         # self.job.manager.stats.append(
 #         #     {'name': '2 python user.py --trial_id 0 --config config.yaml --x1=1.0 --x2=1.0', }
 #         # )
 #         self.job.trial_id = 99
-#         self.job.scheduler.storage.trial.set_any_trial_state(self.job.trial_id, 'running')
+#         self.job.manager.storage.trial.set_any_trial_state(self.job.trial_id, 'running')
 #         assert self.model.conditions_job_confirmed(self.job)
 
 #     def test_after_result(self, database_remove):
@@ -250,8 +250,8 @@
 #         assert self.model.before_kill_submitted(self.job) is None
 
 #         fake_pid = 99999999
-#         # self.job.scheduler.stats.append({'name': '001', 'job-ID': fake_pid})
-#         self.job.scheduler.stats.append(
+#         # self.job.manager.stats.append({'name': '001', 'job-ID': fake_pid})
+#         self.job.manager.stats.append(
 #             {
 #                 'name': '2 python user.py --trial_id 1 --config config.yaml --x1=1.0 --x2=1.0',
 #                 'job-ID': fake_pid
@@ -268,9 +268,9 @@
 #     def test_conditions_kill_confirmed(self, database_remove):
 #         assert self.model.conditions_kill_confirmed(self.job)
 
-#         # self.job.scheduler.stats.append({'name': '001'})
-#         # self.job.scheduler.stats.append({'name': 0})
-#         self.job.scheduler.stats.append(
+#         # self.job.manager.stats.append({'name': '001'})
+#         # self.job.manager.stats.append({'name': 0})
+#         self.job.manager.stats.append(
 #             {'name': '2 python user.py --trial_id=0 --config=config.yaml --x1=1.0 --x2=1.0'}
 #         )
 #         assert not self.model.conditions_kill_confirmed(self.job)
@@ -304,14 +304,14 @@
 #         self.workspace.create()
 
 #         config = self.load_config_for_test(self.configs['config.json'])
-#         scheduler = create_scheduler(config.resource.type.value)(config)
+#         manager = create_manager(config.resource.type.value)(config)
 
 #         setup_hp_ready(1)
 #         trial_id = 1
 #         self.job = Job(
 #             config,
-#             scheduler,
-#             scheduler.create_model(),
+#             manager,
+#             manager.create_model(),
 #             trial_id
 #         )
 #         yield
@@ -327,14 +327,14 @@
 #         database_remove
 #     ):
 #         config = self.load_config_for_test(self.configs['config.json'])
-#         scheduler = LocalScheduler(config)
+#         manager = LocalManager(config)
 #         # config = load_test_config()
 #         setup_hp_ready(1)
 #         trial_id = 1
 #         job = Job(
 #             config,
-#             scheduler,
-#             scheduler.create_model(),
+#             manager,
+#             manager.create_model(),
 #             trial_id
 #         )
 #         assert type(job) is Job
@@ -359,7 +359,7 @@
 #         assert self.job.schedule() is None
 
 #     def test_run_2(self, database_remove):
-#         self.job.scheduler.pre_process()
+#         self.job.manager.pre_process()
 #         self.job.main()
 #         self.job.threshold_timeout = datetime.datetime.now()
 #         self.job.threshold_timeout = datetime.datetime.now() + datetime.timedelta(10)

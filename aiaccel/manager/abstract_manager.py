@@ -4,15 +4,15 @@ from typing import Any
 
 from omegaconf.dictconfig import DictConfig
 
+from aiaccel.manager.job.job import Job
+from aiaccel.manager.job.model.local_model import LocalModel
 from aiaccel.module import AbstractModule
 from aiaccel.optimizer import AbstractOptimizer
-from aiaccel.scheduler.job.job import Job
-from aiaccel.scheduler.job.model.local_model import LocalModel
 from aiaccel.util import Buffer, create_yaml
 
 
-class AbstractScheduler(AbstractModule):
-    """An abstract class for AbciScheduler and LocalScheduler.
+class AbstractManager(AbstractModule):
+    """An abstract class for AbciManager and LocalManager.
 
     Args:
         options (dict[str, str | int | bool]): A dictionary containing
@@ -29,13 +29,13 @@ class AbstractScheduler(AbstractModule):
     """
 
     def __init__(self, config: DictConfig, optimizer: AbstractOptimizer) -> None:
-        super().__init__(config, "scheduler")
+        super().__init__(config, "manager")
         self.set_logger(
-            logger_name="root.scheduler",
-            logfile=self.workspace.log / "scheduler.log",
+            logger_name="root.manager",
+            logfile=self.workspace.log / "manager.log",
             file_level=self.config.generic.logging_level,
             stream_level=self.config.generic.logging_level,
-            module_type="Scheduler",
+            module_type="Manager",
         )
         self.optimizer = optimizer
         self.num_workers = self.config.resource.num_workers
@@ -86,7 +86,7 @@ class AbstractScheduler(AbstractModule):
             None
         """
         self.optimizer.finalize_operation()
-        self.logger.info("scheduler finished.")
+        self.logger.info("Optimization is completed.")
 
     def get_available_pool_size(self, num_ready: int, num_running: int, num_finished: int) -> int:
         sum_status = num_ready + num_running + num_finished
@@ -155,7 +155,7 @@ class AbstractScheduler(AbstractModule):
             if job.trial_id in self.buff.d.keys():
                 self.buff.d[job.trial_id].add(state_name)
                 if self.buff.d[job.trial_id].has_difference():
-                    self.logger.info(f"name: {job.trial_id}, state: {state_name}")
+                    self.logger.info(f"trial: {job.trial_id}, state: {state_name}")
 
         if self.trial_number == self.job_completed_count:
             self.logger.info("All jobs are completed.")
@@ -195,18 +195,18 @@ class AbstractScheduler(AbstractModule):
     def create_model(self) -> Any:
         """Creates model object of state machine.
 
-        Override with a Scheduler that uses a Model.
-        For example, LocalScheduler, AbciScheduler, etc.
-        By the way, PylocalScheduler does not use Model.
+        Override with a Manager that uses a Model.
+        For example, LocalManager, AbciManager, etc.
+        By the way, PylocalManager does not use Model.
 
         Returns:
             LocalModel: LocalModel object.
 
             Should return None.
-            For that purpose, it is necessary to modify TestAbstractScheduler etc significantly.
+            For that purpose, it is necessary to modify TestAbstractManager etc significantly.
             So it returns LocalModel.
 
-            # TODO: Fix TestAbstractScheduler etc to return None.
+            # TODO: Fix TestAbstractManager etc to return None.
         """
         return LocalModel()
 
@@ -253,17 +253,30 @@ class AbstractScheduler(AbstractModule):
         Returns:
             None
         """
+        hps = self.get_best_result()
+        if len(hps) == 0:
+            self.logger.info("No results are available.")
+            return
+        for hp in hps:
+            for parameter in hp["parameters"]:
+                parameter["value"] = str(parameter["value"])
+            hp["retult"] = str(hp["result"])
+        create_yaml(self.workspace.best_result_file, hps, self.workspace.lock)
+        return
 
+    def get_best_result(self) -> list[dict[str, Any]]:
+        """Get the best result of optimization.
+
+        Returns:
+            dict[str, Any]: The best result.
+        """
         best_trial_ids, _ = self.storage.get_best_trial(self.goals)
         if best_trial_ids is None:
-            self.logger.error(f"Failed to output {self.workspace.final_result_file}.")
-            return
-        hp_results = []
+            return []
+        hps = []
         for best_trial_id in best_trial_ids:
-            hp_results.append(self.storage.get_hp_dict(best_trial_id))
-        create_yaml(self.workspace.final_result_file, hp_results, self.workspace.lock)
-        self.logger.info("Best hyperparameter is followings:")
-        self.logger.info(hp_results)
+            hps.append(self.storage.get_hp_dict(best_trial_id))
+        return hps
 
     def __getstate__(self) -> dict[str, Any]:
         obj = super().__getstate__()

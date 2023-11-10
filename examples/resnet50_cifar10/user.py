@@ -3,7 +3,7 @@ import logging
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from torch.optim.lr_scheduler import CosineAnnealingLR
+from torch.optim.lr_manager import CosineAnnealingLR
 from torchvision import datasets, models, transforms
 
 import aiaccel
@@ -111,7 +111,7 @@ def main(p):
     epochs = 100
 
     optimizer = optim.SGD(model.parameters(), lr=p["lr"], momentum=p["momentum"], weight_decay=p["weight_decay"])
-    scheduler = CosineAnnealingLR(optimizer, T_max=epochs, eta_min=p["lr"] * p["lr_decay"])
+    manager = CosineAnnealingLR(optimizer, T_max=epochs, eta_min=p["lr"] * p["lr_decay"])
 
     logger = logging.getLogger(__name__)
 
@@ -136,7 +136,7 @@ def main(p):
             f"val loss: {val_loss:.4f}"
         )
         # Update lr
-        scheduler.step()
+        manager.step()
 
     # Test
     test_loss, test_acc = val_test_func(model, test_loader, device, criterion)

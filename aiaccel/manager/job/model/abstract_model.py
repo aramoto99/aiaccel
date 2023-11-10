@@ -17,14 +17,6 @@ class AbstractModel(object):
     next_state: Any
     timeout: Any
 
-    # ready
-    def before_ready(self, obj: Job) -> None:
-        self.runner_create(obj)
-
-    def after_ready(self, obj: Job) -> None:
-        obj.write_start_time_to_storage()
-        self.job_submitted(obj)
-
     def runner_create(self, obj: Job) -> None:  # noqa: U100
         ...
 
@@ -33,6 +25,9 @@ class AbstractModel(object):
 
     # running
     def before_running(self, obj: Job) -> None:
+        self.runner_create(obj)
+        self.job_submitted(obj)
+        obj.write_start_time_to_storage()
         obj.write_state_to_storage("running")
 
     def after_running(self, obj: Job) -> None:  # noqa: U100
@@ -40,6 +35,7 @@ class AbstractModel(object):
 
     def conditions_job_finished(self, obj: Job) -> bool:
         objective = obj.storage.result.get_any_trial_objective(trial_id=obj.trial_id)
+        obj.manager.evaluate()
         return objective is not None
 
     # finished

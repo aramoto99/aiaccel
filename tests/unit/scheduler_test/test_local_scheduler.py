@@ -1,6 +1,6 @@
-from aiaccel.scheduler import Job, LocalScheduler
+from aiaccel.manager import Job, LocalManager
 from tests.base_test import BaseTest
 
 
-class TestLocalScheduler(BaseTest):
+class TestLocalManager(BaseTest):
     ...

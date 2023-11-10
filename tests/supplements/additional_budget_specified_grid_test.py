@@ -62,5 +62,5 @@ class AdditionalBudgetSpecifiedGridTest(BaseTest):
         assert num_running == 0
         assert num_ready == 0
 
-        final_result = work_dir.joinpath("final_result.result")
-        assert final_result.exists()
+        best_result = work_dir.joinpath("best_result.yaml")
+        assert best_result.exists()

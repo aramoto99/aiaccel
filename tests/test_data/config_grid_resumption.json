@@ -134,15 +134,15 @@
   },
   "logger": {
     "file": {
-      "scheduler": "scheduler.log",
+      "manager": "manager.log",
       "optimizer": "optimizer.log"
     },
     "log_level": {
-      "scheduler": "DEBUG",
+      "manager": "DEBUG",
       "optimizer": "DEBUG"
     },
     "stream_level": {
-      "scheduler": "DEBUG",
+      "manager": "DEBUG",
       "optimizer": "DEBUG"
     }
   }

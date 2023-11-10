@@ -2,12 +2,12 @@ from __future__ import annotations
 
 from typing import Any
 
-from aiaccel.scheduler.abstract_scheduler import AbstractScheduler
-from aiaccel.scheduler.job.model.local_model import LocalModel
+from aiaccel.manager.abstract_manager import AbstractManager
+from aiaccel.manager.job.model.local_model import LocalModel
 
 
-class LocalScheduler(AbstractScheduler):
-    """A scheduler class running on a local computer."""
+class LocalManager(AbstractManager):
+    """A manager class running on a local computer."""
 
     def create_model(self) -> LocalModel:
         """Creates model object of state machine.

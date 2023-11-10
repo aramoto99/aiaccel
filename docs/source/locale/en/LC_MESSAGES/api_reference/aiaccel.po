@@ -352,7 +352,7 @@ msgid "aiaccel.module module"
 msgstr ""
 
 #: aiaccel.module.AbstractModule:1 of
-msgid "An abstract class for Master, Optimizer and Scheduler."
+msgid "An abstract class for Master, Optimizer and Manager."
 msgstr ""
 
 #: aiaccel.module.AbstractModule:3 of

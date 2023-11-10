@@ -11,9 +11,9 @@ from omegaconf.dictconfig import DictConfig
 from aiaccel.cli.set_result import write_results_to_database
 from aiaccel.common import datetime_format
 from aiaccel.config import load_config
+from aiaccel.manager.abstract_manager import AbstractManager
 from aiaccel.optimizer import AbstractOptimizer
 from aiaccel.run import set_logging_file_for_trial_id
-from aiaccel.scheduler.abstract_scheduler import AbstractScheduler
 
 # These are for avoiding mypy-errors from initializer().
 # `global` does not work well.
@@ -22,8 +22,8 @@ user_func: Any
 workspace: Path
 
 
-class PylocalScheduler(AbstractScheduler):
-    """A scheduler class running on a local computer."""
+class PylocalManager(AbstractManager):
+    """A manager class running on a local computer."""
 
     def __init__(self, config: DictConfig, optimizer: AbstractOptimizer) -> None:
         super().__init__(config, optimizer)
@@ -68,12 +68,12 @@ class PylocalScheduler(AbstractScheduler):
                 returncode=None,
             )
             self.storage.state.set_any_trial_state(trial_id=trial_id, state="finished")
+            self.evaluate()
         return True
 
     def post_process(self) -> None:
         for process in self.processes:
             process.wait()
-
         super().post_process()
 
     def get_any_trial_xs(self, trial_id: int) -> dict[str, Any] | None:
@@ -148,9 +148,7 @@ def initializer(config_path: str | Path) -> None:
     if spec.loader is None:
         raise ValueError("spec.loader not defined.")
     spec.loader.exec_module(module)
-
     user_func = getattr(module, config.generic.function)
-
     workspace = Path(config.generic.workspace).resolve()
 
 
@@ -180,5 +178,4 @@ def execute(args: Any) -> tuple[int, dict[str, Any], list[Any], str, str, str]:
         err = ""
 
     end_time = datetime.now().strftime(datetime_format)
-
     return trial_id, xs, ys, err, start_time, end_time

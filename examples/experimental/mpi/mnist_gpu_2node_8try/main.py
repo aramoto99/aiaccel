@@ -6,7 +6,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
-from torch.optim.lr_scheduler import StepLR
+from torch.optim.lr_manager import StepLR
 from torchvision import datasets, transforms
 
 average_loss = 0  # aiaccel/experimental/mpi
@@ -143,11 +143,11 @@ def main():
     model = Net().to(device)
     optimizer = optim.Adadelta(model.parameters(), lr=args.lr)
 
-    scheduler = StepLR(optimizer, step_size=1, gamma=args.gamma)
+    manager = StepLR(optimizer, step_size=1, gamma=args.gamma)
     for epoch in range(1, args.epochs + 1):
         train(args, model, device, train_loader, optimizer, epoch)
         test(model, device, test_loader)
-        scheduler.step()
+        manager.step()
 
     if args.save_model:
         torch.save(model.state_dict(), "mnist_cnn.pt")

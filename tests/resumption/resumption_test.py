@@ -59,3 +59,4 @@ class ResumptionTest(IntegrationTest):
     def get_final_result(self, storage):
         data = storage.result.get_all_result()
         return [data[trial_id] for trial_id in data.keys()][-1]
+

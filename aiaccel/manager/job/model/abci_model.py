@@ -8,11 +8,11 @@ from typing import TYPE_CHECKING, Any
 import fasteners
 
 from aiaccel.abci import create_qsub_command
-from aiaccel.scheduler.job.model.abstract_model import AbstractModel
+from aiaccel.manager.job.model.abstract_model import AbstractModel
 from aiaccel.util import OutputHandler, create_job_script_preamble
 
 if TYPE_CHECKING:
-    from aiaccel.scheduler.job import Job
+    from aiaccel.manager.job import Job
 
 
 class AbciModel(AbstractModel):
@@ -37,7 +37,7 @@ class AbciModel(AbstractModel):
     def job_submitted(self, obj: Job) -> None:
         runner_file_path = obj.workspace.get_runner_file(obj.trial_id)
         runner_command = create_qsub_command(obj.config, runner_file_path)
-        obj.logger.info(f'runner command: {" ".join(runner_command)}')
+        obj.logger.info(f'{" ".join(runner_command)}')
         obj.proc = Popen(runner_command, stdout=PIPE, stderr=PIPE, bufsize=0)
         obj.th_oh = OutputHandler(obj.proc)
         obj.th_oh.start()

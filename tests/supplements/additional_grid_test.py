@@ -36,5 +36,5 @@ class AdditionalGridTest(BaseTest):
         assert finished == config.optimize.trial_number
         assert ready == 0
         assert running == 0
-        final_result = work_dir.joinpath("final_result.result")
-        assert final_result.exists()
+        best_result = work_dir.joinpath("best_result.yaml")
+        assert best_result.exists()

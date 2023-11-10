@@ -3,13 +3,13 @@ generic:
 logger:
   file:
     optimizer: "optimizer.log"
-    scheduler: "scheduler.log"
+    manager: "manager.log"
   log_level:
     optimizer: "DEBUG"
-    scheduler: "DEBUG"
+    manager: "DEBUG"
   stream_level:
     optimizer: "DEBUG"
-    scheduler: "DEBUG"
+    manager: "DEBUG"
 optimize:
   goal: "minimize"
   trial_number: 10

@@ -2,11 +2,11 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from aiaccel.scheduler.job.model import LocalModel
+from aiaccel.manager.job.model import LocalModel
 from aiaccel.util.mpi import Mpi, MpiOutputHandler
 
 if TYPE_CHECKING:
-    from aiaccel.scheduler import Job
+    from aiaccel.manager import Job
 
 
 class MpiModel(LocalModel):
@@ -20,11 +20,11 @@ class MpiModel(LocalModel):
             obj.config.generic.enabled_variable_name_argumentation,
         )
 
-        obj.logger.info(f'runner command: {" ".join(runner_command)}')
+        obj.logger.info(f'{" ".join(runner_command)}')
 
         gpu_mode = obj.config.resource.mpi_gpu_mode
         (processor, tag) = Mpi.submit(runner_command, obj.trial_id, gpu_mode)
         obj.proc = None
-        obj.th_oh = MpiOutputHandler(obj.scheduler, gpu_mode, processor, tag, "Job", obj.trial_id, storage=obj.storage)
+        obj.th_oh = MpiOutputHandler(obj.manager, gpu_mode, processor, tag, "Job", obj.trial_id, storage=obj.storage)
         obj.th_oh.start()
         self.is_firsttime_called = False

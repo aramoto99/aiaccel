@@ -15,11 +15,10 @@ from aiaccel.util import Buffer
 from aiaccel.workspace import Workspace
 
 if TYPE_CHECKING:  # pragma: no cover
-    from aiaccel.scheduler import AbstractModel, AbstractScheduler
+    from aiaccel.manager import AbstractManager, AbstractModel
 
 
 JOB_STATES = [
-    {"name": "init"},
     {"name": "ready"},
     {"name": "running"},
     {"name": "finished"},
@@ -30,13 +29,6 @@ JOB_STATES = [
 
 
 JOB_TRANSITIONS: list[dict[str, str | list[str]]] = [
-    {
-        "trigger": "next_state",
-        "source": "init",
-        "dest": "ready",
-        "before": "before_ready",
-        "after": "after_ready",
-    },
     {
         "trigger": "next_state",
         "source": "ready",
@@ -59,12 +51,12 @@ JOB_TRANSITIONS: list[dict[str, str | list[str]]] = [
     },
     {
         "trigger": "expire",
-        "source": ["init", "ready", "running", "finished"],
+        "source": ["ready", "running", "finished"],
         "dest": "failure",
     },
     {
         "trigger": "timeout",
-        "source": ["init", "ready", "running", "finished"],
+        "source": ["ready", "running", "finished"],
         "dest": "timeout",
         "before": "before_timeout",
         "after": "after_timeout",
@@ -80,25 +72,25 @@ class CustomMachine(Machine):
 class Job:
     """A job thread to manage running jobs on local computer or ABCI."""
 
-    def __init__(self, config: DictConfig, scheduler: AbstractScheduler, model: AbstractModel, trial_id: int) -> None:
+    def __init__(self, config: DictConfig, manager: AbstractManager, model: AbstractModel, trial_id: int) -> None:
         super(Job, self).__init__()
         # === Load config file===
         self.config = config
         # === Get config parameter values ===
         self.count_retry = 0
-        self.logger = logging.getLogger("root.scheduler.job")
+        self.logger = logging.getLogger("root.manager.job")
         self.workspace = Workspace(self.config.generic.workspace)
         self.storage = Storage(self.workspace.storage_file_path)
         self.trial_id = trial_id
         self.content = self.storage.get_hp_dict(self.trial_id)
-        self.scheduler = scheduler
+        self.manager = manager
         self.goals: list[str] = self.config.optimize.goal
         self.model = model
         if self.model is None:
             raise ValueError(
                 "model is None. "
                 "Be sure to specify the model to use in the Job class. "
-                "For example, PylocalScheduler doesn't use model. "
+                "For example, PylocalManager doesn't use model. "
                 "Therefore, Job class cannot be used."
             )
         self.machine = CustomMachine(
@@ -186,9 +178,7 @@ class Job:
 
         state = self.machine.get_state(self.model.state)
         try:
-            if state.name.lower() == "init":
-                self.model.next_state(self)
-            elif state.name.lower() == "ready":
+            if state.name.lower() == "ready":
                 self.model.next_state(self)
             elif state.name.lower() == "running":
                 self.model.next_state(self)

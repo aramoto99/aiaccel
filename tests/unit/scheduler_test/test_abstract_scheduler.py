@@ -6,7 +6,7 @@ from unittest.mock import patch
 import numpy as np
 
 from aiaccel.optimizer import create_optimizer
-from aiaccel.scheduler import AbstractScheduler
+from aiaccel.manager import AbstractManager
 from tests.base_test import BaseTest
 
 
@@ -31,5 +31,5 @@ def test_create_stat():
 """
 
 
-class TestAbstractScheduler(BaseTest):
+class TestAbstractManager(BaseTest):
     ...

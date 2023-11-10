@@ -4,7 +4,6 @@ import os
 import shutil
 import time
 from argparse import ArgumentParser
-from datetime import datetime
 from logging import StreamHandler, getLogger
 from pathlib import Path
 from typing import Any
@@ -13,10 +12,10 @@ import yaml
 from omegaconf.dictconfig import DictConfig
 
 from aiaccel.cli import CsvWriter
-from aiaccel.common import datetime_format, resource_type_mpi
+from aiaccel.common import resource_type_mpi
 from aiaccel.config import load_config
+from aiaccel.manager import create_manager
 from aiaccel.optimizer import create_optimizer
-from aiaccel.scheduler import create_scheduler
 from aiaccel.storage import Storage
 from aiaccel.tensorboard import TensorBoard
 from aiaccel.util.buffer import Buffer
@@ -78,74 +77,58 @@ def main() -> None:  # pragma: no cover
     logger.info(f"config: {config.config_path}")
 
     optimizer = create_optimizer(config.optimize.search_algorithm)(config)
-    scheduler = create_scheduler(config.resource.type.value)(config, optimizer)
+    manager = create_manager(config.resource.type.value)(config, optimizer)
     tensorboard = TensorBoard(config)
     storage = Storage(workspace.storage_file_path)
 
     time_s = time.time()
     max_trial_number = config.optimize.trial_number
-    loop_start_time = datetime.now()
-    end_estimated_time = "Unknown"
-    buff = Buffer(["num_finished", "available_pool_size"])
+    buff = Buffer(["num_finished"])
     buff.d["num_finished"].set_max_len(2)
-    buff.d["available_pool_size"].set_max_len(2)
 
-    scheduler.pre_process()
+    manager.pre_process()
 
     if config.resource.type.value.lower() == resource_type_mpi:  # MPI
         Mpi.prepare(workspace.path)
 
     while True:
         try:
-            if not scheduler.run_in_main_loop():
+            if not manager.run_in_main_loop():
                 break
-            if not scheduler.is_error_free():
+            if not manager.is_error_free():
                 break
-
             if int((time.time() - time_s)) % 10 == 0:
                 num_ready, num_running, num_finished = storage.get_num_running_ready_finished()
-                available_pool_size = scheduler.get_available_pool_size(num_ready, num_running, num_finished)
-                now = datetime.now()
-                looping_time = now - loop_start_time
-
-                if num_finished > 0:
-                    one_loop_time = looping_time / num_finished
-                    finishing_time = now + (max_trial_number - num_finished) * one_loop_time
-                    end_estimated_time = finishing_time.strftime(datetime_format)
-
                 buff.d["num_finished"].add(num_finished)
                 if buff.d["num_finished"].length == 1 or buff.d["num_finished"].has_difference():
-                    scheduler.logger.info(
+                    manager.logger.info(
                         f"{num_finished}/{max_trial_number} finished, "
                         f"max trial number: {max_trial_number}, "
                         f"ready: {num_ready} ,"
-                        f"running: {num_running}, "
-                        f"end estimated time: {end_estimated_time}"
+                        f"running: {num_running}"
                     )
                     # TensorBoard
                     tensorboard.update()
-
-                buff.d["available_pool_size"].add(available_pool_size)
-                if buff.d["available_pool_size"].length == 1 or buff.d["available_pool_size"].has_difference():
-                    scheduler.logger.info(f"pool_size: {available_pool_size}")
-
             time.sleep(config.generic.main_loop_sleep_seconds)
-
         except Exception as e:
             logger.exception("Unexpected error occurred.")
             logger.exception(e)
             break
 
-    scheduler.post_process()
-    scheduler.evaluate()
+    manager.post_process()
+    manager.evaluate()
+
+    best_result = manager.get_best_result()
+    print("Best hyperparameter is followings:")
+    print(best_result)
 
     csv_writer = CsvWriter(config)
     csv_writer.create()
 
-    logger.info("moving...")
+    print("moving...")
     dst = workspace.move_completed_data()
     if dst is None:
-        logger.error("Moving data is failed.")
+        print("Moving data is failed.")
         return
 
     config_name = Path(args.config).name
@@ -159,11 +142,11 @@ def main() -> None:  # pragma: no cover
             best_id = final_result["trial_id"]
             best_value = final_result["result"][i]
             if best_id is not None and best_value is not None:
-                logger.info(f"Best trial [{i}] : {best_id}")
-                logger.info(f"\tvalue : {best_value}")
-    logger.info(f"result file : {dst}/{'results.csv'}")
-    logger.info(f"Total time [s] : {round(time.time() - time_s)}")
-    logger.info("Done.")
+                print(f"Best trial [{i}] : {best_id}")
+                print(f"\tvalue : {best_value}")
+    print(f"result file : {dst}/{'results.csv'}")
+    print(f"Total time [s] : {round(time.time() - time_s)}")
+    print("Done.")
     return
 
 

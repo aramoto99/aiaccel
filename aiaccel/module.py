@@ -14,7 +14,7 @@ from aiaccel.workspace import Workspace
 
 
 class AbstractModule(object):
-    """An abstract class for Optimizer and Scheduler.
+    """An abstract class for Optimizer and Manager.
 
     The procedure of this class is as follows:
 
@@ -103,7 +103,7 @@ class AbstractModule(object):
         fh.setLevel(str_to_logging_level(file_level))
 
         ch = ColoredHandler(sys.stdout)
-        ch_formatter = logging.Formatter(f"[{module_type}]: %(levelname)-8s %(message)s")
+        ch_formatter = logging.Formatter("%(message)s")
         ch.setFormatter(ch_formatter)
         ch.setLevel(str_to_logging_level(stream_level))
 
