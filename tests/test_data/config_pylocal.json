@@ -1,12 +1,9 @@
 {
   "generic": {
-    "config_path": "config.json",
-    "init_fail_count": 10,
-    "$name_length": 32,
-    "name_length": 3,
-    "randseed": 1,
     "workspace": "/tmp/work",
     "job_command": "python original_main.py",
+    "python_file": "original_main.py",
+    "function": "main",
     "logging_level": "DEBUG"
   },
   "resource": {
@@ -16,7 +13,7 @@
   "ABCI": {
     "job_script_preamble": "",
     "job_script_preamble_path": "",
-    "group": "[group]"
+    "group": ""
   },
   "optimize": {
     "search_algorithm": "aiaccel.optimizer.NelderMeadOptimizer",
@@ -219,86 +216,6 @@
           2.15,
           1.92
         ]
-      }
-    ],
-    "parameters_for_TestNelderMead": [
-      {
-        "name": "x1",
-        "type": "uniform_float",
-        "log": false,
-        "lower": -1.0,
-        "upper": 1.0,
-        "initial": [
-          0.81,
-          0.72,
-          -0.41
-        ]
-      },
-      {
-        "name": "x2",
-        "type": "uniform_float",
-        "log": false,
-        "lower": -1.0,
-        "upper": 1.0,
-        "initial": [
-          0.61,
-          0.62,
-          -0.56
-        ]
-      }
-    ],
-    "parameters_for_TestNelderMeadSearch": [
-      {
-        "name": "x1",
-        "type": "uniform_int",
-        "log": false,
-        "lower": -10,
-        "upper": 10,
-        "initial": [
-          4,
-          2,
-          -3
-        ]
-      },
-      {
-        "name": "x2",
-        "type": "uniform_int",
-        "log": false,
-        "lower": -10,
-        "upper": 10,
-        "initial": [
-          -1,
-          9,
-          -3
-        ]
-      }
-    ],
-    "parameters_for_TestTPESampler": [
-      {
-        "name": "x1",
-        "type": "uniform_int",
-        "log": false,
-        "lower": -10,
-        "upper": 10,
-        "initial": 5
-      },
-      {
-        "name": "x2",
-        "type": "uniform_float",
-        "log": false,
-        "lower": -1.0,
-        "upper": 1.0,
-        "initial": 0.5
-      },
-      {
-        "name": "x3",
-        "type": "categorical",
-        "choices": [
-          "red",
-          "green",
-          "blue"
-        ],
-        "initial": "red"
       }
     ]
   }
